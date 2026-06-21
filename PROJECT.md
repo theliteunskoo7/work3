@@ -7,8 +7,10 @@ This project integrates LLM-based AI agents into a reinforcement learning traini
 The system has three distinct components that work together:
 
 1. **AI Agent** — explores the environment, builds and maintains a living 10-point summary of environment dynamics
-2. **REINFORCE Agent** — the RL agent that learns to land using policy gradient with a baseline
-3. **LLM Trajectory Analyzer** — analyzes completed trajectories, identifies the top 2 bad actions per trajectory, which are then used to penalize the actor network
+2. **PPO Agent** — the RL agent that learns to land via clipped-surrogate policy gradient + GAE
+3. **LLM Trajectory Analyzer** — analyzes completed trajectories, identifies the top-K bad actions per trajectory, which are then used to suppress those actions in the actor network
+
+Two copies of the RL agent exist side by side: `ppo.py` is the **untouched PPO baseline** (no LLM involvement at all), kept around purely so its training curve can be compared against the LLM-integrated version. `ppo_llm.py` is the actual integration — same PPO core, plus the AI Agent and LLM Trajectory Analyzer wired in.
 
 ---
 
@@ -24,7 +26,7 @@ Standard RL agents learn purely from numerical reward signals with no semantic u
 ## System Architecture
 
 ```
-WARM START PHASE
+WARM START PHASE  (ai_agent.py, run standalone before training)
 ─────────────────────────────────────────────────────────────
   AI Agent (GPT-4o mini)
     → explores LunarLander with action chunking (20 steps/call)
@@ -32,26 +34,39 @@ WARM START PHASE
     → generates initial 10-point summary → saved to summary.md
     → updates summary every 2 episodes (each update builds on prior summary)
 
-TRAINING PHASE (runs concurrently)
+TRAINING PHASE  (ppo_llm.py — single process, interleaved, not multi-threaded)
 ─────────────────────────────────────────────────────────────
-  REINFORCE Agent
-    → collects full episodes (state, action, reward, next_state, done)
-    → computes Monte Carlo returns Gt
-    → sends trajectory batch to LLM Trajectory Analyzer
-    → receives top 2 (bad_state, bad_action) pairs per trajectory
-    → computes modified actor loss
-    → updates actor and baseline networks
+  PPO Agent
+    → collects a fixed-size rollout (n_steps env steps, default 2048),
+      resetting at episode boundaries; bootstraps the value of a partial
+      trailing episode rather than waiting for it to finish
+    → computes GAE advantages + returns
+    → runs n_epochs (default 4) of clipped-surrogate minibatch updates
+      on actor + baseline jointly (one optimizer)
+    → completed episodes from the rollout are buffered (raw, unnormalized
+      state/action/reward) for the two LLM-driven steps below; a rollout's
+      unfinished trailing episode is dropped from these buffers
 
-  AI Agent (async)
-    → continues exploring environment in parallel
-    → updates summary.md periodically with new observations
-    → LLM Trajectory Analyzer always reads the latest summary.md
+  LLM Trajectory Analyzer + unlikelihood update (every `analyzer_every`
+  completed episodes, hyperparam, default 5)
+    → reads the latest summary.md as system context
+    → sends that batch of full episode trajectories to GPT-4o mini
+    → receives top `analyzer_topk` (default 2) bad (state, action) pairs
+      PER episode
+    → runs ONE separate gradient step on the actor only (its own optimizer,
+      its own lr) minimizing -log(1 - π(bad_action|bad_state)) averaged
+      over all flagged pairs in the batch — this is interleaved with, not
+      fused into, the PPO update above
 
-  LLM Trajectory Analyzer (GPT-4o mini)
-    → reads current summary from summary.md as system context
-    → receives batch of trajectories (state, action, reward per step)
-    → identifies top 2 bad (state, action) pairs per trajectory
-    → returns structured output: [(state, action_index), (state, action_index)]
+  AI Agent summary refresh (every `summary_every` completed episodes,
+  hyperparam, default 10)
+    → takes the most recent `summary_n_traj` (default 2) episodes of that
+      window
+    → sends them + the current summary to GPT-4o mini to produce an updated
+      10-point summary → overwrites summary.md
+    → there is no separate, continuously-running AI Agent environment
+      during training — the AI Agent and the LLM Trajectory Analyzer both
+      consume the SAME trajectories the PPO agent already collected
 ```
 
 ---
@@ -102,86 +117,86 @@ step | state                     | action | reward
 ```
 
 ### Warm Start
-Before REINFORCE training begins, the AI agent runs **5 episodes** to build an initial summary. This ensures the LLM Trajectory Analyzer has meaningful environment context from episode 1 of training.
+Before PPO training begins, the AI agent runs **5 episodes** to build an initial summary. This ensures the LLM Trajectory Analyzer has meaningful environment context from episode 1 of training.
 
 ### Logging
-Every API call (action chunks + summary calls) is logged to `logs/interaction_log.md` with full prompt and response, timestamped.
+Every API call the AI Agent makes — action chunks during warm start, plus summary generation/updates whether triggered during warm start or during PPO training (`ppo_llm.py`'s `update_summary_from_episodes` also writes here) — is logged to `logs/interaction_log.md` with full prompt and response, timestamped. The LLM Trajectory Analyzer logs separately (see Module 3).
 
 ---
 
-## Module 2: REINFORCE Agent (`reinforce.py`)
+## Module 2: PPO Agent (`ppo.py` baseline / `ppo_llm.py` LLM-integrated)
 
 ### Algorithm
-REINFORCE with a learned baseline (value network). Full-episode Monte Carlo returns are used — no bootstrapping.
+PPO (clipped surrogate objective) with Generalized Advantage Estimation (GAE), replacing an earlier REINFORCE-with-baseline design.
 
-REINFORCE is chosen because:
-- It collects **complete episodes**, which aligns perfectly with LLM trajectory analysis (the LLM sees the full arc of what happened)
-- Simpler than actor-critic; no TD error or bootstrapping complexity
-- The LLM's "bad action" judgment of "action that prevented reaching the goal" maps naturally to full-episode reasoning
+This project originally used REINFORCE + full-episode Monte Carlo returns (no bootstrapping) specifically because that aligns cleanly with the LLM seeing complete episodes. Switching to PPO trades that clean alignment for faster, more stable training (PPO reuses each rollout for multiple epochs, and the clipped objective tolerates larger updates without collapsing). The cost: PPO collects a fixed-size **step** buffer rather than a fixed number of **episodes**, so rollouts now routinely end mid-episode. The LLM Trajectory Analyzer and AI Agent summarizer need complete episodes, so `ppo_llm.py` buffers completed episodes separately and drops any rollout's unfinished trailing episode before handing data to either of them.
 
 ### Actor Network
 ```
-Input:  8  (state dim)
-Hidden: 256 (ReLU)
-Hidden: 256 (ReLU)
-Output: 4  (action logits → softmax)
+Input:  8   (state dim)
+Hidden: 128 (Tanh)
+Hidden: 128 (Tanh)
+Output: 4   (action logits → softmax via Categorical)
 ```
-The actor outputs a probability distribution over the 4 discrete actions given the current state.
+Orthogonal weight init (gain √2 on hidden layers, gain 0.01 on the output layer so the initial policy starts close to uniform).
 
 ### Baseline (Value) Network
 ```
-Input:  8  (state dim)
-Hidden: 256 (ReLU)
-Hidden: 256 (ReLU)
-Output: 1  (estimated state value V(s))
+Input:  8   (state dim)
+Hidden: 128 (Tanh)
+Hidden: 128 (Tanh)
+Output: 1   (estimated state value V(s))
 ```
-The baseline reduces variance in the policy gradient update without introducing bias.
+Actor and baseline share a single Adam optimizer (one learning rate, annealed linearly across training) — there is no separate baseline learning rate.
 
-### Standard REINFORCE Loss
+### PPO Loss
 ```
-returns    Gt = Σ γᵗ rₜ  (Monte Carlo, computed backwards)
-advantage  At = Gt - V(st)   (normalized across episode)
-actor_loss = -Σ log π(at | st) * At
-baseline_loss = MSE(V(st), Gt)
+advantage  At, return Gt = GAE(rewards, V(s), gamma, gae_lambda)   # bootstraps V(s) at episode/rollout cutoffs
+ratio      = exp(log π_new(at|st) - log π_old(at|st))
+policy_loss  = -min(ratio * At, clip(ratio, 1-eps, 1+eps) * At)
+value_loss   = max(SmoothL1(V(st), Gt), SmoothL1(V_clipped(st), Gt))
+loss = policy_loss + value_coef * value_loss - entropy_coef * entropy
 ```
+Run for `n_epochs` minibatch passes over each `n_steps`-sized rollout. Advantages are normalized (zero mean, unit std) once per rollout before the epochs begin. Entropy bonus maintains exploration.
 
-Advantage normalization (zero mean, unit std) stabilizes training. An entropy bonus (coefficient 0.01) is added to the actor loss to maintain exploration and prevent premature convergence.
-
-### Modified Actor Loss (with LLM penalty)
-Once the LLM Trajectory Analyzer is integrated:
+### Unlikelihood Update (LLM-driven bad-action suppression)
+Once the LLM Trajectory Analyzer flags `(bad_state, bad_action)` pairs, **`ppo_llm.py` only** (not the baseline) runs one additional, separate gradient step on the actor:
 ```
-bad_penalty = mean(π(bad_action | bad_state))   for each (bad_state, bad_action) from LLM
-total_actor_loss = actor_loss + λ * bad_penalty
+p_bad = π(bad_action | bad_state)     # bad_state normalized with the SAME running normalizer the actor was trained on
+loss  = -log(1 - clamp(p_bad, max=0.999))   averaged over all flagged pairs in the batch
 ```
+This is deliberately **not** the originally-planned `mean(π(bad|s))` term fused into the PPO loss with a coefficient λ. Two design changes made during integration:
+1. **Loss shape**: `-log(1-p)` (unlikelihood loss) instead of raw `mean(p)`. Gradient is self-limiting — large when p is near 1 (urgent), vanishing as p→0 (job done) — versus a flat, constant-magnitude gradient for raw probability minimization.
+2. **Separate optimizer step, no λ**: rather than tuning a coefficient to balance two competing loss terms in one backward pass, the unlikelihood update runs as its own Adam step (own lr: `unlikelihood_lr`) on its own cadence, interleaved with — not fused into — the PPO update. This sidesteps λ-tuning, at the cost of having no trust-region protection (PPO's clipping only protects PPO's own update).
 
-The key insight: the actor network is the function π(a|s). To penalize a specific (state, action) pair:
-1. Feed `bad_state` through the actor → get full probability distribution
-2. Index into it at `bad_action` → get π(bad_action | bad_state)
-3. Minimize this probability
+The core mechanism is unchanged from the original design: the actor is π(a|s); feed `bad_state` through it, index into `bad_action`, minimize that probability. This stays **state-conditioned** — softmax normalization automatically redistributes the suppressed probability mass to the other actions, so nearby/unrelated states are only affected via ordinary neural-net generalization, not by direct construction of a target distribution.
 
-This is naturally **state-conditioned** — the same action is only penalized in the specific state where the LLM identified it as harmful. Different states produce different distributions, so the penalty is automatically localized.
-
-### Hyperparameters
-- Gamma (discount): 0.99
-- Actor learning rate: 3e-4
-- Baseline learning rate: 1e-3
-- Entropy coefficient: 0.01
-- Gradient clipping: max norm 0.5
-- LLM penalty coefficient λ: to be tuned during integration
+### Hyperparameters (`ppo_llm.py`, all CLI flags)
+- Gamma (discount): 0.99, GAE lambda: 0.95
+- Learning rate: 3e-4 (linearly annealed to 0), shared by actor+baseline
+- Clip epsilon: 0.2, entropy coefficient: 0.01, value coefficient: 0.5
+- Gradient clipping: max norm 0.5 (both PPO and unlikelihood updates)
+- Rollout size: `n_steps`=2048, `n_epochs`=4, `batch_size`=64
+- `analyzer_every`=5, `analyzer_topk`=2 — LLM Trajectory Analyzer cadence/yield
+- `unlikelihood_lr`=1e-4 — separate actor-only optimizer for the unlikelihood step
+- `summary_every`=10, `summary_n_traj`=2 — AI Agent summary-refresh cadence
+- `llm_model`="gpt-4o-mini" — single model used everywhere (warm start, analyzer, summarizer)
+- `api_key` — resolved the same way in `ai_agent.py` and `ppo_llm.py`: `--api-key` CLI flag, else `OPENAI_API_KEY` env var
+- `seed`=1 (`seeding.py`'s `DEFAULT_SEED`) — same default across `ai_agent.py`, `ppo.py`, `ppo_llm.py`; seeds Python `random`, NumPy, PyTorch (CPU+CUDA, deterministic cuDNN), the Gymnasium env's `reset(seed=...)`, and is passed as OpenAI's best-effort `seed` parameter on every API call. Makes a run reproducible across machines/GPUs, not just re-runs on one machine (exact bit-for-bit equality across different GPU hardware still isn't 100% guaranteed by PyTorch, and the LLM-side `seed` is best-effort only — but everything local is exactly reproducible)
 
 ### Convergence Tracking
 - Episode rewards logged each episode
 - Running mean over last 100 episodes tracked
-- Plot saved to `logs/rewards.png` every 100 episodes (raw rewards + running mean + solved threshold at 200)
-- Best model saved to `actor_best.pt` whenever a new best mean-100 is achieved
+- Plot saved every `plot_every` episodes (raw rewards + running mean + solved threshold at 200) — `logs/rewards.png` for the baseline, `logs/rewards_llm.png` for the LLM-integrated run
+- Best model saved whenever a new best mean-100 is achieved — `actor_best.pt` (baseline) vs `actor_best_llm.pt` (LLM-integrated), kept separate so the two can be compared
 - Training stops early if mean-100 ≥ 200 (environment considered solved)
 
 ---
 
-## Module 3: LLM Trajectory Analyzer
+## Module 3: LLM Trajectory Analyzer (`llm_trajectory_analyzer.py`)
 
 ### Role
-After each batch of REINFORCE episodes, the LLM Trajectory Analyzer receives the full trajectory data and identifies the **top 2 bad (state, action) pairs** per trajectory. These pairs are fed back into the modified actor loss.
+Every `analyzer_every` completed PPO episodes (default 5), the LLM Trajectory Analyzer receives that batch of full trajectories and identifies the **top `analyzer_topk` bad (state, action) pairs** (default 2) per trajectory. These pairs feed the unlikelihood update described in Module 2.
 
 ### Definition of "Bad Action"
 A bad action is not simply the step with the lowest immediate reward. It is the action that:
@@ -205,18 +220,24 @@ step | state                                      | action | reward
 ```
 
 ### Output Format
-Structured JSON identifying the top 2 bad actions:
+Structured JSON, one entry per episode in the batch, each carrying its own top-K bad actions:
 ```json
 {
-  "bad_actions": [
-    {"step": 14, "state": [...], "action": 2, "reason": "..."},
-    {"step": 47, "state": [...], "action": 1, "reason": "..."}
+  "episodes": [
+    {
+      "episode_index": 0,
+      "bad_actions": [
+        {"step": 14, "state": [...], "action": 2, "reason": "..."},
+        {"step": 47, "state": [...], "action": 1, "reason": "..."}
+      ]
+    }
   ]
 }
 ```
+`episode_index` lines up positionally with the order episodes were sent in. Pairs that fail to parse (missing/malformed state or an out-of-range action) are dropped rather than crashing the run; if the whole API call fails, that round's analysis is skipped and the unlikelihood update is simply not run that cycle.
 
 ### Batching
-Trajectories are batched before each LLM call to reduce API costs. One GPT-4o mini call analyzes a full batch of episodes and returns bad actions for each.
+All `analyzer_every` episodes are sent in a single GPT-4o mini call (one call analyzes the whole batch and returns bad actions for every episode in it). Logged to its own `logs/analyzer_log.md` — kept separate from the AI Agent's `logs/interaction_log.md` so the two roles' logs are never interleaved.
 
 ---
 
@@ -224,20 +245,22 @@ Trajectories are batched before each LLM call to reduce API costs. One GPT-4o mi
 
 ```
 summary.md
-    ↑ written by AI Agent after every update
+    ↑ written by AI Agent (warm start, then every summary_every episodes during training)
     ↓ read by LLM Trajectory Analyzer before each batch analysis
 
 Episode trajectory (state, action, reward per step)
-    → produced by REINFORCE Agent
-    → sent to LLM Trajectory Analyzer
-    → also sent to AI Agent (async) for summary updates
+    → produced by the PPO Agent's own rollout collection (collect_rollout)
+    → buffered, then sent to the LLM Trajectory Analyzer (every analyzer_every episodes)
+    → ALSO buffered and sent to the AI Agent for summary updates (every summary_every episodes)
+    → there is no separate trajectory source — both LLM consumers read the
+      exact same completed episodes the PPO agent already collected
 
 (bad_state, bad_action) pairs
-    → produced by LLM Trajectory Analyzer
-    → consumed by REINFORCE Agent modified actor loss
+    → produced by the LLM Trajectory Analyzer
+    → consumed by ppo_llm.py's separate unlikelihood update (actor only)
 
-actor_best.pt
-    → saved whenever a new best mean-100 reward is achieved
+actor_best.pt / actor_best_llm.pt
+    → saved whenever a new best mean-100 reward is achieved (baseline vs LLM-integrated, kept separate)
 ```
 
 ---
@@ -246,14 +269,20 @@ actor_best.pt
 
 ```
 llm_rl_project/
-├── ai_agent.py          # AI Agent: action chunking, summary generation + updates
-├── reinforce.py         # REINFORCE agent: actor, baseline, training loop
-├── summary.md           # Living 10-point environment summary (auto-updated)
-├── actor_best.pt        # Best actor network checkpoint
-├── PROJECT.md           # This file
+├── ai_agent.py                # AI Agent: action chunking, summary generation + updates
+├── ppo.py                     # PPO baseline: actor, baseline, training loop — NO LLM involvement, kept for comparison
+├── ppo_llm.py                 # PPO + LLM Trajectory Analyzer + AI Agent integration
+├── llm_trajectory_analyzer.py # LLM Trajectory Analyzer: batch episode analysis -> top-K bad (state,action) pairs
+├── seeding.py                  # set_global_seed(): shared reproducibility helper used by all three runnable scripts
+├── summary.md                 # Living 10-point environment summary (auto-updated)
+├── actor_best.pt               # Best baseline (ppo.py) actor checkpoint
+├── actor_best_llm.pt           # Best LLM-integrated (ppo_llm.py) actor checkpoint
+├── PROJECT.md                  # This file
 └── logs/
-    ├── interaction_log.md   # All AI Agent API prompts and responses
-    └── rewards.png          # Training reward curve (updated every 100 episodes)
+    ├── interaction_log.md     # AI Agent API prompts/responses: warm start action chunks + all summary generation/updates
+    ├── analyzer_log.md        # LLM Trajectory Analyzer API prompts/responses
+    ├── rewards.png            # ppo.py baseline training reward curve
+    └── rewards_llm.png        # ppo_llm.py training reward curve
 ```
 
 ---
@@ -262,14 +291,20 @@ llm_rl_project/
 
 | Decision | Choice | Reason |
 |----------|--------|--------|
-| RL algorithm | REINFORCE + baseline | Full episodes align with LLM trajectory analysis |
+| RL algorithm | PPO + GAE (was REINFORCE + MC baseline) | Faster, more stable training; trade-off is a step-buffer/episode-buffer mismatch the LLM modules now need bridging (see Module 2) |
+| Baseline kept | `ppo.py` left untouched, `ppo_llm.py` is a separate copy | Lets the LLM-integrated run be compared against a clean PPO baseline |
 | Action chunking size | 20 steps | Balances LLM decision quality vs API cost |
 | State representation | Raw numerical array | Consistent format across all modules; LLM handles numbers directly |
 | Bad action definition | Trajectory divergence / goal prevention | More meaningful than lowest immediate reward |
-| Bad action penalty | π(bad_action \| bad_state) minimized | Naturally state-conditioned; same action only penalized in specific context |
-| Summary persistence | summary.md file | Shared across modules; async-safe; human-readable |
-| LLM model | GPT-4o mini | Cost-efficient; capable enough for numerical reasoning and trajectory analysis |
-| Summary update strategy | Previous summary + new trajectories | Knowledge accumulates rather than restarting each time |
+| Bad action penalty | Unlikelihood loss `-log(1-π(bad_action\|bad_state))`, separate actor-only optimizer step (was: `mean(π(bad\|s))` fused into actor loss with λ) | Self-limiting gradient (strong when p is high, vanishes as p→0); avoids tuning a λ to balance two competing loss terms in one backward pass |
+| Trajectory source for LLM modules | Reuse the PPO agent's own collected episodes (was: a separate, continuously-running AI Agent environment) | One source of truth, no redundant live agent/API usage during training |
+| Analyzer/summarizer scheduling | Interleaved into the single training loop, triggered by completed-episode counters (was: implied background/async) | No real concurrency needed on shared actor weights; only the OpenAI calls are "slow," and they just run inline between rollouts |
+| Summary persistence | summary.md file | Shared across modules; human-readable |
+| LLM interaction logging | Separate files per role: `logs/interaction_log.md` (AI Agent) vs `logs/analyzer_log.md` (LLM Trajectory Analyzer) | Two different roles/concerns; keeping them apart makes each log readable on its own instead of interleaving unrelated calls |
+| Reproducibility | Shared `seeding.py`, default seed = 1 everywhere (`ai_agent.py`, `ppo.py`, `ppo_llm.py`) | One run config should reproduce the same result on any machine/GPU, not just on the one it was first run on; verified bit-identical across independent fresh processes |
+| LLM model | GPT-4o mini, passed as a `model`/`llm_model` parameter everywhere (CLI-overridable) | Cost-efficient; never hardcoded, so it's a true hyperparameter consistent across `ai_agent.py` and `ppo_llm.py` |
+| API key | `--api-key` CLI flag, else `OPENAI_API_KEY` env var — same resolution in `ai_agent.py` and `ppo_llm.py` | Guarantees warm start and main training use the same key without duplicating logic |
+| Summary update strategy | Previous summary + most recent `summary_n_traj` episodes of each `summary_every`-sized window | Knowledge accumulates rather than restarting each time |
 | Trajectory format for LLM | Full trajectory, compact (state, action, reward) | Complete picture without doubling tokens with next_state |
 
 ---

@@ -5,6 +5,8 @@ import gymnasium as gym
 from datetime import datetime
 from openai import OpenAI
 
+from seeding import set_global_seed, DEFAULT_SEED
+
 SYSTEM_PROMPT = """You are an intelligent agent controlling a lunar lander in a physics simulation.
 
 GOAL: Land the spacecraft safely on the landing pad at coordinates (0, 0).
@@ -88,10 +90,14 @@ def format_trajectories_for_summary(trajectories, episode_rewards):
 
 
 class LunarLanderAIAgent:
-    def __init__(self, api_key, chunk_size=20):
+    def __init__(self, api_key, chunk_size=20, model="gpt-4o-mini", seed=DEFAULT_SEED):
+        self.seed = seed
+        set_global_seed(seed)
         self.env = gym.make("LunarLander-v3")
+        self.env.reset(seed=seed)
         self.client = OpenAI(api_key=api_key)
         self.chunk_size = chunk_size
+        self.model = model
         self.summary = None
         init_log()
 
@@ -108,10 +114,13 @@ class LunarLanderAIAgent:
             },
         ]
         try:
+            # `seed` is OpenAI's best-effort determinism knob (not a hard
+            # guarantee), threaded through from the same seed used locally.
             response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=self.model,
                 messages=messages,
                 response_format={"type": "json_object"},
+                seed=self.seed,
             )
             response_text = response.choices[0].message.content
             log_interaction(f"Action Chunk | Episode {episode_num} Chunk {chunk_num}", messages, response_text)
@@ -186,7 +195,7 @@ class LunarLanderAIAgent:
             },
         ]
 
-        response = self.client.chat.completions.create(model="gpt-4o-mini", messages=messages)
+        response = self.client.chat.completions.create(model=self.model, messages=messages, seed=self.seed)
         response_text = response.choices[0].message.content
         log_interaction("Initial Summary Generation", messages, response_text)
         self.summary = response_text
@@ -220,7 +229,7 @@ class LunarLanderAIAgent:
             },
         ]
 
-        response = self.client.chat.completions.create(model="gpt-4o-mini", messages=messages)
+        response = self.client.chat.completions.create(model=self.model, messages=messages, seed=self.seed)
         response_text = response.choices[0].message.content
         log_interaction("Summary Update", messages, response_text)
         self.summary = response_text
@@ -266,12 +275,27 @@ class LunarLanderAIAgent:
 
 
 if __name__ == "__main__":
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("Set OPENAI_API_KEY environment variable")
+    import argparse
 
-    agent = LunarLanderAIAgent(api_key=api_key, chunk_size=20)
+    parser = argparse.ArgumentParser(description="AI Agent warm start on LunarLander-v3.")
+    parser.add_argument("--api-key", type=str, default=None,
+                        help="OpenAI API key. Defaults to OPENAI_API_KEY env var.")
+    parser.add_argument("--model", type=str, default="gpt-4o-mini",
+                        help="OpenAI model used for both action chunking and summary generation.")
+    parser.add_argument("--chunk-size", type=int, default=20)
+    parser.add_argument("--episodes", type=int, default=5)
+    parser.add_argument("--summary-update-every", type=int, default=2)
+    parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    args = parser.parse_args()
+
+    api_key = args.api_key or os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("Set OPENAI_API_KEY environment variable or pass --api-key")
+
+    agent = LunarLanderAIAgent(api_key=api_key, chunk_size=args.chunk_size, model=args.model, seed=args.seed)
     try:
-        trajectories, rewards, summary = agent.run_warm_start(n_episodes=5, summary_update_every=2)
+        trajectories, rewards, summary = agent.run_warm_start(
+            n_episodes=args.episodes, summary_update_every=args.summary_update_every,
+        )
     finally:
         agent.close()

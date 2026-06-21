@@ -10,6 +10,11 @@ import gymnasium as gym
 import matplotlib.pyplot as plt
 from collections import deque
 from torch.distributions import Categorical
+from openai import OpenAI
+
+import ai_agent
+from llm_trajectory_analyzer import analyze_trajectories
+from seeding import set_global_seed, DEFAULT_SEED
 
 
 class _Tee:
@@ -89,7 +94,11 @@ def collect_rollout(env, actor, baseline, state_normalizer,
     """
     Collect exactly n_steps transitions from a single env, resetting at episode
     boundaries.  Returns flat arrays suitable for minibatch PPO training, plus
-    a list of completed-episode total rewards for logging.
+    a list of completed-episode total rewards for logging, plus the completed
+    episodes themselves as RAW (unnormalized) state/action/reward trajectories
+    for the LLM trajectory analyzer and AI agent summarizer. A trailing
+    episode that hasn't finished by the time the rollout ends is dropped (the
+    analyzer/summarizer only ever see complete episodes).
     """
     obs_buf  = np.zeros((n_steps, 8), dtype=np.float32)
     act_buf  = np.zeros(n_steps,      dtype=np.int64)
@@ -99,8 +108,10 @@ def collect_rollout(env, actor, baseline, state_normalizer,
     done_buf = np.zeros(n_steps,      dtype=np.float32)
 
     ep_rewards = []
-    cur_ep_rew = 0.0
-    state, _   = env.reset()
+    completed_episodes = []
+    cur_ep_rew  = 0.0
+    cur_ep_traj = []
+    state, _    = env.reset()
 
     for t in range(n_steps):
         state_normalizer.update(state)
@@ -123,10 +134,17 @@ def collect_rollout(env, actor, baseline, state_normalizer,
         rew_buf[t]  = reward
         done_buf[t] = float(done)
         cur_ep_rew += reward
+        cur_ep_traj.append({
+            "state":  [round(float(v), 4) for v in state],
+            "action": act.item(),
+            "reward": round(float(reward), 4),
+        })
 
         if done:
             ep_rewards.append(cur_ep_rew)
-            cur_ep_rew = 0.0
+            completed_episodes.append((cur_ep_traj, cur_ep_rew))
+            cur_ep_rew  = 0.0
+            cur_ep_traj = []
             state, _ = env.reset()
         else:
             state = next_state
@@ -153,7 +171,7 @@ def collect_rollout(env, actor, baseline, state_normalizer,
         adv_buf[t] = gae
 
     ret_buf = adv_buf + val_buf
-    return obs_buf, act_buf, lp_buf, adv_buf, ret_buf, val_buf, ep_rewards
+    return obs_buf, act_buf, lp_buf, adv_buf, ret_buf, val_buf, ep_rewards, completed_episodes
 
 
 def ppo_update(obs, actions, old_log_probs, advantages, returns, old_values,
@@ -229,6 +247,47 @@ def ppo_update(obs, actions, old_log_probs, advantages, returns, old_values,
     return total_aloss / n_updates, total_vloss / n_updates
 
 
+def unlikelihood_update(actor, optimizer, state_normalizer, bad_pairs, max_grad_norm=0.5):
+    """
+    One gradient step pushing pi(bad_action | bad_state) down, for every
+    (state, action) pair the LLM Trajectory Analyzer flagged.
+
+    loss = -log(1 - pi(a|s))   averaged over all flagged pairs this round.
+
+    This is intentionally a SEPARATE optimizer/step from ppo_update — it is
+    interleaved with the normal PPO update, not fused into it (see PROJECT
+    discussion: avoids having to balance two loss terms with a single lambda,
+    and keeps PPO's own clipped objective untouched).
+
+    bad_pairs: list of (raw_state, action) — raw_state is the un-normalized
+    8-float state as seen by the LLM. It's normalized here with the SAME
+    running normalizer PPO uses, since that's the input distribution the
+    actor was actually trained on.
+    """
+    if not bad_pairs:
+        return None
+
+    raw_states = np.array([p[0] for p in bad_pairs], dtype=np.float32)
+    norm_states = np.stack([state_normalizer.normalize(s) for s in raw_states])
+    states_t  = torch.FloatTensor(norm_states)
+    actions_t = torch.LongTensor([p[1] for p in bad_pairs])
+
+    dist  = Categorical(logits=actor(states_t))
+    p_bad = dist.probs.gather(1, actions_t.unsqueeze(1)).squeeze(1)
+    p_bad_pre = p_bad.mean().item()
+
+    # Clamp away from 1.0 so -log(1-p) can't blow up to inf on a confident
+    # bad action; no lower clamp needed since log(1-p)->0 as p->0 is fine.
+    loss = -torch.log(1.0 - p_bad.clamp(max=0.999)).mean()
+
+    optimizer.zero_grad()
+    loss.backward()
+    nn.utils.clip_grad_norm_(actor.parameters(), max_grad_norm)
+    optimizer.step()
+
+    return {"loss": loss.item(), "p_bad_pre": p_bad_pre, "n_pairs": len(bad_pairs)}
+
+
 def plot_rewards(episode_rewards, save_path, window=50):
     fig, ax = plt.subplots(figsize=(10, 5))
     eps = np.arange(1, len(episode_rewards) + 1)
@@ -251,17 +310,104 @@ def plot_rewards(episode_rewards, save_path, window=50):
     print(f"  Plot saved to: {save_path}")
 
 
+def update_summary_from_episodes(client, current_summary, episodes, rewards, model="gpt-4o-mini", seed=None):
+    """
+    Refresh summary.md from PPO-collected episodes, reusing the exact prompts
+    ai_agent.py uses during warm start so the summary's voice/format stays
+    consistent whether it was written during warm start or during training.
+
+    `current_summary` may be None (e.g. warm start was skipped) — in that case
+    this generates a fresh initial summary instead of updating one.
+    """
+    traj_text = ai_agent.format_trajectories_for_summary(episodes, rewards)
+
+    if current_summary is None:
+        print("\n[AI Agent] No prior summary found — generating initial summary from PPO episodes...")
+        user_content = (
+            f"State format: [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]\n"
+            f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
+            f"Trajectories:\n{traj_text}\n\n"
+            f"Generate exactly 10 concise numbered key points summarizing:\n"
+            f"- Environment physics and dynamics\n"
+            f"- How each action affects state\n"
+            f"- What action patterns lead to success vs failure\n"
+            f"- Critical moments in a trajectory"
+        )
+        log_label = "Initial Summary Generation (from PPO episodes)"
+    else:
+        print("\n[AI Agent] Updating 10-point summary with new PPO episodes...")
+        user_content = (
+            f"State format: [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]\n"
+            f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
+            f"Your current 10-point understanding of the environment:\n{current_summary}\n\n"
+            f"New trajectories observed:\n{traj_text}\n\n"
+            f"Update and refine your 10-point summary. Keep points that are still valid, "
+            f"update points where you have learned more, and add new insights. "
+            f"Output exactly 10 numbered points."
+        )
+        log_label = "Summary Update (from PPO episodes)"
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are an expert analyst studying a lunar lander simulation. "
+                "Your summaries will be used by an LLM to analyze RL training trajectories "
+                "and identify bad actions."
+            ),
+        },
+        {"role": "user", "content": user_content},
+    ]
+
+    try:
+        # `seed` is OpenAI's best-effort determinism knob — not a hard
+        # guarantee like the local torch/numpy/random seeding, but it's the
+        # closest the API offers.
+        response = client.chat.completions.create(model=model, messages=messages, seed=seed)
+        response_text = response.choices[0].message.content
+        ai_agent.log_interaction(log_label, messages, response_text)
+        ai_agent.save_summary(response_text)
+        return response_text
+    except Exception as e:
+        ai_agent.log_interaction(log_label + " ERROR", messages, str(e))
+        print(f"  [Summary update failed: {e}] — keeping previous summary")
+        return current_summary
+
+
 def train(n_steps=2048, n_epochs=4, batch_size=64,
           gamma=0.99, gae_lambda=0.95, clip_eps=0.2,
           lr=3e-4, entropy_coef=0.01, value_coef=0.5,
           max_episodes=2000, max_grad_norm=0.5,
-          print_every=10, plot_every=50, seed=None):
+          print_every=10, plot_every=50, seed=DEFAULT_SEED,
+          api_key=None, llm_model="gpt-4o-mini",
+          analyzer_every=5, analyzer_topk=2,
+          unlikelihood_lr=1e-4,
+          summary_every=10, summary_n_traj=2):
+    """
+    Same PPO loop as ppo.py, interleaved with two LLM-driven side updates,
+    both triggered on completed-episode counts (not on the PPO n_steps
+    rollout boundary, since they need whole episodes):
 
+      - every `analyzer_every` completed episodes: send them + the latest
+        summary.md to the LLM Trajectory Analyzer, get back `analyzer_topk`
+        bad (state,action) pairs per episode, and take ONE separate
+        unlikelihood gradient step on the actor with all of them.
+      - every `summary_every` completed episodes: hand the most recent
+        `summary_n_traj` of that window to the AI agent's summarizer, which
+        refreshes summary.md (building on the prior summary).
+
+    Both are plain interleaved steps in this single loop — not background
+    threads — per the agreed design (see PROJECT discussion).
+    """
+    if api_key is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("Set OPENAI_API_KEY environment variable")
+    client = OpenAI(api_key=api_key)
+
+    set_global_seed(seed)
     env = gym.make("LunarLander-v3")
-    if seed is not None:
-        np.random.seed(seed)
-        torch.manual_seed(seed)
-        env.reset(seed=seed)
+    env.reset(seed=seed)
 
     actor    = ActorNetwork()
     baseline = BaselineNetwork()
@@ -270,6 +416,11 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         list(actor.parameters()) + list(baseline.parameters()),
         lr=lr, eps=1e-5,
     )
+    # Separate, actor-only optimizer for the unlikelihood update — kept
+    # independent of PPO's optimizer/lr-schedule on purpose (see PROJECT
+    # discussion: PPO's clipping protects its own update, nothing protects
+    # this one, so it gets its own smaller, fixed lr).
+    unlikelihood_optimizer = optim.Adam(actor.parameters(), lr=unlikelihood_lr)
 
     all_ep_rewards   = []
     recent           = deque(maxlen=100)
@@ -277,10 +428,22 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     state_normalizer = RunningStateNormalizer(shape=8)
     save_dir         = os.path.dirname(os.path.abspath(__file__))
 
-    print(f"Training PPO on LunarLander-v3 (up to {max_episodes} episodes)")
+    # Seed from whatever summary.md already has (e.g. from ai_agent.py warm
+    # start). None is fine — update_summary_from_episodes will bootstrap one.
+    summary_text = ai_agent.load_summary()
+
+    # Two independent buffers of (episode_trajectory, episode_reward),
+    # fed from the same stream of PPO-completed episodes, drained on their
+    # own cadences.
+    analyzer_buffer = []
+    summary_buffer  = []
+
+    print(f"Training PPO+LLM on LunarLander-v3 (up to {max_episodes} episodes)")
     print(f"  n_steps={n_steps}  n_epochs={n_epochs}  batch_size={batch_size}")
     print(f"  clip_eps={clip_eps}  lr={lr}  gae_lambda={gae_lambda}")
-    print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}\n")
+    print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}")
+    print(f"  analyzer_every={analyzer_every}  analyzer_topk={analyzer_topk}  unlikelihood_lr={unlikelihood_lr}")
+    print(f"  summary_every={summary_every}  summary_n_traj={summary_n_traj}  llm_model={llm_model}\n")
 
     ep_count   = 0
     update_num = 0
@@ -292,7 +455,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         for pg in optimizer.param_groups:
             pg['lr'] = lr_now
 
-        obs, acts, old_lp, advs, rets, old_vals, ep_rewards = collect_rollout(
+        obs, acts, old_lp, advs, rets, old_vals, ep_rewards, completed_episodes = collect_rollout(
             env, actor, baseline, state_normalizer,
             n_steps=n_steps, gamma=gamma, gae_lambda=gae_lambda,
         )
@@ -302,10 +465,13 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             recent.append(r)
             ep_count += 1
 
+        analyzer_buffer.extend(completed_episodes)
+        summary_buffer.extend(completed_episodes)
+
         mean_100 = np.mean(recent) if recent else float("nan")
         if mean_100 > best_mean:
             best_mean = mean_100
-            torch.save(actor.state_dict(), os.path.join(save_dir, "actor_best.pt"))
+            torch.save(actor.state_dict(), os.path.join(save_dir, "actor_best_llm.pt"))
 
         al, vl = ppo_update(
             obs, acts, old_lp, advs, rets, old_vals,
@@ -316,6 +482,36 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         )
         update_num += 1
 
+        # --- LLM Trajectory Analyzer + unlikelihood actor update ---
+        while len(analyzer_buffer) >= analyzer_every:
+            batch = analyzer_buffer[:analyzer_every]
+            analyzer_buffer = analyzer_buffer[analyzer_every:]
+            episodes = [traj for traj, _ in batch]
+
+            bad_pairs_per_ep = analyze_trajectories(
+                client, episodes, summary_text, top_k=analyzer_topk, model=llm_model, seed=seed,
+            )
+            bad_pairs = [pair for pairs in bad_pairs_per_ep for pair in pairs]
+            stats = unlikelihood_update(actor, unlikelihood_optimizer, state_normalizer, bad_pairs,
+                                        max_grad_norm=max_grad_norm)
+            if stats:
+                print(f"  [Analyzer] {len(episodes)} episodes -> {stats['n_pairs']} bad pairs | "
+                      f"unlikelihood_loss={stats['loss']:.4f} | "
+                      f"mean p(bad) before update={stats['p_bad_pre']:.4f}")
+            else:
+                print(f"  [Analyzer] {len(episodes)} episodes -> 0 bad pairs (skipped update)")
+
+        # --- AI agent summary refresh ---
+        while len(summary_buffer) >= summary_every:
+            batch = summary_buffer[:summary_every]
+            summary_buffer = summary_buffer[summary_every:]
+            recent_batch = batch[-summary_n_traj:]
+            episodes = [traj for traj, _ in recent_batch]
+            rewards  = [r for _, r in recent_batch]
+            summary_text = update_summary_from_episodes(
+                client, summary_text, episodes, rewards, model=llm_model, seed=seed,
+            )
+
         if update_num % print_every == 0 or ep_count >= max_episodes:
             last_r = all_ep_rewards[-1] if all_ep_rewards else float("nan")
             print(f"  Update {update_num:4d} | Ep {ep_count:5d} | "
@@ -325,7 +521,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
 
         if ep_count % plot_every == 0 and all_ep_rewards:
             plot_rewards(all_ep_rewards,
-                         save_path=os.path.join(save_dir, "logs", "rewards.png"))
+                         save_path=os.path.join(save_dir, "logs", "rewards_llm.png"))
 
         if mean_100 >= 200 and ep_count >= 100:
             print(f"\nSolved at episode {ep_count} (update {update_num}) "
@@ -333,13 +529,13 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             break
 
     plot_rewards(all_ep_rewards,
-                 save_path=os.path.join(save_dir, "logs", "rewards.png"))
+                 save_path=os.path.join(save_dir, "logs", "rewards_llm.png"))
     env.close()
     return actor, baseline, all_ep_rewards
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="PPO on LunarLander-v3.")
+    parser = argparse.ArgumentParser(description="PPO + LLM Trajectory Analyzer on LunarLander-v3.")
     parser.add_argument("--episodes",   type=int,   default=2000)
     parser.add_argument("--n-steps",    type=int,   default=2048,
                         help="Env steps per rollout before each PPO update.")
@@ -349,13 +545,26 @@ if __name__ == "__main__":
     parser.add_argument("--clip-eps",   type=float, default=0.2)
     parser.add_argument("--lr",         type=float, default=3e-4)
     parser.add_argument("--gae-lambda", type=float, default=0.95)
-    parser.add_argument("--seed",       type=int,   default=None)
+    parser.add_argument("--seed",       type=int,   default=DEFAULT_SEED)
+    parser.add_argument("--api-key",          type=str,   default=None,
+                        help="OpenAI API key. Defaults to OPENAI_API_KEY env var.")
+    parser.add_argument("--llm-model",        type=str,   default="gpt-4o-mini")
+    parser.add_argument("--analyzer-every",   type=int,   default=5,
+                        help="Run the LLM Trajectory Analyzer + unlikelihood update every N completed episodes.")
+    parser.add_argument("--analyzer-topk",    type=int,   default=2,
+                        help="Top-K bad (state,action) pairs the analyzer extracts per episode.")
+    parser.add_argument("--unlikelihood-lr",  type=float, default=1e-4,
+                        help="LR for the separate actor-only unlikelihood optimizer.")
+    parser.add_argument("--summary-every",    type=int,   default=10,
+                        help="Refresh summary.md every N completed episodes.")
+    parser.add_argument("--summary-n-traj",   type=int,   default=2,
+                        help="Of each summary-every window, use the most recent N episodes for the summary update.")
     args = parser.parse_args()
 
     save_dir = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(os.path.join(save_dir, "logs"), exist_ok=True)
 
-    log_path = os.path.join(save_dir, "terminal_output.md")
+    log_path = os.path.join(save_dir, "terminal_output_llm.md")
     log_file = open(log_path, "w")
     sys.stdout = _Tee(sys.__stdout__, log_file)
 
@@ -369,6 +578,13 @@ if __name__ == "__main__":
             gae_lambda=args.gae_lambda,
             max_episodes=args.episodes,
             seed=args.seed,
+            api_key=args.api_key,
+            llm_model=args.llm_model,
+            analyzer_every=args.analyzer_every,
+            analyzer_topk=args.analyzer_topk,
+            unlikelihood_lr=args.unlikelihood_lr,
+            summary_every=args.summary_every,
+            summary_n_traj=args.summary_n_traj,
         )
     finally:
         sys.stdout = sys.__stdout__
