@@ -1,12 +1,17 @@
 import os
 import sys
 import argparse
+import faulthandler
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import gymnasium as gym
+import matplotlib
+matplotlib.use("Agg")  # headless training script — only ever saves PNGs, never shows a window;
+                        # the default GUI backend (TkAgg) repeatedly creating/destroying figures
+                        # in a long-running background process is what caused the segfaults.
 import matplotlib.pyplot as plt
 from collections import deque
 from torch.distributions import Categorical
@@ -417,11 +422,20 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     env = gym.make("LunarLander-v3")
     env.reset(seed=seed)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
+    # Hybrid device placement: the batched PPO minibatch update (and the
+    # small-batch unlikelihood update) genuinely benefit from the GPU, but
+    # collect_rollout does single-sample inference sequentially ~n_steps
+    # times per rollout — thousands of tiny CUDA kernel launches in a tight
+    # loop, which proved to reliably segfault on this driver (faulthandler
+    # pinned the crash to Categorical.log_prob's internal validation kernel
+    # during rollout collection). So rollout collection always runs on CPU;
+    # the actor/baseline are shuttled to the GPU only for batched updates.
+    cpu_device = torch.device("cpu")
+    device     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device} (rollout collection stays on CPU; batched updates use {device})")
 
-    actor    = ActorNetwork().to(device)
-    baseline = BaselineNetwork().to(device)
+    actor    = ActorNetwork().to(cpu_device)
+    baseline = BaselineNetwork().to(cpu_device)
     # Single optimizer — PPO updates both networks jointly each minibatch
     optimizer = optim.Adam(
         list(actor.parameters()) + list(baseline.parameters()),
@@ -470,7 +484,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
 
         obs, acts, old_lp, advs, rets, old_vals, ep_rewards, completed_episodes = collect_rollout(
             env, actor, baseline, state_normalizer,
-            n_steps=n_steps, gamma=gamma, gae_lambda=gae_lambda, device=device,
+            n_steps=n_steps, gamma=gamma, gae_lambda=gae_lambda, device=cpu_device,
         )
 
         for traj, r in completed_episodes:
@@ -484,9 +498,18 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         mean_100 = np.mean(recent) if recent else float("nan")
         if mean_100 > best_mean:
             best_mean = mean_100
+            # actor is on cpu_device here (rollout just finished, not yet
+            # moved to GPU for the updates below) — .cpu() kept anyway as a
+            # cheap safety net.
             torch.save({k: v.cpu() for k, v in actor.state_dict().items()},
                        os.path.join(save_dir, "actor_best_llm.pt"))
 
+        # Batched updates: move params to the GPU only for these steps,
+        # where there's an actual batch to parallelize. baseline is only
+        # needed for ppo_update, so it goes back to CPU right after; actor
+        # stays on GPU a bit longer for the unlikelihood update below.
+        actor.to(device)
+        baseline.to(device)
         al, vl = ppo_update(
             obs, acts, old_lp, advs, rets, old_vals,
             actor, baseline, optimizer, device,
@@ -494,6 +517,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             entropy_coef=entropy_coef, value_coef=value_coef,
             max_grad_norm=max_grad_norm,
         )
+        baseline.to(cpu_device)
         update_num += 1
 
         # --- LLM Trajectory Analyzer + unlikelihood actor update ---
@@ -525,6 +549,9 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             summary_text = update_summary_from_episodes(
                 client, summary_text, episodes, rewards, model=llm_model, seed=seed,
             )
+
+        # Back to CPU before the next rollout's single-step inference loop.
+        actor.to(cpu_device)
 
         if update_num % print_every == 0 or ep_count >= max_episodes:
             last_r = all_ep_rewards[-1] if all_ep_rewards else float("nan")
@@ -583,6 +610,16 @@ if __name__ == "__main__":
 
     save_dir = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(os.path.join(save_dir, "logs"), exist_ok=True)
+
+    # Diagnostic instrumentation for the recurring segfault: faulthandler
+    # installs a low-level handler for SIGSEGV that dumps every thread's
+    # Python-level stack the instant the fault happens, bypassing normal
+    # exception handling (which a segfault skips entirely). This is what
+    # will tell us which line of Python code (and which thread — e.g. a
+    # background CUDA/autograd thread vs the main loop) was executing when
+    # the crash hit, instead of just inferring it from training logs.
+    crash_log = open(os.path.join(save_dir, "crash_trace_llm.log"), "w")
+    faulthandler.enable(file=crash_log, all_threads=True)
 
     log_path = os.path.join(save_dir, "terminal_output_llm.md")
     log_file = open(log_path, "w")
