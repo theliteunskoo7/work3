@@ -25,6 +25,7 @@ class _Tee:
     def write(self, text):
         for s in self.streams:
             s.write(text)
+            s.flush()
 
     def flush(self):
         for s in self.streams:
@@ -90,7 +91,7 @@ class RunningStateNormalizer:
 
 
 def collect_rollout(env, actor, baseline, state_normalizer,
-                    n_steps, gamma, gae_lambda):
+                    n_steps, gamma, gae_lambda, device):
     """
     Collect exactly n_steps transitions from a single env, resetting at episode
     boundaries.  Returns flat arrays suitable for minibatch PPO training, plus
@@ -116,7 +117,7 @@ def collect_rollout(env, actor, baseline, state_normalizer,
     for t in range(n_steps):
         state_normalizer.update(state)
         norm_s = state_normalizer.normalize(state)
-        s_t    = torch.FloatTensor(norm_s)
+        s_t    = torch.FloatTensor(norm_s).to(device)
 
         with torch.no_grad():
             val   = baseline(s_t).item()
@@ -152,7 +153,7 @@ def collect_rollout(env, actor, baseline, state_normalizer,
     # Bootstrap value for a rollout that ends mid-episode
     if done_buf[-1] == 0.0:
         state_normalizer.update(state)
-        last_t = torch.FloatTensor(state_normalizer.normalize(state))
+        last_t = torch.FloatTensor(state_normalizer.normalize(state)).to(device)
         with torch.no_grad():
             last_val = baseline(last_t).item()
     else:
@@ -175,7 +176,7 @@ def collect_rollout(env, actor, baseline, state_normalizer,
 
 
 def ppo_update(obs, actions, old_log_probs, advantages, returns, old_values,
-               actor, baseline, optimizer,
+               actor, baseline, optimizer, device,
                clip_eps=0.2, n_epochs=4, batch_size=64,
                entropy_coef=0.01, value_coef=0.5, max_grad_norm=0.5):
     """
@@ -186,12 +187,12 @@ def ppo_update(obs, actions, old_log_probs, advantages, returns, old_values,
                  the rollout estimates, mirroring the policy clip constraint.
     """
     n = len(obs)
-    obs_t     = torch.FloatTensor(obs)
-    acts_t    = torch.LongTensor(actions)
-    old_lp_t  = torch.FloatTensor(old_log_probs)
-    adv_t     = torch.FloatTensor(advantages)
-    ret_t     = torch.FloatTensor(returns)
-    old_val_t = torch.FloatTensor(old_values)
+    obs_t     = torch.FloatTensor(obs).to(device)
+    acts_t    = torch.LongTensor(actions).to(device)
+    old_lp_t  = torch.FloatTensor(old_log_probs).to(device)
+    adv_t     = torch.FloatTensor(advantages).to(device)
+    ret_t     = torch.FloatTensor(returns).to(device)
+    old_val_t = torch.FloatTensor(old_values).to(device)
 
     # Normalize advantages across the full rollout once before epochs
     adv_t = (adv_t - adv_t.mean()) / (adv_t.std() + 1e-8)
@@ -247,7 +248,7 @@ def ppo_update(obs, actions, old_log_probs, advantages, returns, old_values,
     return total_aloss / n_updates, total_vloss / n_updates
 
 
-def unlikelihood_update(actor, optimizer, state_normalizer, bad_pairs, max_grad_norm=0.5):
+def unlikelihood_update(actor, optimizer, state_normalizer, bad_pairs, device, max_grad_norm=0.5):
     """
     One gradient step pushing pi(bad_action | bad_state) down, for every
     (state, action) pair the LLM Trajectory Analyzer flagged.
@@ -269,8 +270,8 @@ def unlikelihood_update(actor, optimizer, state_normalizer, bad_pairs, max_grad_
 
     raw_states = np.array([p[0] for p in bad_pairs], dtype=np.float32)
     norm_states = np.stack([state_normalizer.normalize(s) for s in raw_states])
-    states_t  = torch.FloatTensor(norm_states)
-    actions_t = torch.LongTensor([p[1] for p in bad_pairs])
+    states_t  = torch.FloatTensor(norm_states).to(device)
+    actions_t = torch.LongTensor([p[1] for p in bad_pairs]).to(device)
 
     dist  = Categorical(logits=actor(states_t))
     p_bad = dist.probs.gather(1, actions_t.unsqueeze(1)).squeeze(1)
@@ -378,7 +379,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
           gamma=0.99, gae_lambda=0.95, clip_eps=0.2,
           lr=3e-4, entropy_coef=0.01, value_coef=0.5,
           max_episodes=2000, max_grad_norm=0.5,
-          print_every=10, plot_every=50, seed=DEFAULT_SEED,
+          print_every=1, plot_every=50, seed=DEFAULT_SEED,
           api_key=None, llm_model="gpt-4o-mini",
           analyzer_every=5, analyzer_topk=2,
           unlikelihood_lr=1e-4,
@@ -416,8 +417,11 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     env = gym.make("LunarLander-v3")
     env.reset(seed=seed)
 
-    actor    = ActorNetwork()
-    baseline = BaselineNetwork()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    actor    = ActorNetwork().to(device)
+    baseline = BaselineNetwork().to(device)
     # Single optimizer — PPO updates both networks jointly each minibatch
     optimizer = optim.Adam(
         list(actor.parameters()) + list(baseline.parameters()),
@@ -432,6 +436,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     all_ep_rewards   = []
     recent           = deque(maxlen=100)
     best_mean        = -float("inf")
+    last_plot_ep     = 0
     state_normalizer = RunningStateNormalizer(shape=8)
     save_dir         = os.path.dirname(os.path.abspath(__file__))
 
@@ -465,7 +470,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
 
         obs, acts, old_lp, advs, rets, old_vals, ep_rewards, completed_episodes = collect_rollout(
             env, actor, baseline, state_normalizer,
-            n_steps=n_steps, gamma=gamma, gae_lambda=gae_lambda,
+            n_steps=n_steps, gamma=gamma, gae_lambda=gae_lambda, device=device,
         )
 
         for traj, r in completed_episodes:
@@ -479,11 +484,12 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         mean_100 = np.mean(recent) if recent else float("nan")
         if mean_100 > best_mean:
             best_mean = mean_100
-            torch.save(actor.state_dict(), os.path.join(save_dir, "actor_best_llm.pt"))
+            torch.save({k: v.cpu() for k, v in actor.state_dict().items()},
+                       os.path.join(save_dir, "actor_best_llm.pt"))
 
         al, vl = ppo_update(
             obs, acts, old_lp, advs, rets, old_vals,
-            actor, baseline, optimizer,
+            actor, baseline, optimizer, device,
             clip_eps=clip_eps, n_epochs=n_epochs, batch_size=batch_size,
             entropy_coef=entropy_coef, value_coef=value_coef,
             max_grad_norm=max_grad_norm,
@@ -500,7 +506,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
                 client, episodes, summary_text, top_k=analyzer_topk, model=llm_model, seed=seed,
             )
             bad_pairs = [pair for pairs in bad_pairs_per_ep for pair in pairs]
-            stats = unlikelihood_update(actor, unlikelihood_optimizer, state_normalizer, bad_pairs,
+            stats = unlikelihood_update(actor, unlikelihood_optimizer, state_normalizer, bad_pairs, device,
                                         max_grad_norm=max_grad_norm)
             if stats:
                 print(f"  [Analyzer] {len(episodes)} episodes -> {stats['n_pairs']} bad pairs | "
@@ -527,7 +533,11 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
                   f"actor_loss: {al:.4f} | value_loss: {vl:.4f} | "
                   f"lr: {lr_now:.2e}")
 
-        if ep_count % plot_every == 0 and all_ep_rewards:
+        # A rollout can complete several episodes at once, so ep_count can
+        # jump past an exact multiple of plot_every — track episodes since
+        # the last plot instead of testing for exact equality.
+        if ep_count - last_plot_ep >= plot_every and all_ep_rewards:
+            last_plot_ep = ep_count
             plot_rewards(all_ep_rewards,
                          save_path=os.path.join(save_dir, "logs", "rewards_llm.png"))
 
