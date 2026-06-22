@@ -382,7 +382,8 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
           api_key=None, llm_model="gpt-4o-mini",
           analyzer_every=5, analyzer_topk=2,
           unlikelihood_lr=1e-4,
-          summary_every=10, summary_n_traj=2):
+          summary_every=10, summary_n_traj=2,
+          warmup_episodes=100):
     """
     Same PPO loop as ppo.py, interleaved with two LLM-driven side updates,
     both triggered on completed-episode counts (not on the PPO n_steps
@@ -398,6 +399,12 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
 
     Both are plain interleaved steps in this single loop — not background
     threads — per the agreed design (see PROJECT discussion).
+
+    Neither side update starts until `warmup_episodes` PPO episodes have
+    completed: early-training episodes come from a near-random policy and
+    aren't useful signal for "what's a bad action" or "what does normal play
+    look like", so they're dropped rather than buffered — the analyzer/
+    summary cadences only start counting from episode `warmup_episodes`+1.
     """
     if api_key is None:
         api_key = os.getenv("OPENAI_API_KEY")
@@ -443,7 +450,8 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     print(f"  clip_eps={clip_eps}  lr={lr}  gae_lambda={gae_lambda}")
     print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}")
     print(f"  analyzer_every={analyzer_every}  analyzer_topk={analyzer_topk}  unlikelihood_lr={unlikelihood_lr}")
-    print(f"  summary_every={summary_every}  summary_n_traj={summary_n_traj}  llm_model={llm_model}\n")
+    print(f"  summary_every={summary_every}  summary_n_traj={summary_n_traj}  llm_model={llm_model}")
+    print(f"  warmup_episodes={warmup_episodes} (analyzer/summary updates disabled until this many episodes complete)\n")
 
     ep_count   = 0
     update_num = 0
@@ -460,13 +468,13 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             n_steps=n_steps, gamma=gamma, gae_lambda=gae_lambda,
         )
 
-        for r in ep_rewards:
+        for traj, r in completed_episodes:
             all_ep_rewards.append(r)
             recent.append(r)
             ep_count += 1
-
-        analyzer_buffer.extend(completed_episodes)
-        summary_buffer.extend(completed_episodes)
+            if ep_count >= warmup_episodes:
+                analyzer_buffer.append((traj, r))
+                summary_buffer.append((traj, r))
 
         mean_100 = np.mean(recent) if recent else float("nan")
         if mean_100 > best_mean:
@@ -559,6 +567,8 @@ if __name__ == "__main__":
                         help="Refresh summary.md every N completed episodes.")
     parser.add_argument("--summary-n-traj",   type=int,   default=2,
                         help="Of each summary-every window, use the most recent N episodes for the summary update.")
+    parser.add_argument("--warmup-episodes",  type=int,   default=100,
+                        help="Disable the analyzer and summary updater until this many PPO episodes have completed.")
     args = parser.parse_args()
 
     save_dir = os.path.dirname(os.path.abspath(__file__))
@@ -585,6 +595,7 @@ if __name__ == "__main__":
             unlikelihood_lr=args.unlikelihood_lr,
             summary_every=args.summary_every,
             summary_n_traj=args.summary_n_traj,
+            warmup_episodes=args.warmup_episodes,
         )
     finally:
         sys.stdout = sys.__stdout__
