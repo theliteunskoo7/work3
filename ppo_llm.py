@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import faulthandler
+import threading
 import numpy as np
 import torch
 import torch.nn as nn
@@ -386,10 +387,9 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
           max_episodes=2000, max_grad_norm=0.5,
           print_every=1, plot_every=50, seed=DEFAULT_SEED,
           api_key=None, llm_model="gpt-4o-mini",
-          analyzer_every=5, analyzer_topk=2,
+          analyzer_every=10, analyzer_topk=2, analyzer_n_traj=2,
           unlikelihood_lr=1e-4,
-          summary_every=10, summary_n_traj=2,
-          warmup_episodes=100):
+          summary_n_traj=2):
     """
     Same PPO loop as ppo.py, interleaved with two LLM-driven side updates,
     both triggered on completed-episode counts (not on the PPO n_steps
@@ -406,11 +406,10 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     Both are plain interleaved steps in this single loop — not background
     threads — per the agreed design (see PROJECT discussion).
 
-    Neither side update starts until `warmup_episodes` PPO episodes have
-    completed: early-training episodes come from a near-random policy and
-    aren't useful signal for "what's a bad action" or "what does normal play
-    look like", so they're dropped rather than buffered — the analyzer/
-    summary cadences only start counting from episode `warmup_episodes`+1.
+    Both start from the very first PPO update — no warmup gate. The analyzer
+    fires every `analyzer_every` completed episodes and sends only the most
+    recent `analyzer_n_traj` of that window to the LLM; the summary refreshes
+    once per update in a background thread (not on a fixed episode cadence).
     """
     if api_key is None:
         api_key = os.getenv("OPENAI_API_KEY")
@@ -458,19 +457,21 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     # start). None is fine — update_summary_from_episodes will bootstrap one.
     summary_text = ai_agent.load_summary()
 
-    # Two independent buffers of (episode_trajectory, episode_reward),
-    # fed from the same stream of PPO-completed episodes, drained on their
-    # own cadences.
+    # summary_text is shared between the main loop (reads it for the analyzer)
+    # and the background summary thread (writes a new value after the API call).
+    # summary_lock protects all reads/writes; summary_ref is a mutable
+    # container so the thread can write back without a closure-cell race.
+    summary_lock    = threading.Lock()
+    summary_ref     = [summary_text]
+    summary_thread: threading.Thread | None = None
     analyzer_buffer = []
-    summary_buffer  = []
 
     print(f"Training PPO+LLM on LunarLander-v3 (up to {max_episodes} episodes)")
     print(f"  n_steps={n_steps}  n_epochs={n_epochs}  batch_size={batch_size}")
     print(f"  clip_eps={clip_eps}  lr={lr}  gae_lambda={gae_lambda}")
     print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}")
-    print(f"  analyzer_every={analyzer_every}  analyzer_topk={analyzer_topk}  unlikelihood_lr={unlikelihood_lr}")
-    print(f"  summary_every={summary_every}  summary_n_traj={summary_n_traj}  llm_model={llm_model}")
-    print(f"  warmup_episodes={warmup_episodes} (analyzer/summary updates disabled until this many episodes complete)\n")
+    print(f"  analyzer_every={analyzer_every}  analyzer_n_traj={analyzer_n_traj}  analyzer_topk={analyzer_topk}  unlikelihood_lr={unlikelihood_lr}")
+    print(f"  summary_n_traj={summary_n_traj} (AI agent updates summary every PPO update using the last N episodes)  llm_model={llm_model}\n")
 
     ep_count   = 0
     update_num = 0
@@ -491,9 +492,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             all_ep_rewards.append(r)
             recent.append(r)
             ep_count += 1
-            if ep_count >= warmup_episodes:
-                analyzer_buffer.append((traj, r))
-                summary_buffer.append((traj, r))
+            analyzer_buffer.append((traj, r))
 
         mean_100 = np.mean(recent) if recent else float("nan")
         if mean_100 > best_mean:
@@ -503,6 +502,16 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             # cheap safety net.
             torch.save({k: v.cpu() for k, v in actor.state_dict().items()},
                        os.path.join(save_dir, "actor_best_llm.pt"))
+
+        # OpenSSL (used by the summary thread's HTTPS call) and CUDA both
+        # install SIGSEGV handlers. Running them concurrently crashes the CUDA
+        # autograd worker thread. Fix: join the summary thread here — before
+        # any CUDA op — so SSL and CUDA are never active at the same time.
+        # The thread was launched AFTER the previous iteration's CUDA work and
+        # runs during collect_rollout (CPU-only), so in the common case it has
+        # already finished by the time we reach this join.
+        if summary_thread is not None and summary_thread.is_alive():
+            summary_thread.join()
 
         # Batched updates: move params to the GPU only for these steps,
         # where there's an actual batch to parallelize. baseline is only
@@ -524,10 +533,17 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         while len(analyzer_buffer) >= analyzer_every:
             batch = analyzer_buffer[:analyzer_every]
             analyzer_buffer = analyzer_buffer[analyzer_every:]
-            episodes = [traj for traj, _ in batch]
+            # Only send the most recent analyzer_n_traj episodes to the LLM —
+            # the rest of the window were just the cadence trigger.
+            recent_batch = batch[-analyzer_n_traj:]
+            episodes = [traj for traj, _ in recent_batch]
 
+            # Snapshot summary under the lock so the background summary thread
+            # can't write a new value mid-call.
+            with summary_lock:
+                current_summary = summary_ref[0]
             bad_pairs_per_ep = analyze_trajectories(
-                client, episodes, summary_text, top_k=analyzer_topk, model=llm_model, seed=seed,
+                client, episodes, current_summary, top_k=analyzer_topk, model=llm_model, seed=seed,
             )
             bad_pairs = [pair for pairs in bad_pairs_per_ep for pair in pairs]
             stats = unlikelihood_update(actor, unlikelihood_optimizer, state_normalizer, bad_pairs, device,
@@ -539,19 +555,33 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             else:
                 print(f"  [Analyzer] {len(episodes)} episodes -> 0 bad pairs (skipped update)")
 
-        # --- AI agent summary refresh ---
-        while len(summary_buffer) >= summary_every:
-            batch = summary_buffer[:summary_every]
-            summary_buffer = summary_buffer[summary_every:]
-            recent_batch = batch[-summary_n_traj:]
-            episodes = [traj for traj, _ in recent_batch]
-            rewards  = [r for _, r in recent_batch]
-            summary_text = update_summary_from_episodes(
-                client, summary_text, episodes, rewards, model=llm_model, seed=seed,
-            )
-
-        # Back to CPU before the next rollout's single-step inference loop.
+        # Back to CPU before launching the summary thread — all CUDA ops for
+        # this update are now done. The thread will run during the NEXT
+        # collect_rollout (CPU-only), safely separated from CUDA.
         actor.to(cpu_device)
+
+        # --- AI agent summary refresh: background thread, once per update ---
+        # Launched AFTER all CUDA work for this update. Runs concurrently with
+        # the next collect_rollout. Joined at the top of the next iteration
+        # before CUDA resumes, so SSL and CUDA never overlap.
+        if completed_episodes:
+            recent_eps = completed_episodes[-summary_n_traj:]
+            ep_trajs   = [traj for traj, _ in recent_eps]
+            ep_rews    = [r for _, r in recent_eps]
+
+            def _run_summary(trajs, rews):
+                with summary_lock:
+                    base = summary_ref[0]
+                new_text = update_summary_from_episodes(
+                    client, base, trajs, rews, model=llm_model, seed=seed,
+                )
+                with summary_lock:
+                    summary_ref[0] = new_text
+
+            summary_thread = threading.Thread(
+                target=_run_summary, args=(ep_trajs, ep_rews), daemon=True,
+            )
+            summary_thread.start()
 
         if update_num % print_every == 0 or ep_count >= max_episodes:
             last_r = all_ep_rewards[-1] if all_ep_rewards else float("nan")
@@ -594,18 +624,16 @@ if __name__ == "__main__":
     parser.add_argument("--api-key",          type=str,   default=None,
                         help="OpenAI API key. Defaults to OPENAI_API_KEY env var.")
     parser.add_argument("--llm-model",        type=str,   default="gpt-4o-mini")
-    parser.add_argument("--analyzer-every",   type=int,   default=5,
+    parser.add_argument("--analyzer-every",   type=int,   default=10,
                         help="Run the LLM Trajectory Analyzer + unlikelihood update every N completed episodes.")
+    parser.add_argument("--analyzer-n-traj",  type=int,   default=2,
+                        help="Of each analyzer window, send only the most recent N episodes to the LLM.")
     parser.add_argument("--analyzer-topk",    type=int,   default=2,
                         help="Top-K bad (state,action) pairs the analyzer extracts per episode.")
     parser.add_argument("--unlikelihood-lr",  type=float, default=1e-4,
                         help="LR for the separate actor-only unlikelihood optimizer.")
-    parser.add_argument("--summary-every",    type=int,   default=10,
-                        help="Refresh summary.md every N completed episodes.")
     parser.add_argument("--summary-n-traj",   type=int,   default=2,
-                        help="Of each summary-every window, use the most recent N episodes for the summary update.")
-    parser.add_argument("--warmup-episodes",  type=int,   default=100,
-                        help="Disable the analyzer and summary updater until this many PPO episodes have completed.")
+                        help="Number of most recent episodes sent to the AI agent summary update each PPO update.")
     args = parser.parse_args()
 
     save_dir = os.path.dirname(os.path.abspath(__file__))
@@ -638,11 +666,10 @@ if __name__ == "__main__":
             api_key=args.api_key,
             llm_model=args.llm_model,
             analyzer_every=args.analyzer_every,
+            analyzer_n_traj=args.analyzer_n_traj,
             analyzer_topk=args.analyzer_topk,
             unlikelihood_lr=args.unlikelihood_lr,
-            summary_every=args.summary_every,
             summary_n_traj=args.summary_n_traj,
-            warmup_episodes=args.warmup_episodes,
         )
     finally:
         sys.stdout = sys.__stdout__

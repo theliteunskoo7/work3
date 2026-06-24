@@ -34,7 +34,7 @@ WARM START PHASE  (ai_agent.py, run standalone before training)
     → generates initial 10-point summary → saved to summary.md
     → updates summary every 2 episodes (each update builds on prior summary)
 
-TRAINING PHASE  (ppo_llm.py — single process, interleaved, not multi-threaded)
+TRAINING PHASE  (ppo_llm.py — main loop + one background thread for summary)
 ─────────────────────────────────────────────────────────────
   PPO Agent
     → collects a fixed-size rollout (n_steps env steps, default 2048),
@@ -48,22 +48,33 @@ TRAINING PHASE  (ppo_llm.py — single process, interleaved, not multi-threaded)
       unfinished trailing episode is dropped from these buffers
 
   LLM Trajectory Analyzer + unlikelihood update (every `analyzer_every`
-  completed episodes, hyperparam, default 5)
-    → reads the latest summary.md as system context
-    → sends that batch of full episode trajectories to GPT-4o mini
+  completed episodes, hyperparam, default 10)
+    → reads the latest summary.md as system context (snapshot under lock)
+    → sends the most recent `analyzer_n_traj` (default 2) episodes of that
+      window to GPT-4o mini (not the full window — the rest were just the
+      cadence trigger)
     → receives top `analyzer_topk` (default 2) bad (state, action) pairs
-      PER episode
+      per episode sent
     → runs ONE separate gradient step on the actor only (its own optimizer,
       its own lr) minimizing -log(1 - π(bad_action|bad_state)) averaged
-      over all flagged pairs in the batch — this is interleaved with, not
-      fused into, the PPO update above
+      over all flagged pairs in the batch — synchronous, blocks the loop
+      (because its result feeds directly into the actor before the next
+      rollout)
 
-  AI Agent summary refresh (every `summary_every` completed episodes,
-  hyperparam, default 10)
-    → takes the most recent `summary_n_traj` (default 2) episodes of that
-      window
-    → sends them + the current summary to GPT-4o mini to produce an updated
-      10-point summary → overwrites summary.md
+  AI Agent summary refresh (every PPO update, background thread)
+    → fired once per PPO update immediately after all CUDA work for that
+      update is done (after actor.to(cpu_device))
+    → takes the most recent `summary_n_traj` (default 2) episodes from
+      the current rollout's completed episodes
+    → runs in a daemon thread — the main loop does NOT wait for it and
+      proceeds to the next collect_rollout immediately
+    → the thread is joined (waited on) at the start of the NEXT update,
+      before any CUDA operation — this ensures OpenSSL (used by httpx
+      inside the OpenAI client) and CUDA never hold their respective
+      SIGSEGV handlers at the same time (which caused segfaults)
+    → summary_ref[0] (protected by summary_lock) is updated atomically
+      when the thread completes; the analyzer always reads a consistent
+      snapshot via the same lock
     → there is no separate, continuously-running AI Agent environment
       during training — the AI Agent and the LLM Trajectory Analyzer both
       consume the SAME trajectories the PPO agent already collected
@@ -177,9 +188,9 @@ The core mechanism is unchanged from the original design: the actor is π(a|s); 
 - Clip epsilon: 0.2, entropy coefficient: 0.01, value coefficient: 0.5
 - Gradient clipping: max norm 0.5 (both PPO and unlikelihood updates)
 - Rollout size: `n_steps`=2048, `n_epochs`=4, `batch_size`=64
-- `analyzer_every`=5, `analyzer_topk`=2 — LLM Trajectory Analyzer cadence/yield
+- `analyzer_every`=10, `analyzer_topk`=2, `analyzer_n_traj`=2 — LLM Trajectory Analyzer cadence/episodes-sent/bad-pairs-per-episode
 - `unlikelihood_lr`=1e-4 — separate actor-only optimizer for the unlikelihood step
-- `summary_every`=10, `summary_n_traj`=2 — AI Agent summary-refresh cadence
+- `summary_n_traj`=2 — episodes from the current rollout sent to the AI Agent per update
 - `llm_model`="gpt-4o-mini" — single model used everywhere (warm start, analyzer, summarizer)
 - `api_key` — resolved the same way in `ai_agent.py` and `ppo_llm.py`: `--api-key` CLI flag, else `OPENAI_API_KEY` env var
 - `seed`=1 (`seeding.py`'s `DEFAULT_SEED`) — same default across `ai_agent.py`, `ppo.py`, `ppo_llm.py`; seeds Python `random`, NumPy, PyTorch (CPU+CUDA, deterministic cuDNN), the Gymnasium env's `reset(seed=...)`, and is passed as OpenAI's best-effort `seed` parameter on every API call. Makes a run reproducible across machines/GPUs, not just re-runs on one machine (exact bit-for-bit equality across different GPU hardware still isn't 100% guaranteed by PyTorch, and the LLM-side `seed` is best-effort only — but everything local is exactly reproducible)
@@ -245,13 +256,14 @@ All `analyzer_every` episodes are sent in a single GPT-4o mini call (one call an
 
 ```
 summary.md
-    ↑ written by AI Agent (warm start, then every summary_every episodes during training)
-    ↓ read by LLM Trajectory Analyzer before each batch analysis
+    ↑ written by AI Agent (warm start, then once per PPO update via background thread)
+    ↓ read by LLM Trajectory Analyzer before each batch analysis (snapshot under lock)
 
 Episode trajectory (state, action, reward per step)
     → produced by the PPO Agent's own rollout collection (collect_rollout)
-    → buffered, then sent to the LLM Trajectory Analyzer (every analyzer_every episodes)
-    → ALSO buffered and sent to the AI Agent for summary updates (every summary_every episodes)
+    → buffered in analyzer_buffer, sent to LLM Trajectory Analyzer every analyzer_every episodes
+      (only the most recent analyzer_n_traj episodes of each window are sent to the LLM)
+    → most recent summary_n_traj episodes also sent to AI Agent background thread each update
     → there is no separate trajectory source — both LLM consumers read the
       exact same completed episodes the PPO agent already collected
 
@@ -298,7 +310,8 @@ llm_rl_project/
 | Bad action definition | Trajectory divergence / goal prevention | More meaningful than lowest immediate reward |
 | Bad action penalty | Unlikelihood loss `-log(1-π(bad_action\|bad_state))`, separate actor-only optimizer step (was: `mean(π(bad\|s))` fused into actor loss with λ) | Self-limiting gradient (strong when p is high, vanishes as p→0); avoids tuning a λ to balance two competing loss terms in one backward pass |
 | Trajectory source for LLM modules | Reuse the PPO agent's own collected episodes (was: a separate, continuously-running AI Agent environment) | One source of truth, no redundant live agent/API usage during training |
-| Analyzer/summarizer scheduling | Interleaved into the single training loop, triggered by completed-episode counters (was: implied background/async) | No real concurrency needed on shared actor weights; only the OpenAI calls are "slow," and they just run inline between rollouts |
+| Analyzer scheduling | Synchronous, interleaved in main loop, triggered every `analyzer_every` completed episodes | Result feeds directly into the unlikelihood update on the actor before the next rollout — must be synchronous |
+| Summary scheduling | Background thread per PPO update, joined before next CUDA phase | OpenAI HTTPS (OpenSSL) and CUDA both install SIGSEGV handlers; running them concurrently in threads crashed the CUDA autograd worker. Fix: thread runs during collect_rollout (CPU-only), joined before actor.to(device) so SSL and CUDA never overlap |
 | Summary persistence | summary.md file | Shared across modules; human-readable |
 | LLM interaction logging | Separate files per role: `logs/interaction_log.md` (AI Agent) vs `logs/analyzer_log.md` (LLM Trajectory Analyzer) | Two different roles/concerns; keeping them apart makes each log readable on its own instead of interleaving unrelated calls |
 | Reproducibility | Shared `seeding.py`, default seed = 1 everywhere (`ai_agent.py`, `ppo.py`, `ppo_llm.py`) | One run config should reproduce the same result on any machine/GPU, not just on the one it was first run on; verified bit-identical across independent fresh processes |
@@ -315,4 +328,4 @@ llm_rl_project/
 - **Action space**: 4 discrete actions (nothing, left engine, main engine, right engine)
 - **Reward**: shaped reward for moving toward pad, penalty for crash (-100), bonus for safe landing (+100 to +140)
 - **Solved**: mean reward ≥ 200 over 100 consecutive episodes
-- **Max steps**: 500 per episode
+- **Max steps**: 1000 per episode (Gymnasium TimeLimit wrapper truncates at 1000 steps)
