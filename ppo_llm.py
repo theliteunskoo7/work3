@@ -142,9 +142,10 @@ def collect_rollout(env, actor, baseline, state_normalizer,
         done_buf[t] = float(done)
         cur_ep_rew += reward
         cur_ep_traj.append({
-            "state":  [round(float(v), 4) for v in state],
-            "action": act.item(),
-            "reward": round(float(reward), 4),
+            "state":   [round(float(v), 4) for v in state],
+            "action":  act.item(),
+            "reward":  round(float(reward), 4),
+            "step":    t,
         })
 
         if done:
@@ -178,6 +179,13 @@ def collect_rollout(env, actor, baseline, state_normalizer,
         adv_buf[t] = gae
 
     ret_buf = adv_buf + val_buf
+
+    # Stamp each trajectory step with its GAE advantage so the training loop
+    # can look it up by (state, action) when filtering unlikelihood pairs.
+    for traj, _ in completed_episodes:
+        for step_data in traj:
+            step_data["advantage"] = float(adv_buf[step_data["step"]])
+
     return obs_buf, act_buf, lp_buf, adv_buf, ret_buf, val_buf, ep_rewards, completed_episodes
 
 
@@ -317,7 +325,7 @@ def plot_rewards(episode_rewards, save_path, window=50):
     print(f"  Plot saved to: {save_path}")
 
 
-def update_summary_from_episodes(client, current_summary, episodes, rewards, model="gpt-4o-mini", seed=None):
+def update_summary_from_episodes(client, current_summary, episodes, rewards, model="unsloth/gemma-4-26B-A4B-it-GGUF", seed=None):
     """
     Refresh summary.md from PPO-collected episodes, reusing the exact prompts
     ai_agent.py uses during warm start so the summary's voice/format stays
@@ -348,8 +356,10 @@ def update_summary_from_episodes(client, current_summary, episodes, rewards, mod
             f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
             f"Your current 10-point understanding of the environment:\n{current_summary}\n\n"
             f"New trajectories observed:\n{traj_text}\n\n"
-            f"Update and refine your 10-point summary. Keep points that are still valid, "
-            f"update points where you have learned more, and add new insights. "
+            f"Update and refine your 10-point summary of environment physics and action effects. "
+            f"Keep points that are still valid, update points where new trajectory data reveals "
+            f"more about how the environment behaves, and add new physics insights. "
+            f"Do not comment on agent performance, training progress, or learning trends. "
             f"Output exactly 10 numbered points."
         )
         log_label = "Summary Update (from PPO episodes)"
@@ -386,8 +396,11 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
           lr=3e-4, entropy_coef=0.01, value_coef=0.5,
           max_episodes=2000, max_grad_norm=0.5,
           print_every=1, plot_every=50, seed=DEFAULT_SEED,
-          api_key=None, llm_model="gpt-4o-mini",
+          api_key=None, base_url="http://172.16.180.19:8001/v1",
+          analyzer_base_url="http://172.16.180.19:8002/v1",
+          llm_model="unsloth/gemma-4-26B-A4B-it-GGUF",
           analyzer_every=10, analyzer_topk=2, analyzer_n_traj=2,
+          analyzer_threshold=200,
           unlikelihood_lr=1e-4,
           summary_n_traj=2):
     """
@@ -412,10 +425,9 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     once per update in a background thread (not on a fixed episode cadence).
     """
     if api_key is None:
-        api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("Set OPENAI_API_KEY environment variable")
-    client = OpenAI(api_key=api_key)
+        api_key = os.getenv("OPENAI_API_KEY", "sk-no-key-required")
+    client          = OpenAI(base_url=base_url,          api_key=api_key, timeout=None)  # summary updates
+    analyzer_client = OpenAI(base_url=analyzer_base_url, api_key=api_key, timeout=None)  # trajectory analysis
 
     set_global_seed(seed)
     env = gym.make("LunarLander-v3")
@@ -470,7 +482,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     print(f"  n_steps={n_steps}  n_epochs={n_epochs}  batch_size={batch_size}")
     print(f"  clip_eps={clip_eps}  lr={lr}  gae_lambda={gae_lambda}")
     print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}")
-    print(f"  analyzer_every={analyzer_every}  analyzer_n_traj={analyzer_n_traj}  analyzer_topk={analyzer_topk}  unlikelihood_lr={unlikelihood_lr}")
+    print(f"  analyzer_every={analyzer_every}  analyzer_n_traj={analyzer_n_traj}  analyzer_topk={analyzer_topk}  analyzer_threshold={analyzer_threshold}  unlikelihood_lr={unlikelihood_lr}")
     print(f"  summary_n_traj={summary_n_traj} (AI agent updates summary every PPO update using the last N episodes)  llm_model={llm_model}\n")
 
     ep_count   = 0
@@ -530,41 +542,93 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         update_num += 1
 
         # --- LLM Trajectory Analyzer + unlikelihood actor update ---
+        # Reward-adaptive annealing: full lr when mean_100 <= 0, zero at analyzer_threshold.
+        _mean_for_scale = mean_100 if not np.isnan(mean_100) else 0.0
+        reward_scale = max(0.0, 1.0 - max(0.0, _mean_for_scale) / analyzer_threshold)
+        ul_lr_now = unlikelihood_lr * reward_scale
+        for pg in unlikelihood_optimizer.param_groups:
+            pg['lr'] = ul_lr_now
+
         while len(analyzer_buffer) >= analyzer_every:
             batch = analyzer_buffer[:analyzer_every]
             analyzer_buffer = analyzer_buffer[analyzer_every:]
             # Only send the most recent analyzer_n_traj episodes to the LLM —
             # the rest of the window were just the cadence trigger.
             recent_batch = batch[-analyzer_n_traj:]
-            episodes = [traj for traj, _ in recent_batch]
+            filtered = [(traj, r) for traj, r in recent_batch if r < analyzer_threshold]
+            if not filtered:
+                continue
+            episodes = [traj for traj, _ in filtered]
 
             # Snapshot summary under the lock so the background summary thread
             # can't write a new value mid-call.
             with summary_lock:
                 current_summary = summary_ref[0]
             bad_pairs_per_ep = analyze_trajectories(
-                client, episodes, current_summary, top_k=analyzer_topk, model=llm_model, seed=seed,
+                analyzer_client, episodes, current_summary, top_k=analyzer_topk, model=llm_model, seed=seed,
             )
             bad_pairs = [pair for pairs in bad_pairs_per_ep for pair in pairs]
+
+            # Advantage filter: drop pairs where the policy is already confident
+            # (prob > 0.5) AND PPO found the action above average (advantage > 0).
+            # Applying unlikelihood against PPO's own positive signal is what caused
+            # the catastrophic regression at ep 748.
+            n_raw = len(bad_pairs)
+            if bad_pairs:
+                raw_states  = np.array([p[0] for p in bad_pairs], dtype=np.float32)
+                norm_states = np.stack([state_normalizer.normalize(s) for s in raw_states])
+                states_t    = torch.FloatTensor(norm_states).to(device)
+                actions_t   = torch.LongTensor([p[1] for p in bad_pairs]).to(device)
+                with torch.no_grad():
+                    dist  = Categorical(logits=actor(states_t))
+                    probs = dist.probs.gather(1, actions_t.unsqueeze(1)).squeeze(1)
+
+                filtered_pairs = []
+                for i, (state, action) in enumerate(bad_pairs):
+                    prob = probs[i].item()
+                    if prob > 0.5:
+                        adv = None
+                        for ep in episodes:
+                            for step_data in ep:
+                                if (step_data["action"] == action and
+                                        all(abs(a - b) < 1e-4
+                                            for a, b in zip(step_data["state"], state))):
+                                    adv = step_data.get("advantage")
+                                    break
+                            if adv is not None:
+                                break
+                        if adv is not None and adv > 0.0:
+                            continue  # drop: policy confident + PPO agrees it's good
+                    filtered_pairs.append((state, action))
+                bad_pairs = filtered_pairs
+
+            n_dropped = n_raw - len(bad_pairs)
             stats = unlikelihood_update(actor, unlikelihood_optimizer, state_normalizer, bad_pairs, device,
                                         max_grad_norm=max_grad_norm)
             if stats:
-                print(f"  [Analyzer] {len(episodes)} episodes -> {stats['n_pairs']} bad pairs | "
+                print(f"  [Analyzer] {len(episodes)} episodes -> {n_raw} bad pairs "
+                      f"({n_dropped} dropped by adv filter) | "
                       f"unlikelihood_loss={stats['loss']:.4f} | "
-                      f"mean p(bad) before update={stats['p_bad_pre']:.4f}")
+                      f"mean p(bad) before update={stats['p_bad_pre']:.4f} | "
+                      f"ul_lr={ul_lr_now:.2e} (scale={reward_scale:.2f})")
             else:
-                print(f"  [Analyzer] {len(episodes)} episodes -> 0 bad pairs (skipped update)")
+                print(f"  [Analyzer] {len(episodes)} episodes -> {n_raw} bad pairs "
+                      f"({n_dropped} dropped by adv filter, 0 applied)")
 
         # Back to CPU before launching the summary thread — all CUDA ops for
         # this update are now done. The thread will run during the NEXT
         # collect_rollout (CPU-only), safely separated from CUDA.
         actor.to(cpu_device)
 
-        # --- AI agent summary refresh: background thread, once per update ---
+        # --- AI agent summary refresh: background thread, reward-adaptive rate ---
         # Launched AFTER all CUDA work for this update. Runs concurrently with
         # the next collect_rollout. Joined at the top of the next iteration
         # before CUDA resumes, so SSL and CUDA never overlap.
-        if completed_episodes:
+        # Gap scales from 1 (every rollout, when policy is bad) up to 5 (every
+        # 5th rollout, when mean_100 approaches the solve threshold) — summaries
+        # converge early so high-frequency updates add no value at late training.
+        _summary_gap = max(1, int(5 * _mean_for_scale / analyzer_threshold))
+        if completed_episodes and update_num % _summary_gap == 0:
             recent_eps = completed_episodes[-summary_n_traj:]
             ep_trajs   = [traj for traj, _ in recent_eps]
             ep_rews    = [r for _, r in recent_eps]
@@ -622,14 +686,20 @@ if __name__ == "__main__":
     parser.add_argument("--gae-lambda", type=float, default=0.95)
     parser.add_argument("--seed",       type=int,   default=DEFAULT_SEED)
     parser.add_argument("--api-key",          type=str,   default=None,
-                        help="OpenAI API key. Defaults to OPENAI_API_KEY env var.")
-    parser.add_argument("--llm-model",        type=str,   default="gpt-4o-mini")
+                        help="API key for the model server. Defaults to OPENAI_API_KEY env var, or 'sk-no-key-required'.")
+    parser.add_argument("--base-url",          type=str,   default="http://172.16.180.19:8001/v1",
+                        help="Base URL for summary update LLM calls (port 8001).")
+    parser.add_argument("--analyzer-base-url", type=str,   default="http://172.16.180.19:8002/v1",
+                        help="Base URL for trajectory analysis LLM calls (port 8002).")
+    parser.add_argument("--llm-model",        type=str,   default="unsloth/gemma-4-26B-A4B-it-GGUF")
     parser.add_argument("--analyzer-every",   type=int,   default=10,
                         help="Run the LLM Trajectory Analyzer + unlikelihood update every N completed episodes.")
     parser.add_argument("--analyzer-n-traj",  type=int,   default=2,
                         help="Of each analyzer window, send only the most recent N episodes to the LLM.")
-    parser.add_argument("--analyzer-topk",    type=int,   default=2,
+    parser.add_argument("--analyzer-topk",      type=int,   default=2,
                         help="Top-K bad (state,action) pairs the analyzer extracts per episode.")
+    parser.add_argument("--analyzer-threshold", type=float, default=200,
+                        help="Only send episodes with return below this threshold to the analyzer.")
     parser.add_argument("--unlikelihood-lr",  type=float, default=1e-4,
                         help="LR for the separate actor-only unlikelihood optimizer.")
     parser.add_argument("--summary-n-traj",   type=int,   default=2,
@@ -664,10 +734,13 @@ if __name__ == "__main__":
             max_episodes=args.episodes,
             seed=args.seed,
             api_key=args.api_key,
+            base_url=args.base_url,
+            analyzer_base_url=args.analyzer_base_url,
             llm_model=args.llm_model,
             analyzer_every=args.analyzer_every,
             analyzer_n_traj=args.analyzer_n_traj,
             analyzer_topk=args.analyzer_topk,
+            analyzer_threshold=args.analyzer_threshold,
             unlikelihood_lr=args.unlikelihood_lr,
             summary_n_traj=args.summary_n_traj,
         )

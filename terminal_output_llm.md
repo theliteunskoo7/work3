@@ -1,1039 +1,825 @@
-Using device: cuda (rollout collection stays on CPU; batched updates use cuda)
+Using device: cpu (rollout collection stays on CPU; batched updates use cpu)
 Training PPO+LLM on LunarLander-v3 (up to 2000 episodes)
   n_steps=2048  n_epochs=4  batch_size=64
   clip_eps=0.2  lr=0.0003  gae_lambda=0.95
   entropy_coef=0.01  value_coef=0.5
-  analyzer_every=10  analyzer_n_traj=2  analyzer_topk=2  unlikelihood_lr=0.0001
-  summary_n_traj=2 (AI agent updates summary every PPO update using the last N episodes)  llm_model=gpt-4o-mini
+  analyzer_every=10  analyzer_n_traj=2  analyzer_topk=2  analyzer_threshold=200  unlikelihood_lr=0.0001
+  summary_n_traj=2 (AI agent updates summary every PPO update using the last N episodes)  llm_model=unsloth/gemma-4-26B-A4B-it-GGUF
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2240 | mean p(bad) before update=0.2006
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2788 | mean p(bad) before update=0.2430
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3126 | mean p(bad) before update=0.2674 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2329 | mean p(bad) before update=0.2077 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update    1 | Ep    22 | reward:    -85.4 | mean(100):   -191.1 | actor_loss: -0.0100 | value_loss: 32.9811 | lr: 3.00e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2520 | mean p(bad) before update=0.2225 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2433 | mean p(bad) before update=0.2159 | ul_lr=1.00e-04 (scale=1.00)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update    1 | Ep    21 | reward:    -34.9 | mean(100):   -193.8 | actor_loss: -0.0055 | value_loss: 32.4345 | lr: 3.00e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2355 | mean p(bad) before update=0.2092
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2182 | mean p(bad) before update=0.1957
+  Update    2 | Ep    44 | reward:   -170.9 | mean(100):   -168.9 | actor_loss: -0.0092 | value_loss: 27.9374 | lr: 2.97e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3788 | mean p(bad) before update=0.3153 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3598 | mean p(bad) before update=0.2988 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update    2 | Ep    41 | reward:    -46.8 | mean(100):   -182.0 | actor_loss: -0.0072 | value_loss: 27.3470 | lr: 2.97e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update    3 | Ep    64 | reward:   -108.1 | mean(100):   -156.9 | actor_loss: -0.0084 | value_loss: 21.7894 | lr: 2.93e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2311 | mean p(bad) before update=0.2033 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2940 | mean p(bad) before update=0.2508 | ul_lr=1.00e-04 (scale=1.00)
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2366 | mean p(bad) before update=0.2093
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2358 | mean p(bad) before update=0.2097
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update    4 | Ep    86 | reward:    -96.6 | mean(100):   -148.3 | actor_loss: -0.0067 | value_loss: 20.7971 | lr: 2.90e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2055 | mean p(bad) before update=0.1854 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2977 | mean p(bad) before update=0.2529 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update    3 | Ep    62 | reward:   -109.0 | mean(100):   -182.0 | actor_loss: -0.0090 | value_loss: 31.2863 | lr: 2.94e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update    5 | Ep   108 | reward:    -75.3 | mean(100):   -139.7 | actor_loss: -0.0100 | value_loss: 23.8239 | lr: 2.87e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1872 | mean p(bad) before update=0.1705 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2448 | mean p(bad) before update=0.2137 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update    6 | Ep   127 | reward:   -120.6 | mean(100):   -125.8 | actor_loss: -0.0073 | value_loss: 20.4949 | lr: 2.84e-04
 
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2948 | mean p(bad) before update=0.2449
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2018 | mean p(bad) before update=0.1824
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1615 | mean p(bad) before update=0.1483 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2104 | mean p(bad) before update=0.1896 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update    4 | Ep    83 | reward:      1.0 | mean(100):   -170.5 | actor_loss: -0.0044 | value_loss: 25.5203 | lr: 2.91e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update    7 | Ep   148 | reward:    -44.2 | mean(100):   -117.3 | actor_loss: -0.0089 | value_loss: 17.7433 | lr: 2.81e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2149 | mean p(bad) before update=0.1934
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2375 | mean p(bad) before update=0.2109
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2957 | mean p(bad) before update=0.2525 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1568 | mean p(bad) before update=0.1443 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update    5 | Ep   104 | reward:    -79.6 | mean(100):   -163.6 | actor_loss: -0.0063 | value_loss: 24.2682 | lr: 2.88e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update    8 | Ep   169 | reward:   -126.0 | mean(100):   -110.8 | actor_loss: -0.0130 | value_loss: 19.2218 | lr: 2.78e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3404 | mean p(bad) before update=0.2595
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2516 | mean p(bad) before update=0.2209
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3099 | mean p(bad) before update=0.2591 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2032 | mean p(bad) before update=0.1826 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update    6 | Ep   125 | reward:    -93.7 | mean(100):   -148.7 | actor_loss: -0.0070 | value_loss: 22.4917 | lr: 2.84e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update    9 | Ep   188 | reward:    -76.7 | mean(100):   -108.8 | actor_loss: -0.0074 | value_loss: 17.5591 | lr: 2.75e-04
+
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2536 | mean p(bad) before update=0.2193
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2737 | mean p(bad) before update=0.2390
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4606 | mean p(bad) before update=0.3261 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3409 | mean p(bad) before update=0.2706 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update    7 | Ep   147 | reward:    -86.7 | mean(100):   -136.5 | actor_loss: -0.0065 | value_loss: 19.3395 | lr: 2.81e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   10 | Ep   207 | reward:    -71.9 | mean(100):   -102.6 | actor_loss: -0.0112 | value_loss: 16.7686 | lr: 2.72e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2449 | mean p(bad) before update=0.2164
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2174 | mean p(bad) before update=0.1930
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2735 | mean p(bad) before update=0.2241 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1318 | mean p(bad) before update=0.1229 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   11 | Ep   226 | reward:    -14.3 | mean(100):    -93.5 | actor_loss: -0.0109 | value_loss: 14.2993 | lr: 2.69e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.6369 | mean p(bad) before update=0.4429 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.7975 | mean p(bad) before update=0.5118 | ul_lr=1.00e-04 (scale=1.00)
+  Update   12 | Ep   240 | reward:     -4.8 | mean(100):    -91.2 | actor_loss: -0.0066 | value_loss: 15.6579 | lr: 2.66e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update    8 | Ep   168 | reward:   -113.5 | mean(100):   -123.3 | actor_loss: -0.0079 | value_loss: 17.7683 | lr: 2.78e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2855 | mean p(bad) before update=0.2481
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2387 | mean p(bad) before update=0.2080
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2199 | mean p(bad) before update=0.1960
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update    9 | Ep   191 | reward:    -84.9 | mean(100):   -108.5 | actor_loss: -0.0057 | value_loss: 16.2768 | lr: 2.75e-04
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2950 | mean p(bad) before update=0.2539
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2519 | mean p(bad) before update=0.2195
+  [Analyzer] 2 episodes -> 3 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.5740 | mean p(bad) before update=0.4096 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   13 | Ep   254 | reward:   -208.9 | mean(100):    -95.5 | actor_loss: -0.0055 | value_loss: 15.8107 | lr: 2.64e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3454 | mean p(bad) before update=0.2750 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   14 | Ep   268 | reward:    -86.1 | mean(100):    -87.9 | actor_loss: -0.0078 | value_loss: 12.3032 | lr: 2.62e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.6650 | mean p(bad) before update=0.4606 | ul_lr=1.00e-04 (scale=1.00)
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4731 | mean p(bad) before update=0.3398 | ul_lr=1.00e-04 (scale=1.00)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   10 | Ep   211 | reward:    -55.1 | mean(100):    -99.4 | actor_loss: -0.0081 | value_loss: 15.4516 | lr: 2.71e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3771 | mean p(bad) before update=0.2912
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5565 | mean p(bad) before update=0.4034
+  Update   15 | Ep   280 | reward:   -206.0 | mean(100):    -84.0 | actor_loss: -0.0067 | value_loss: 13.5643 | lr: 2.60e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4610 | mean p(bad) before update=0.3231 | ul_lr=1.00e-04 (scale=1.00)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   11 | Ep   231 | reward:    -36.5 | mean(100):    -90.2 | actor_loss: -0.0079 | value_loss: 17.8978 | lr: 2.68e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3979 | mean p(bad) before update=0.2965
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2417 | mean p(bad) before update=0.2126
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   12 | Ep   252 | reward:    -28.6 | mean(100):    -85.1 | actor_loss: -0.0070 | value_loss: 15.2473 | lr: 2.65e-04
+  Update   16 | Ep   294 | reward:     20.3 | mean(100):    -73.9 | actor_loss: -0.0032 | value_loss: 13.5274 | lr: 2.58e-04
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3281 | mean p(bad) before update=0.2789
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2812 | mean p(bad) before update=0.2241 | ul_lr=1.00e-04 (scale=1.00)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   13 | Ep   269 | reward:    -40.6 | mean(100):    -78.8 | actor_loss: -0.0080 | value_loss: 15.3859 | lr: 2.62e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.1503 | mean p(bad) before update=0.1395
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.1691 | mean p(bad) before update=0.1550
+  Update   17 | Ep   301 | reward:    -21.7 | mean(100):    -65.5 | actor_loss: -0.0072 | value_loss: 8.3977 | lr: 2.56e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   14 | Ep   286 | reward:    -29.5 | mean(100):    -70.3 | actor_loss: -0.0131 | value_loss: 12.1728 | lr: 2.60e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.1963 | mean p(bad) before update=0.1739
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   18 | Ep   307 | reward:    119.4 | mean(100):    -63.3 | actor_loss: -0.0093 | value_loss: 10.0667 | lr: 2.55e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   15 | Ep   295 | reward:    -13.9 | mean(100):    -65.7 | actor_loss: -0.0075 | value_loss: 10.3500 | lr: 2.57e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4381 | mean p(bad) before update=0.3435
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.1588 | mean p(bad) before update=0.1447
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.5502 | mean p(bad) before update=0.4131 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   16 | Ep   311 | reward:    -46.1 | mean(100):    -58.0 | actor_loss: -0.0048 | value_loss: 11.9738 | lr: 2.56e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2358 | mean p(bad) before update=0.1976
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   17 | Ep   320 | reward:    -48.0 | mean(100):    -48.1 | actor_loss: -0.0085 | value_loss: 9.6995 | lr: 2.53e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   18 | Ep   326 | reward:      7.5 | mean(100):    -45.8 | actor_loss: -0.0066 | value_loss: 9.5064 | lr: 2.52e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   19 | Ep   315 | reward:   -108.8 | mean(100):    -67.8 | actor_loss: -0.0056 | value_loss: 13.2603 | lr: 2.54e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   19 | Ep   328 | reward:    121.1 | mean(100):    -42.7 | actor_loss: -0.0098 | value_loss: 6.5266 | lr: 2.51e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   20 | Ep   319 | reward:    119.6 | mean(100):    -64.4 | actor_loss: -0.0085 | value_loss: 5.6561 | lr: 2.53e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.1765 | mean p(bad) before update=0.1587
-  Update   20 | Ep   330 | reward:     99.2 | mean(100):    -40.1 | actor_loss: -0.0054 | value_loss: 6.1331 | lr: 2.51e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4142 | mean p(bad) before update=0.3315 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   21 | Ep   333 | reward:   -152.8 | mean(100):    -39.2 | actor_loss: -0.0063 | value_loss: 7.1387 | lr: 2.50e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   21 | Ep   324 | reward:      3.0 | mean(100):    -62.6 | actor_loss: -0.0054 | value_loss: 7.3492 | lr: 2.52e-04
 
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4084 | mean p(bad) before update=0.3110 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   22 | Ep   335 | reward:     29.9 | mean(100):    -36.7 | actor_loss: -0.0120 | value_loss: 5.1855 | lr: 2.50e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.1246 | mean p(bad) before update=0.1132
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   23 | Ep   340 | reward:    -61.4 | mean(100):    -35.4 | actor_loss: -0.0012 | value_loss: 8.4548 | lr: 2.50e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   24 | Ep   344 | reward:    -64.3 | mean(100):    -38.0 | actor_loss: -0.0053 | value_loss: 8.3062 | lr: 2.49e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   22 | Ep   333 | reward:   -100.9 | mean(100):    -65.5 | actor_loss: -0.0059 | value_loss: 12.4115 | lr: 2.51e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   25 | Ep   346 | reward:     72.0 | mean(100):    -36.9 | actor_loss: -0.0043 | value_loss: 4.6342 | lr: 2.48e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   23 | Ep   337 | reward:     50.8 | mean(100):    -63.0 | actor_loss: -0.0058 | value_loss: 8.1014 | lr: 2.50e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2712 | mean p(bad) before update=0.2354 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   24 | Ep   340 | reward:   -115.6 | mean(100):    -62.6 | actor_loss: -0.0081 | value_loss: 7.1684 | lr: 2.49e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   26 | Ep   349 | reward:     97.8 | mean(100):    -38.2 | actor_loss: -0.0100 | value_loss: 6.0753 | lr: 2.48e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4017 | mean p(bad) before update=0.3024
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   27 | Ep   352 | reward:   -147.7 | mean(100):    -37.2 | actor_loss: -0.0042 | value_loss: 6.0580 | lr: 2.48e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   28 | Ep   356 | reward:    -36.1 | mean(100):    -33.6 | actor_loss: -0.0072 | value_loss: 5.6066 | lr: 2.47e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   25 | Ep   343 | reward:   -132.4 | mean(100):    -60.8 | actor_loss: -0.0052 | value_loss: 6.9715 | lr: 2.49e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   29 | Ep   358 | reward:    -21.2 | mean(100):    -33.0 | actor_loss: -0.0073 | value_loss: 3.9199 | lr: 2.47e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2719 | mean p(bad) before update=0.2365
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   30 | Ep   360 | reward:     39.0 | mean(100):    -33.1 | actor_loss: -0.0122 | value_loss: 4.9522 | lr: 2.46e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   31 | Ep   362 | reward:     23.8 | mean(100):    -31.3 | actor_loss: -0.0069 | value_loss: 3.5290 | lr: 2.46e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   26 | Ep   346 | reward:    -17.1 | mean(100):    -56.4 | actor_loss: -0.0071 | value_loss: 6.0456 | lr: 2.49e-04
 
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   32 | Ep   364 | reward:      9.3 | mean(100):    -30.2 | actor_loss: -0.0044 | value_loss: 2.9392 | lr: 2.46e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   27 | Ep   349 | reward:    -25.8 | mean(100):    -53.4 | actor_loss: -0.0055 | value_loss: 5.8620 | lr: 2.48e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4022 | mean p(bad) before update=0.3140 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   28 | Ep   351 | reward:     62.4 | mean(100):    -51.2 | actor_loss: -0.0077 | value_loss: 4.0244 | lr: 2.48e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   33 | Ep   366 | reward:    -17.2 | mean(100):    -25.5 | actor_loss: -0.0065 | value_loss: 2.9561 | lr: 2.45e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   29 | Ep   353 | reward:     35.9 | mean(100):    -47.1 | actor_loss: -0.0077 | value_loss: 4.3291 | lr: 2.47e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   34 | Ep   368 | reward:     38.6 | mean(100):    -23.9 | actor_loss: -0.0033 | value_loss: 2.6931 | lr: 2.45e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3251 | mean p(bad) before update=0.2716
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   35 | Ep   370 | reward:    -78.2 | mean(100):    -25.7 | actor_loss: -0.0086 | value_loss: 3.4790 | lr: 2.45e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   30 | Ep   355 | reward:   -129.5 | mean(100):    -47.1 | actor_loss: -0.0049 | value_loss: 5.1257 | lr: 2.47e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   36 | Ep   372 | reward:     -5.1 | mean(100):    -25.7 | actor_loss: -0.0015 | value_loss: 2.4900 | lr: 2.44e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   31 | Ep   357 | reward:   -154.4 | mean(100):    -49.9 | actor_loss: -0.0064 | value_loss: 5.6347 | lr: 2.47e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   37 | Ep   374 | reward:     71.2 | mean(100):    -25.5 | actor_loss: -0.0010 | value_loss: 2.9949 | lr: 2.44e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   32 | Ep   359 | reward:    101.6 | mean(100):    -50.1 | actor_loss: -0.0011 | value_loss: 4.0364 | lr: 2.46e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   38 | Ep   376 | reward:     61.0 | mean(100):    -26.1 | actor_loss: -0.0068 | value_loss: 3.0909 | lr: 2.44e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3226 | mean p(bad) before update=0.2497 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   39 | Ep   378 | reward:     20.2 | mean(100):    -27.4 | actor_loss: -0.0061 | value_loss: 3.1890 | lr: 2.44e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5407 | mean p(bad) before update=0.3057
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   40 | Ep   380 | reward:    -51.6 | mean(100):    -26.1 | actor_loss: -0.0063 | value_loss: 2.7924 | lr: 2.43e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   33 | Ep   361 | reward:    -65.9 | mean(100):    -50.3 | actor_loss: -0.0158 | value_loss: 3.8387 | lr: 2.46e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   41 | Ep   382 | reward:    -99.9 | mean(100):    -26.1 | actor_loss: -0.0057 | value_loss: 3.5010 | lr: 2.43e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   34 | Ep   363 | reward:     21.3 | mean(100):    -48.5 | actor_loss: -0.0125 | value_loss: 2.8644 | lr: 2.46e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   42 | Ep   384 | reward:     48.2 | mean(100):    -24.2 | actor_loss: -0.0049 | value_loss: 3.9832 | lr: 2.43e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   35 | Ep   365 | reward:     10.3 | mean(100):    -46.4 | actor_loss: -0.0044 | value_loss: 2.6801 | lr: 2.46e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   36 | Ep   367 | reward:    -67.9 | mean(100):    -45.3 | actor_loss: -0.0137 | value_loss: 3.1713 | lr: 2.45e-04
 
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   43 | Ep   386 | reward:     27.3 | mean(100):    -22.3 | actor_loss: -0.0047 | value_loss: 2.6475 | lr: 2.42e-04
+  Update   37 | Ep   369 | reward:     71.5 | mean(100):    -43.2 | actor_loss: -0.0060 | value_loss: 2.3609 | lr: 2.45e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2596 | mean p(bad) before update=0.2070 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   44 | Ep   388 | reward:     49.1 | mean(100):    -21.1 | actor_loss: -0.0089 | value_loss: 2.8049 | lr: 2.42e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2587 | mean p(bad) before update=0.2216
-  Update   45 | Ep   390 | reward:    120.2 | mean(100):    -18.4 | actor_loss: -0.0091 | value_loss: 3.0844 | lr: 2.42e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   46 | Ep   392 | reward:    -51.8 | mean(100):    -17.6 | actor_loss: -0.0029 | value_loss: 2.7980 | lr: 2.41e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   47 | Ep   394 | reward:     56.1 | mean(100):    -15.5 | actor_loss: -0.0035 | value_loss: 1.9898 | lr: 2.41e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   48 | Ep   396 | reward:   -133.2 | mean(100):    -16.3 | actor_loss: -0.0063 | value_loss: 2.8908 | lr: 2.41e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   49 | Ep   398 | reward:     47.4 | mean(100):    -13.6 | actor_loss: -0.0043 | value_loss: 3.0785 | lr: 2.41e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.9949 | mean p(bad) before update=0.4886
-  Update   50 | Ep   400 | reward:     39.6 | mean(100):    -12.0 | actor_loss: -0.0020 | value_loss: 1.8380 | lr: 2.40e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   51 | Ep   403 | reward:   -154.3 | mean(100):    -14.9 | actor_loss: -0.0018 | value_loss: 4.7371 | lr: 2.40e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   52 | Ep   405 | reward:    109.9 | mean(100):    -13.6 | actor_loss: -0.0069 | value_loss: 3.3801 | lr: 2.40e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   53 | Ep   407 | reward:     40.6 | mean(100):    -12.9 | actor_loss: -0.0024 | value_loss: 2.1290 | lr: 2.39e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   38 | Ep   371 | reward:    -76.8 | mean(100):    -44.8 | actor_loss: -0.0079 | value_loss: 3.1818 | lr: 2.45e-04
 
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   54 | Ep   409 | reward:   -104.0 | mean(100):    -12.5 | actor_loss: -0.0026 | value_loss: 1.9323 | lr: 2.39e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3001 | mean p(bad) before update=0.2402
-  Update   55 | Ep   411 | reward:     98.8 | mean(100):    -10.8 | actor_loss: -0.0028 | value_loss: 2.7914 | lr: 2.39e-04
+  Update   39 | Ep   373 | reward:     62.9 | mean(100):    -42.6 | actor_loss: -0.0065 | value_loss: 2.3618 | lr: 2.44e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   40 | Ep   375 | reward:    -44.9 | mean(100):    -42.6 | actor_loss: -0.0085 | value_loss: 2.8982 | lr: 2.44e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   41 | Ep   377 | reward:    -46.4 | mean(100):    -42.2 | actor_loss: -0.0055 | value_loss: 2.5969 | lr: 2.44e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   42 | Ep   379 | reward:     39.6 | mean(100):    -39.1 | actor_loss: -0.0056 | value_loss: 2.7819 | lr: 2.43e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (2 dropped by adv filter) | unlikelihood_loss=0.5293 | mean p(bad) before update=0.4037 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   43 | Ep   381 | reward:    174.3 | mean(100):    -35.5 | actor_loss: -0.0099 | value_loss: 3.8670 | lr: 2.43e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   44 | Ep   383 | reward:    -48.7 | mean(100):    -33.4 | actor_loss: -0.0044 | value_loss: 2.7436 | lr: 2.43e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   45 | Ep   385 | reward:   -108.4 | mean(100):    -34.4 | actor_loss: -0.0037 | value_loss: 2.7628 | lr: 2.43e-04
+
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
+  Update   46 | Ep   387 | reward:     36.0 | mean(100):    -32.7 | actor_loss: -0.0062 | value_loss: 2.4635 | lr: 2.42e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   56 | Ep   413 | reward:   -102.4 | mean(100):    -10.5 | actor_loss: 0.0017 | value_loss: 3.1338 | lr: 2.38e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  Update   47 | Ep   389 | reward:     34.4 | mean(100):    -31.8 | actor_loss: -0.0046 | value_loss: 2.0157 | lr: 2.42e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.4886 | mean p(bad) before update=0.3578 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   57 | Ep   415 | reward:     64.5 | mean(100):     -9.3 | actor_loss: -0.0022 | value_loss: 1.6489 | lr: 2.38e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   58 | Ep   418 | reward:   -115.8 | mean(100):    -11.3 | actor_loss: 0.0001 | value_loss: 3.6518 | lr: 2.38e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4053 | mean p(bad) before update=0.3076
-  Update   59 | Ep   420 | reward:     47.4 | mean(100):    -11.0 | actor_loss: -0.0043 | value_loss: 3.3648 | lr: 2.37e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   48 | Ep   391 | reward:   -176.0 | mean(100):    -34.5 | actor_loss: -0.0009 | value_loss: 3.4896 | lr: 2.42e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   60 | Ep   422 | reward:    124.9 | mean(100):     -8.1 | actor_loss: -0.0023 | value_loss: 3.0772 | lr: 2.37e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   49 | Ep   393 | reward:    -39.5 | mean(100):    -33.6 | actor_loss: -0.0023 | value_loss: 2.1896 | lr: 2.41e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   61 | Ep   424 | reward:    104.9 | mean(100):     -7.2 | actor_loss: -0.0081 | value_loss: 2.6200 | lr: 2.37e-04
-
-  Update   62 | Ep   426 | reward:     57.1 | mean(100):     -6.4 | actor_loss: -0.0073 | value_loss: 2.1851 | lr: 2.36e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   50 | Ep   395 | reward:     29.6 | mean(100):    -34.0 | actor_loss: -0.0039 | value_loss: 2.0471 | lr: 2.41e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   63 | Ep   428 | reward:    141.5 | mean(100):     -3.7 | actor_loss: -0.0037 | value_loss: 3.4904 | lr: 2.36e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5819 | mean p(bad) before update=0.3382
-  Update   64 | Ep   430 | reward:     81.7 | mean(100):     -2.6 | actor_loss: -0.0021 | value_loss: 2.5138 | lr: 2.36e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   65 | Ep   433 | reward:    150.6 | mean(100):      2.1 | actor_loss: -0.0012 | value_loss: 4.0549 | lr: 2.35e-04
-  Update   66 | Ep   436 | reward:    104.1 | mean(100):      1.4 | actor_loss: -0.0022 | value_loss: 3.5921 | lr: 2.35e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2829 | mean p(bad) before update=0.2327
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   67 | Ep   440 | reward:    165.6 | mean(100):      6.2 | actor_loss: -0.0020 | value_loss: 5.4529 | lr: 2.35e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   68 | Ep   444 | reward:    -32.9 | mean(100):     13.3 | actor_loss: -0.0064 | value_loss: 5.2717 | lr: 2.34e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   69 | Ep   446 | reward:     70.0 | mean(100):     15.3 | actor_loss: -0.0030 | value_loss: 3.3354 | lr: 2.33e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4211 | mean p(bad) before update=0.3145
-  Update   70 | Ep   450 | reward:    190.7 | mean(100):     21.7 | actor_loss: -0.0023 | value_loss: 6.0060 | lr: 2.33e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   71 | Ep   453 | reward:    152.1 | mean(100):     28.6 | actor_loss: 0.0001 | value_loss: 4.4773 | lr: 2.32e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   72 | Ep   455 | reward:     76.7 | mean(100):     28.4 | actor_loss: -0.0002 | value_loss: 3.3349 | lr: 2.32e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6323 | mean p(bad) before update=0.4476
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   73 | Ep   460 | reward:    -78.3 | mean(100):     32.9 | actor_loss: -0.0016 | value_loss: 6.6661 | lr: 2.32e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   74 | Ep   463 | reward:    198.6 | mean(100):     36.6 | actor_loss: -0.0024 | value_loss: 4.6409 | lr: 2.31e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   51 | Ep   397 | reward:     39.1 | mean(100):    -32.8 | actor_loss: -0.0053 | value_loss: 1.9522 | lr: 2.41e-04
 
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   75 | Ep   468 | reward:    -44.0 | mean(100):     39.6 | actor_loss: -0.0030 | value_loss: 6.8390 | lr: 2.31e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4957 | mean p(bad) before update=0.3443
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   52 | Ep   399 | reward:     43.2 | mean(100):    -33.9 | actor_loss: -0.0034 | value_loss: 2.5347 | lr: 2.40e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   76 | Ep   471 | reward:    143.4 | mean(100):     45.4 | actor_loss: -0.0028 | value_loss: 4.7289 | lr: 2.30e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.6924 | mean p(bad) before update=0.4469 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   77 | Ep   476 | reward:    -25.6 | mean(100):     46.0 | actor_loss: -0.0004 | value_loss: 6.8458 | lr: 2.29e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2086 | mean p(bad) before update=0.1811
-  Update   78 | Ep   480 | reward:    -34.0 | mean(100):     49.3 | actor_loss: -0.0070 | value_loss: 6.2265 | lr: 2.29e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   79 | Ep   482 | reward:    143.2 | mean(100):     52.1 | actor_loss: -0.0035 | value_loss: 3.3637 | lr: 2.28e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   53 | Ep   401 | reward:   -123.5 | mean(100):    -36.4 | actor_loss: -0.0026 | value_loss: 4.4889 | lr: 2.40e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   80 | Ep   484 | reward:    129.3 | mean(100):     53.8 | actor_loss: -0.0024 | value_loss: 4.1849 | lr: 2.28e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   54 | Ep   404 | reward:    147.7 | mean(100):    -33.0 | actor_loss: -0.0055 | value_loss: 4.9205 | lr: 2.40e-04
 
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   81 | Ep   486 | reward:     55.0 | mean(100):     52.8 | actor_loss: 0.0003 | value_loss: 2.7388 | lr: 2.27e-04
+  Update   55 | Ep   406 | reward:    123.6 | mean(100):    -32.0 | actor_loss: -0.0031 | value_loss: 2.7755 | lr: 2.39e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   82 | Ep   489 | reward:    183.1 | mean(100):     52.9 | actor_loss: -0.0012 | value_loss: 3.7701 | lr: 2.27e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4876 | mean p(bad) before update=0.3832
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   56 | Ep   408 | reward:   -108.6 | mean(100):    -31.7 | actor_loss: -0.0043 | value_loss: 3.5916 | lr: 2.39e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   83 | Ep   493 | reward:    176.8 | mean(100):     56.5 | actor_loss: -0.0026 | value_loss: 4.9023 | lr: 2.27e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=1.5276 | mean p(bad) before update=0.7234 | ul_lr=1.00e-04 (scale=1.00)
 
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   84 | Ep   495 | reward:    103.1 | mean(100):     59.1 | actor_loss: -0.0041 | value_loss: 2.7696 | lr: 2.26e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   57 | Ep   410 | reward:     34.4 | mean(100):    -23.7 | actor_loss: -0.0022 | value_loss: 3.0922 | lr: 2.39e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   85 | Ep   497 | reward:    100.8 | mean(100):     62.4 | actor_loss: -0.0013 | value_loss: 2.3897 | lr: 2.26e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.9506 | mean p(bad) before update=0.5585
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   86 | Ep   501 | reward:    -79.2 | mean(100):     63.9 | actor_loss: -0.0094 | value_loss: 5.5688 | lr: 2.25e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   87 | Ep   503 | reward:    125.3 | mean(100):     68.3 | actor_loss: -0.0044 | value_loss: 1.6787 | lr: 2.25e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   58 | Ep   413 | reward:    -47.3 | mean(100):    -25.2 | actor_loss: -0.0042 | value_loss: 5.2733 | lr: 2.38e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   88 | Ep   505 | reward:    117.9 | mean(100):     69.1 | actor_loss: -0.0052 | value_loss: 2.3601 | lr: 2.25e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   59 | Ep   415 | reward:     45.0 | mean(100):    -22.7 | actor_loss: -0.0081 | value_loss: 2.8271 | lr: 2.38e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3117 | mean p(bad) before update=0.2331
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   89 | Ep   510 | reward:    184.1 | mean(100):     68.1 | actor_loss: -0.0035 | value_loss: 6.4302 | lr: 2.24e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   60 | Ep   417 | reward:    158.2 | mean(100):    -20.1 | actor_loss: -0.0026 | value_loss: 2.6489 | lr: 2.38e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   90 | Ep   512 | reward:    188.0 | mean(100):     68.9 | actor_loss: -0.0058 | value_loss: 3.1343 | lr: 2.23e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   91 | Ep   516 | reward:    -55.3 | mean(100):     70.9 | actor_loss: -0.0014 | value_loss: 4.6069 | lr: 2.23e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   61 | Ep   419 | reward:     80.7 | mean(100):    -21.3 | actor_loss: -0.0064 | value_loss: 2.9570 | lr: 2.37e-04
 
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=1.2457 | mean p(bad) before update=0.5634 | ul_lr=1.00e-04 (scale=1.00)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   92 | Ep   519 | reward:    180.9 | mean(100):     76.8 | actor_loss: -0.0023 | value_loss: 3.4995 | lr: 2.23e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   62 | Ep   421 | reward:     72.9 | mean(100):    -17.2 | actor_loss: -0.0026 | value_loss: 1.6371 | lr: 2.37e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6501 | mean p(bad) before update=0.4447
-  Update   93 | Ep   521 | reward:     70.3 | mean(100):     78.4 | actor_loss: -0.0043 | value_loss: 2.3251 | lr: 2.22e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   94 | Ep   524 | reward:    122.6 | mean(100):     80.1 | actor_loss: -0.0025 | value_loss: 2.8052 | lr: 2.22e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   63 | Ep   423 | reward:     87.3 | mean(100):    -15.8 | actor_loss: -0.0059 | value_loss: 2.1204 | lr: 2.37e-04
 
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   95 | Ep   527 | reward:    195.4 | mean(100):     81.9 | actor_loss: -0.0019 | value_loss: 3.9797 | lr: 2.21e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4257 | mean p(bad) before update=0.2887
+  Update   64 | Ep   426 | reward:    174.7 | mean(100):    -10.9 | actor_loss: -0.0051 | value_loss: 3.8098 | lr: 2.37e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   65 | Ep   428 | reward:    141.8 | mean(100):     -5.6 | actor_loss: -0.0058 | value_loss: 4.5895 | lr: 2.36e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (2 dropped by adv filter) | unlikelihood_loss=1.7859 | mean p(bad) before update=0.5642 | ul_lr=1.00e-04 (scale=1.00)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   66 | Ep   430 | reward:    119.5 | mean(100):     -1.3 | actor_loss: -0.0040 | value_loss: 2.7649 | lr: 2.36e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   67 | Ep   432 | reward:    190.5 | mean(100):      3.7 | actor_loss: -0.0055 | value_loss: 2.6065 | lr: 2.35e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   68 | Ep   434 | reward:     83.0 | mean(100):      8.6 | actor_loss: -0.0062 | value_loss: 1.6141 | lr: 2.35e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   69 | Ep   436 | reward:     97.4 | mean(100):     11.3 | actor_loss: -0.0022 | value_loss: 3.0000 | lr: 2.35e-04
+
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update   96 | Ep   533 | reward:    -15.1 | mean(100):     75.6 | actor_loss: -0.0045 | value_loss: 6.8745 | lr: 2.21e-04
+  Update   70 | Ep   438 | reward:     73.7 | mean(100):     14.9 | actor_loss: -0.0032 | value_loss: 2.2983 | lr: 2.35e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=3.7742 | mean p(bad) before update=0.9756 | ul_lr=9.21e-05 (scale=0.92)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   97 | Ep   536 | reward:    -57.1 | mean(100):     75.4 | actor_loss: -0.0027 | value_loss: 3.5228 | lr: 2.20e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6582 | mean p(bad) before update=0.4087
-  Update   98 | Ep   540 | reward:    -61.8 | mean(100):     78.4 | actor_loss: -0.0040 | value_loss: 4.9987 | lr: 2.20e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   71 | Ep   442 | reward:    -59.2 | mean(100):     15.9 | actor_loss: -0.0022 | value_loss: 5.6994 | lr: 2.34e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update   99 | Ep   542 | reward:    135.4 | mean(100):     79.6 | actor_loss: -0.0045 | value_loss: 3.1337 | lr: 2.19e-04
-
-  Update  100 | Ep   544 | reward:     94.1 | mean(100):     80.5 | actor_loss: -0.0012 | value_loss: 2.6834 | lr: 2.19e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   72 | Ep   445 | reward:    204.2 | mean(100):     18.6 | actor_loss: -0.0003 | value_loss: 3.7967 | lr: 2.34e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  101 | Ep   547 | reward:     84.5 | mean(100):     81.5 | actor_loss: -0.0009 | value_loss: 3.6415 | lr: 2.18e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  102 | Ep   549 | reward:     76.7 | mean(100):     80.4 | actor_loss: -0.0019 | value_loss: 2.3303 | lr: 2.18e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5971 | mean p(bad) before update=0.4073
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  103 | Ep   552 | reward:     -7.1 | mean(100):     76.9 | actor_loss: -0.0075 | value_loss: 3.8392 | lr: 2.18e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  104 | Ep   556 | reward:    -81.2 | mean(100):     71.9 | actor_loss: -0.0069 | value_loss: 4.7435 | lr: 2.17e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  105 | Ep   558 | reward:    169.8 | mean(100):     74.3 | actor_loss: -0.0020 | value_loss: 4.5161 | lr: 2.17e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.7987 | mean p(bad) before update=0.5250
-  Update  106 | Ep   561 | reward:    163.4 | mean(100):     76.6 | actor_loss: -0.0008 | value_loss: 3.0783 | lr: 2.16e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  107 | Ep   563 | reward:     86.2 | mean(100):     75.0 | actor_loss: -0.0078 | value_loss: 1.1827 | lr: 2.16e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  108 | Ep   566 | reward:    167.6 | mean(100):     74.8 | actor_loss: -0.0064 | value_loss: 3.0251 | lr: 2.16e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   73 | Ep   448 | reward:   -104.4 | mean(100):     17.6 | actor_loss: -0.0010 | value_loss: 5.3672 | lr: 2.33e-04
 
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.7671 | mean p(bad) before update=0.5277 | ul_lr=9.05e-05 (scale=0.91)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  109 | Ep   569 | reward:    184.7 | mean(100):     79.0 | actor_loss: -0.0026 | value_loss: 4.1728 | lr: 2.15e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.3874 | mean p(bad) before update=0.5103
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  110 | Ep   573 | reward:     96.8 | mean(100):     73.5 | actor_loss: -0.0033 | value_loss: 4.5819 | lr: 2.15e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  111 | Ep   576 | reward:    -61.4 | mean(100):     77.2 | actor_loss: -0.0025 | value_loss: 3.6250 | lr: 2.14e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   74 | Ep   452 | reward:    128.0 | mean(100):     19.0 | actor_loss: -0.0032 | value_loss: 6.0728 | lr: 2.33e-04
 
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  112 | Ep   578 | reward:     78.9 | mean(100):     78.1 | actor_loss: -0.0074 | value_loss: 1.4424 | lr: 2.14e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2671 | mean p(bad) before update=0.2114
-  Update  113 | Ep   581 | reward:    -76.3 | mean(100):     75.4 | actor_loss: 0.0014 | value_loss: 3.3784 | lr: 2.13e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update   75 | Ep   454 | reward:     79.6 | mean(100):     21.6 | actor_loss: 0.0001 | value_loss: 2.0690 | lr: 2.32e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   76 | Ep   456 | reward:    153.6 | mean(100):     27.3 | actor_loss: -0.0043 | value_loss: 3.2117 | lr: 2.32e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   77 | Ep   459 | reward:    -75.0 | mean(100):     29.6 | actor_loss: -0.0022 | value_loss: 3.2710 | lr: 2.32e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.6880 | mean p(bad) before update=0.4443 | ul_lr=8.33e-05 (scale=0.83)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   78 | Ep   461 | reward:    196.4 | mean(100):     33.4 | actor_loss: -0.0039 | value_loss: 2.5266 | lr: 2.31e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   79 | Ep   464 | reward:    169.9 | mean(100):     37.3 | actor_loss: -0.0021 | value_loss: 3.4205 | lr: 2.31e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   80 | Ep   467 | reward:    110.2 | mean(100):     43.3 | actor_loss: -0.0023 | value_loss: 3.3151 | lr: 2.30e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   81 | Ep   469 | reward:     97.5 | mean(100):     43.8 | actor_loss: -0.0045 | value_loss: 1.1595 | lr: 2.30e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (4 dropped by adv filter, 0 applied)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   82 | Ep   472 | reward:    150.8 | mean(100):     50.3 | actor_loss: -0.0004 | value_loss: 3.4523 | lr: 2.30e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   83 | Ep   475 | reward:    -42.0 | mean(100):     51.0 | actor_loss: -0.0045 | value_loss: 3.3457 | lr: 2.29e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   84 | Ep   477 | reward:     85.2 | mean(100):     52.0 | actor_loss: -0.0006 | value_loss: 2.1387 | lr: 2.29e-04
+
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   85 | Ep   479 | reward:    108.3 | mean(100):     52.9 | actor_loss: -0.0031 | value_loss: 1.2792 | lr: 2.28e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.5598 | mean p(bad) before update=0.3942 | ul_lr=7.42e-05 (scale=0.74)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   86 | Ep   481 | reward:     97.2 | mean(100):     51.6 | actor_loss: -0.0125 | value_loss: 2.1885 | lr: 2.28e-04
 
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  114 | Ep   584 | reward:     30.4 | mean(100):     72.9 | actor_loss: -0.0008 | value_loss: 3.5722 | lr: 2.13e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  115 | Ep   588 | reward:     94.1 | mean(100):     77.1 | actor_loss: -0.0019 | value_loss: 4.2895 | lr: 2.12e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6017 | mean p(bad) before update=0.4256
+  Update   87 | Ep   484 | reward:    179.4 | mean(100):     52.7 | actor_loss: 0.0033 | value_loss: 3.8201 | lr: 2.28e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  116 | Ep   591 | reward:   -163.9 | mean(100):     73.6 | actor_loss: -0.0019 | value_loss: 4.3220 | lr: 2.12e-04
+  Update   88 | Ep   489 | reward:    207.9 | mean(100):     59.8 | actor_loss: -0.0028 | value_loss: 6.2767 | lr: 2.27e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.3643 | mean p(bad) before update=0.3053 | ul_lr=6.73e-05 (scale=0.67)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  117 | Ep   594 | reward:    -53.0 | mean(100):     70.6 | actor_loss: -0.0058 | value_loss: 4.2410 | lr: 2.11e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   89 | Ep   492 | reward:    177.1 | mean(100):     65.3 | actor_loss: -0.0026 | value_loss: 4.8951 | lr: 2.27e-04
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  118 | Ep   597 | reward:    189.5 | mean(100):     72.1 | actor_loss: -0.0014 | value_loss: 2.8896 | lr: 2.11e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   90 | Ep   494 | reward:    118.9 | mean(100):     67.5 | actor_loss: -0.0009 | value_loss: 2.2243 | lr: 2.26e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8869 | mean p(bad) before update=0.5602
-  Update  119 | Ep   601 | reward:    176.3 | mean(100):     73.6 | actor_loss: -0.0002 | value_loss: 6.9340 | lr: 2.10e-04
+  Update   91 | Ep   496 | reward:    164.5 | mean(100):     70.2 | actor_loss: -0.0055 | value_loss: 3.6559 | lr: 2.26e-04
 [AI Agent] Updating 10-point summary with new PPO episodes...
 
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  120 | Ep   605 | reward:    175.0 | mean(100):     74.4 | actor_loss: -0.0022 | value_loss: 4.8300 | lr: 2.10e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  121 | Ep   608 | reward:    196.3 | mean(100):     79.9 | actor_loss: -0.0033 | value_loss: 3.4776 | lr: 2.09e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4872 | mean p(bad) before update=0.3434
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  122 | Ep   613 | reward:    174.9 | mean(100):     77.1 | actor_loss: -0.0050 | value_loss: 6.3006 | lr: 2.09e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  123 | Ep   615 | reward:    148.6 | mean(100):     78.5 | actor_loss: -0.0036 | value_loss: 3.4822 | lr: 2.08e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3589 | mean p(bad) before update=0.2727
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  124 | Ep   621 | reward:    -46.9 | mean(100):     75.4 | actor_loss: -0.0017 | value_loss: 7.6000 | lr: 2.08e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  125 | Ep   625 | reward:    -54.4 | mean(100):     74.1 | actor_loss: -0.0093 | value_loss: 3.6487 | lr: 2.07e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.2233 | mean p(bad) before update=0.6276
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  126 | Ep   630 | reward:    173.8 | mean(100):     78.8 | actor_loss: -0.0056 | value_loss: 6.4508 | lr: 2.06e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  127 | Ep   634 | reward:    218.6 | mean(100):     82.1 | actor_loss: -0.0039 | value_loss: 4.6356 | lr: 2.06e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  128 | Ep   637 | reward:    199.8 | mean(100):     86.4 | actor_loss: -0.0031 | value_loss: 4.7822 | lr: 2.05e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4872 | mean p(bad) before update=0.3478
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  129 | Ep   640 | reward:    209.3 | mean(100):     87.9 | actor_loss: -0.0021 | value_loss: 4.4844 | lr: 2.04e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  130 | Ep   644 | reward:    200.2 | mean(100):     88.4 | actor_loss: -0.0013 | value_loss: 3.5233 | lr: 2.04e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  131 | Ep   649 | reward:    -43.7 | mean(100):     84.0 | actor_loss: -0.0042 | value_loss: 4.3883 | lr: 2.03e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5999 | mean p(bad) before update=0.4464
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  132 | Ep   656 | reward:    -74.9 | mean(100):     85.5 | actor_loss: -0.0050 | value_loss: 8.7106 | lr: 2.03e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.7735 | mean p(bad) before update=0.4624
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  133 | Ep   661 | reward:     90.3 | mean(100):     81.0 | actor_loss: -0.0036 | value_loss: 4.6873 | lr: 2.02e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  134 | Ep   667 | reward:     -2.9 | mean(100):     79.7 | actor_loss: -0.0055 | value_loss: 6.6188 | lr: 2.01e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3332 | mean p(bad) before update=0.2769
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  135 | Ep   671 | reward:     -3.6 | mean(100):     81.3 | actor_loss: -0.0046 | value_loss: 4.8639 | lr: 2.00e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  136 | Ep   674 | reward:    191.2 | mean(100):     84.8 | actor_loss: -0.0011 | value_loss: 4.1193 | lr: 1.99e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  137 | Ep   678 | reward:    -19.3 | mean(100):     85.8 | actor_loss: -0.0006 | value_loss: 5.4293 | lr: 1.99e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3212 | mean p(bad) before update=0.2441
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  138 | Ep   681 | reward:    -71.0 | mean(100):     88.6 | actor_loss: -0.0043 | value_loss: 4.1921 | lr: 1.98e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  139 | Ep   687 | reward:     -9.4 | mean(100):     84.5 | actor_loss: 0.0003 | value_loss: 5.6841 | lr: 1.98e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4141 | mean p(bad) before update=0.3112
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  140 | Ep   694 | reward:    -58.2 | mean(100):     84.1 | actor_loss: -0.0024 | value_loss: 9.4218 | lr: 1.97e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  141 | Ep   697 | reward:     77.4 | mean(100):     83.4 | actor_loss: -0.0025 | value_loss: 4.5793 | lr: 1.96e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  142 | Ep   699 | reward:    129.7 | mean(100):     82.9 | actor_loss: -0.0094 | value_loss: 1.2309 | lr: 1.95e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.1867 | mean p(bad) before update=0.1639
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  143 | Ep   703 | reward:    140.5 | mean(100):     84.6 | actor_loss: -0.0024 | value_loss: 4.6735 | lr: 1.95e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  144 | Ep   706 | reward:    157.6 | mean(100):     80.9 | actor_loss: -0.0009 | value_loss: 5.0825 | lr: 1.95e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  145 | Ep   709 | reward:    167.4 | mean(100):     84.5 | actor_loss: -0.0030 | value_loss: 2.8494 | lr: 1.94e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4209 | mean p(bad) before update=0.3190
-  Update  146 | Ep   711 | reward:    138.0 | mean(100):     86.9 | actor_loss: -0.0051 | value_loss: 2.8483 | lr: 1.94e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  147 | Ep   713 | reward:    107.7 | mean(100):     88.3 | actor_loss: -0.0011 | value_loss: 2.0515 | lr: 1.93e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  148 | Ep   717 | reward:     90.2 | mean(100):     87.8 | actor_loss: -0.0017 | value_loss: 4.5470 | lr: 1.93e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5987 | mean p(bad) before update=0.4116
-  Update  149 | Ep   720 | reward:    124.6 | mean(100):     87.7 | actor_loss: -0.0009 | value_loss: 3.0518 | lr: 1.92e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  150 | Ep   723 | reward:    -32.4 | mean(100):     89.9 | actor_loss: -0.0043 | value_loss: 3.8416 | lr: 1.92e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update   92 | Ep   499 | reward:    164.9 | mean(100):     72.0 | actor_loss: -0.0029 | value_loss: 3.5330 | lr: 2.26e-04
 
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  151 | Ep   725 | reward:    121.1 | mean(100):     90.4 | actor_loss: -0.0082 | value_loss: 0.7723 | lr: 1.92e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  152 | Ep   729 | reward:     -9.3 | mean(100):     87.8 | actor_loss: -0.0031 | value_loss: 4.1479 | lr: 1.91e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5731 | mean p(bad) before update=0.3694
-  Update  153 | Ep   733 | reward:    109.1 | mean(100):     88.8 | actor_loss: -0.0012 | value_loss: 4.5588 | lr: 1.91e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.8164 | mean p(bad) before update=0.4783 | ul_lr=6.10e-05 (scale=0.61)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  154 | Ep   737 | reward:    223.4 | mean(100):     86.1 | actor_loss: -0.0035 | value_loss: 4.2992 | lr: 1.90e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.7586 | mean p(bad) before update=0.4029
-  Update  155 | Ep   743 | reward:     -8.4 | mean(100):     86.4 | actor_loss: -0.0026 | value_loss: 8.4561 | lr: 1.89e-04
+  Update   93 | Ep   502 | reward:    116.2 | mean(100):     78.0 | actor_loss: -0.0019 | value_loss: 3.3356 | lr: 2.25e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  156 | Ep   745 | reward:    189.5 | mean(100):     86.2 | actor_loss: -0.0043 | value_loss: 2.0795 | lr: 1.89e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  157 | Ep   749 | reward:    218.3 | mean(100):     92.1 | actor_loss: -0.0080 | value_loss: 4.1121 | lr: 1.88e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5532 | mean p(bad) before update=0.3753
-  Update  158 | Ep   751 | reward:    114.0 | mean(100):     93.0 | actor_loss: -0.0028 | value_loss: 2.2684 | lr: 1.88e-04
+  Update   94 | Ep   504 | reward:    168.0 | mean(100):     79.5 | actor_loss: -0.0029 | value_loss: 2.2017 | lr: 2.25e-04
+  Update   95 | Ep   508 | reward:    174.1 | mean(100):     82.9 | actor_loss: -0.0019 | value_loss: 6.5969 | lr: 2.24e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3264 | mean p(bad) before update=0.2766 | ul_lr=5.96e-05 (scale=0.60)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  159 | Ep   753 | reward:    126.2 | mean(100):     94.3 | actor_loss: -0.0074 | value_loss: 1.6088 | lr: 1.87e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  160 | Ep   757 | reward:     84.1 | mean(100):    101.6 | actor_loss: -0.0011 | value_loss: 5.4041 | lr: 1.87e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8959 | mean p(bad) before update=0.5285
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  161 | Ep   760 | reward:     15.9 | mean(100):    103.6 | actor_loss: -0.0042 | value_loss: 2.7536 | lr: 1.86e-04
-
+  Update   96 | Ep   510 | reward:     48.4 | mean(100):     80.9 | actor_loss: -0.0036 | value_loss: 2.6345 | lr: 2.24e-04
+  Update   97 | Ep   513 | reward:     94.8 | mean(100):     87.5 | actor_loss: -0.0020 | value_loss: 3.4887 | lr: 2.23e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  162 | Ep   767 | reward:    201.4 | mean(100):    103.1 | actor_loss: -0.0018 | value_loss: 10.1085 | lr: 1.86e-04
+  Update   98 | Ep   516 | reward:    -78.2 | mean(100):     85.3 | actor_loss: -0.0084 | value_loss: 3.5006 | lr: 2.23e-04
+  Update   99 | Ep   518 | reward:     99.5 | mean(100):     86.5 | actor_loss: -0.0033 | value_loss: 1.0858 | lr: 2.23e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.5050 | mean p(bad) before update=0.3116 | ul_lr=5.63e-05 (scale=0.56)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  163 | Ep   769 | reward:    138.1 | mean(100):    101.9 | actor_loss: -0.0012 | value_loss: 2.3871 | lr: 1.85e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  100 | Ep   520 | reward:    159.3 | mean(100):     87.5 | actor_loss: -0.0021 | value_loss: 2.0425 | lr: 2.22e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2393 | mean p(bad) before update=0.2003
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  164 | Ep   773 | reward:    149.2 | mean(100):    103.0 | actor_loss: -0.0011 | value_loss: 4.0449 | lr: 1.85e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  Update  101 | Ep   523 | reward:    198.9 | mean(100):     89.9 | actor_loss: -0.0029 | value_loss: 3.4125 | lr: 2.22e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  165 | Ep   777 | reward:    101.4 | mean(100):    100.7 | actor_loss: -0.0042 | value_loss: 4.2406 | lr: 1.84e-04
+  Update  102 | Ep   526 | reward:    132.1 | mean(100):     93.2 | actor_loss: -0.0011 | value_loss: 3.8688 | lr: 2.22e-04
+  Update  103 | Ep   528 | reward:     99.5 | mean(100):     92.5 | actor_loss: -0.0025 | value_loss: 2.3421 | lr: 2.21e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2313 | mean p(bad) before update=0.1871 | ul_lr=5.34e-05 (scale=0.53)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  166 | Ep   779 | reward:    198.4 | mean(100):    103.5 | actor_loss: -0.0021 | value_loss: 1.9253 | lr: 1.83e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  104 | Ep   530 | reward:    206.6 | mean(100):     93.3 | actor_loss: -0.0016 | value_loss: 1.9682 | lr: 2.21e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.3387 | mean p(bad) before update=0.6933
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  167 | Ep   782 | reward:    -45.2 | mean(100):    102.0 | actor_loss: -0.0055 | value_loss: 3.0448 | lr: 1.83e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  168 | Ep   787 | reward:    -38.1 | mean(100):    102.6 | actor_loss: -0.0044 | value_loss: 4.2631 | lr: 1.83e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8398 | mean p(bad) before update=0.5640
+  Update  105 | Ep   535 | reward:    -33.4 | mean(100):     89.4 | actor_loss: -0.0036 | value_loss: 6.9891 | lr: 2.20e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  169 | Ep   792 | reward:    195.0 | mean(100):    110.4 | actor_loss: -0.0021 | value_loss: 6.1014 | lr: 1.82e-04
+  Update  106 | Ep   538 | reward:    130.6 | mean(100):     88.6 | actor_loss: -0.0039 | value_loss: 2.8747 | lr: 2.20e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4311 | mean p(bad) before update=0.3300 | ul_lr=5.59e-05 (scale=0.56)
+  Update  107 | Ep   542 | reward:     78.0 | mean(100):     88.3 | actor_loss: -0.0042 | value_loss: 3.9627 | lr: 2.19e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  170 | Ep   795 | reward:    103.4 | mean(100):    112.4 | actor_loss: -0.0029 | value_loss: 4.1529 | lr: 1.81e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  108 | Ep   544 | reward:     62.9 | mean(100):     89.1 | actor_loss: -0.0030 | value_loss: 2.3448 | lr: 2.19e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8709 | mean p(bad) before update=0.5241
+  Update  109 | Ep   548 | reward:    -37.5 | mean(100):     89.9 | actor_loss: -0.0077 | value_loss: 4.9465 | lr: 2.18e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2876 | mean p(bad) before update=0.2215 | ul_lr=5.28e-05 (scale=0.53)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  171 | Ep   800 | reward:    -43.5 | mean(100):    109.3 | actor_loss: -0.0027 | value_loss: 6.7852 | lr: 1.81e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  172 | Ep   804 | reward:    141.7 | mean(100):    108.4 | actor_loss: -0.0039 | value_loss: 3.8199 | lr: 1.80e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4323 | mean p(bad) before update=0.3311
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  173 | Ep   812 | reward:   -161.4 | mean(100):     99.3 | actor_loss: -0.0069 | value_loss: 10.3931 | lr: 1.79e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  174 | Ep   815 | reward:    178.1 | mean(100):    102.6 | actor_loss: -0.0046 | value_loss: 4.4122 | lr: 1.78e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3035 | mean p(bad) before update=0.2569
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  175 | Ep   822 | reward:    -53.3 | mean(100):    104.1 | actor_loss: -0.0049 | value_loss: 8.1593 | lr: 1.78e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  176 | Ep   825 | reward:    163.7 | mean(100):    106.9 | actor_loss: -0.0023 | value_loss: 3.3024 | lr: 1.77e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  177 | Ep   828 | reward:    219.3 | mean(100):    107.9 | actor_loss: -0.0037 | value_loss: 2.4381 | lr: 1.76e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.3437 | mean p(bad) before update=0.3278
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  178 | Ep   834 | reward:    171.2 | mean(100):    107.5 | actor_loss: -0.0015 | value_loss: 7.0897 | lr: 1.76e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  179 | Ep   837 | reward:    194.0 | mean(100):    106.7 | actor_loss: -0.0013 | value_loss: 2.8182 | lr: 1.75e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3814 | mean p(bad) before update=0.3081
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  180 | Ep   842 | reward:    195.3 | mean(100):    100.6 | actor_loss: -0.0031 | value_loss: 7.0503 | lr: 1.74e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  181 | Ep   847 | reward:   -158.8 | mean(100):     93.9 | actor_loss: -0.0013 | value_loss: 5.4355 | lr: 1.74e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6590 | mean p(bad) before update=0.4482
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  182 | Ep   852 | reward:    -59.5 | mean(100):     92.2 | actor_loss: -0.0017 | value_loss: 4.1739 | lr: 1.73e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  183 | Ep   856 | reward:   -126.2 | mean(100):     88.6 | actor_loss: -0.0022 | value_loss: 5.3234 | lr: 1.72e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3596 | mean p(bad) before update=0.2818
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  184 | Ep   862 | reward:    -51.0 | mean(100):     89.2 | actor_loss: -0.0041 | value_loss: 7.4849 | lr: 1.72e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  185 | Ep   864 | reward:    122.5 | mean(100):     89.6 | actor_loss: -0.0035 | value_loss: 1.6684 | lr: 1.71e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  186 | Ep   869 | reward:    -74.0 | mean(100):     87.3 | actor_loss: -0.0000 | value_loss: 4.1291 | lr: 1.70e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6774 | mean p(bad) before update=0.4794
-  Update  187 | Ep   874 | reward:    116.3 | mean(100):     87.0 | actor_loss: -0.0010 | value_loss: 4.8623 | lr: 1.70e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  188 | Ep   876 | reward:    124.1 | mean(100):     86.3 | actor_loss: -0.0035 | value_loss: 1.6495 | lr: 1.69e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  110 | Ep   553 | reward:    201.1 | mean(100):     94.4 | actor_loss: -0.0038 | value_loss: 5.9363 | lr: 2.18e-04
 
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4990 | mean p(bad) before update=0.3807
+  Update  111 | Ep   555 | reward:    107.0 | mean(100):     92.8 | actor_loss: -0.0028 | value_loss: 2.0199 | lr: 2.17e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  112 | Ep   558 | reward:    110.4 | mean(100):     92.8 | actor_loss: -0.0075 | value_loss: 3.0172 | lr: 2.17e-04
+
+  [Analyzer] 1 episodes -> 2 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.1802 | mean p(bad) before update=0.1649 | ul_lr=5.18e-05 (scale=0.52)
+  Update  113 | Ep   561 | reward:    166.5 | mean(100):     96.4 | actor_loss: -0.0021 | value_loss: 4.2295 | lr: 2.16e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  114 | Ep   564 | reward:     92.6 | mean(100):     97.0 | actor_loss: -0.0023 | value_loss: 2.7318 | lr: 2.16e-04
+
+  Update  115 | Ep   566 | reward:     83.1 | mean(100):     96.5 | actor_loss: -0.0047 | value_loss: 2.8732 | lr: 2.15e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  116 | Ep   568 | reward:     86.9 | mean(100):     95.0 | actor_loss: -0.0123 | value_loss: 2.6883 | lr: 2.15e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.3847 | mean p(bad) before update=0.3070 | ul_lr=5.22e-05 (scale=0.52)
+  Update  117 | Ep   571 | reward:    193.6 | mean(100):     95.5 | actor_loss: -0.0024 | value_loss: 3.0969 | lr: 2.15e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  189 | Ep   881 | reward:   -147.0 | mean(100):     81.8 | actor_loss: -0.0014 | value_loss: 9.0245 | lr: 1.69e-04
+  Update  118 | Ep   574 | reward:     86.6 | mean(100):     97.9 | actor_loss: -0.0025 | value_loss: 2.6682 | lr: 2.14e-04
+  Update  119 | Ep   578 | reward:    160.5 | mean(100):    104.5 | actor_loss: -0.0010 | value_loss: 5.6851 | lr: 2.14e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.7789 | mean p(bad) before update=0.7576 | ul_lr=4.60e-05 (scale=0.46)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  190 | Ep   885 | reward:    224.8 | mean(100):     84.9 | actor_loss: -0.0020 | value_loss: 4.1527 | lr: 1.68e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  120 | Ep   581 | reward:    115.6 | mean(100):    108.0 | actor_loss: -0.0038 | value_loss: 2.7128 | lr: 2.13e-04
 
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  191 | Ep   889 | reward:    113.2 | mean(100):     87.4 | actor_loss: -0.0032 | value_loss: 4.0697 | lr: 1.67e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8415 | mean p(bad) before update=0.5617
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  192 | Ep   893 | reward:     -6.2 | mean(100):     82.3 | actor_loss: -0.0034 | value_loss: 3.9736 | lr: 1.67e-04
-
+  Update  121 | Ep   586 | reward:    198.1 | mean(100):    109.7 | actor_loss: -0.0046 | value_loss: 6.7367 | lr: 2.13e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  193 | Ep   898 | reward:    -56.6 | mean(100):     81.6 | actor_loss: -0.0028 | value_loss: 5.9473 | lr: 1.66e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2558 | mean p(bad) before update=0.2088
-  Update  194 | Ep   900 | reward:    122.7 | mean(100):     85.4 | actor_loss: -0.0049 | value_loss: 1.2046 | lr: 1.65e-04
+  Update  122 | Ep   588 | reward:    109.1 | mean(100):    107.8 | actor_loss: -0.0033 | value_loss: 1.3255 | lr: 2.12e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2135 | mean p(bad) before update=0.1921 | ul_lr=4.55e-05 (scale=0.45)
+  Update  123 | Ep   591 | reward:     85.5 | mean(100):    109.1 | actor_loss: -0.0021 | value_loss: 3.2960 | lr: 2.12e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  124 | Ep   594 | reward:    217.8 | mean(100):    109.4 | actor_loss: -0.0033 | value_loss: 3.3493 | lr: 2.11e-04
+  Update  125 | Ep   598 | reward:    176.8 | mean(100):    110.3 | actor_loss: 0.0006 | value_loss: 4.6100 | lr: 2.11e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (1 dropped by adv filter) | unlikelihood_loss=1.9793 | mean p(bad) before update=0.8618 | ul_lr=4.51e-05 (scale=0.45)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  195 | Ep   903 | reward:    165.4 | mean(100):     85.3 | actor_loss: -0.0021 | value_loss: 3.5429 | lr: 1.65e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  126 | Ep   601 | reward:    -59.1 | mean(100):    109.7 | actor_loss: -0.0068 | value_loss: 3.2234 | lr: 2.10e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  196 | Ep   906 | reward:    -26.4 | mean(100):     88.8 | actor_loss: -0.0016 | value_loss: 2.4106 | lr: 1.65e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3985 | mean p(bad) before update=0.3243
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  197 | Ep   910 | reward:    144.3 | mean(100):     87.9 | actor_loss: -0.0031 | value_loss: 4.3657 | lr: 1.64e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  198 | Ep   913 | reward:    -33.7 | mean(100):     90.8 | actor_loss: -0.0017 | value_loss: 2.3474 | lr: 1.63e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  199 | Ep   917 | reward:    117.3 | mean(100):     90.0 | actor_loss: -0.0041 | value_loss: 4.9459 | lr: 1.63e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4346 | mean p(bad) before update=0.3106
-  Update  200 | Ep   920 | reward:    201.4 | mean(100):     89.8 | actor_loss: -0.0011 | value_loss: 3.0519 | lr: 1.62e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  201 | Ep   924 | reward:    108.7 | mean(100):     85.5 | actor_loss: -0.0032 | value_loss: 3.8085 | lr: 1.62e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  202 | Ep   929 | reward:    -51.6 | mean(100):     86.2 | actor_loss: -0.0041 | value_loss: 4.5771 | lr: 1.61e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8877 | mean p(bad) before update=0.5853
-  Update  203 | Ep   931 | reward:    120.9 | mean(100):     87.1 | actor_loss: -0.0057 | value_loss: 1.2316 | lr: 1.61e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  204 | Ep   935 | reward:    201.2 | mean(100):     86.9 | actor_loss: -0.0033 | value_loss: 3.5598 | lr: 1.60e-04
-  Update  205 | Ep   937 | reward:    197.7 | mean(100):     86.8 | actor_loss: -0.0025 | value_loss: 2.3158 | lr: 1.60e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4197 | mean p(bad) before update=0.3405
-  Update  206 | Ep   940 | reward:     92.3 | mean(100):     91.3 | actor_loss: -0.0040 | value_loss: 3.0880 | lr: 1.59e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  207 | Ep   944 | reward:    231.4 | mean(100):     96.0 | actor_loss: -0.0042 | value_loss: 3.9988 | lr: 1.59e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6800 | mean p(bad) before update=0.4619
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  208 | Ep   952 | reward:    -47.2 | mean(100):     96.6 | actor_loss: -0.0034 | value_loss: 8.7993 | lr: 1.58e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  209 | Ep   958 | reward:    183.3 | mean(100):     99.8 | actor_loss: -0.0029 | value_loss: 6.5324 | lr: 1.57e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6743 | mean p(bad) before update=0.4346
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  210 | Ep   964 | reward:      3.4 | mean(100):    100.4 | actor_loss: -0.0021 | value_loss: 5.2296 | lr: 1.56e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  211 | Ep   969 | reward:      4.4 | mean(100):     99.9 | actor_loss: -0.0020 | value_loss: 4.0964 | lr: 1.55e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.7210 | mean p(bad) before update=0.4381
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  212 | Ep   976 | reward:    176.7 | mean(100):    103.6 | actor_loss: -0.0016 | value_loss: 7.2544 | lr: 1.55e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  213 | Ep   979 | reward:    182.7 | mean(100):    109.6 | actor_loss: -0.0016 | value_loss: 3.2677 | lr: 1.54e-04
-
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.9494 | mean p(bad) before update=0.5964
-  Update  214 | Ep   983 | reward:    121.4 | mean(100):    112.2 | actor_loss: -0.0014 | value_loss: 4.2708 | lr: 1.53e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  215 | Ep   988 | reward:   -135.3 | mean(100):    109.9 | actor_loss: -0.0032 | value_loss: 5.4477 | lr: 1.53e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6280 | mean p(bad) before update=0.4294
-  Update  216 | Ep   993 | reward:    119.7 | mean(100):    109.1 | actor_loss: -0.0059 | value_loss: 4.8273 | lr: 1.52e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  217 | Ep   998 | reward:    186.7 | mean(100):    106.1 | actor_loss: -0.0035 | value_loss: 4.9183 | lr: 1.51e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3093 | mean p(bad) before update=0.2417
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  218 | Ep  1005 | reward:    223.7 | mean(100):    106.6 | actor_loss: -0.0027 | value_loss: 8.1678 | lr: 1.50e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  219 | Ep  1008 | reward:    180.6 | mean(100):    105.7 | actor_loss: -0.0029 | value_loss: 3.5168 | lr: 1.49e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.1619 | mean p(bad) before update=0.6809
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  220 | Ep  1010 | reward:    205.6 | mean(100):    108.3 | actor_loss: -0.0046 | value_loss: 2.2778 | lr: 1.49e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  221 | Ep  1012 | reward:     27.5 | mean(100):    106.5 | actor_loss: -0.0059 | value_loss: 2.0484 | lr: 1.48e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  222 | Ep  1014 | reward:     98.1 | mean(100):    109.4 | actor_loss: -0.0070 | value_loss: 2.3385 | lr: 1.48e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  223 | Ep  1016 | reward:    119.9 | mean(100):    107.1 | actor_loss: -0.0076 | value_loss: 0.4052 | lr: 1.48e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  224 | Ep  1018 | reward:     92.6 | mean(100):    106.0 | actor_loss: -0.0025 | value_loss: 1.8236 | lr: 1.48e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.7901 | mean p(bad) before update=0.4873
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  225 | Ep  1021 | reward:     21.2 | mean(100):    105.9 | actor_loss: -0.0038 | value_loss: 3.2931 | lr: 1.47e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  226 | Ep  1028 | reward:    224.0 | mean(100):    102.1 | actor_loss: -0.0067 | value_loss: 7.2445 | lr: 1.47e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.0872 | mean p(bad) before update=0.4225
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  227 | Ep  1033 | reward:    132.8 | mean(100):    106.6 | actor_loss: -0.0015 | value_loss: 4.7390 | lr: 1.46e-04
+  Update  127 | Ep   603 | reward:    183.6 | mean(100):    110.5 | actor_loss: -0.0016 | value_loss: 2.6131 | lr: 2.10e-04
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  228 | Ep  1036 | reward:    145.2 | mean(100):    105.0 | actor_loss: -0.0042 | value_loss: 2.9033 | lr: 1.45e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  128 | Ep   606 | reward:    187.9 | mean(100):    112.9 | actor_loss: -0.0019 | value_loss: 4.1598 | lr: 2.10e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8497 | mean p(bad) before update=0.5166
+  Update  129 | Ep   608 | reward:    100.5 | mean(100):    112.7 | actor_loss: -0.0027 | value_loss: 2.9317 | lr: 2.09e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (2 dropped by adv filter, 0 applied)
+  Update  130 | Ep   610 | reward:    114.6 | mean(100):    115.9 | actor_loss: -0.0033 | value_loss: 3.0305 | lr: 2.09e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  229 | Ep  1042 | reward:    214.1 | mean(100):    109.7 | actor_loss: -0.0032 | value_loss: 6.3116 | lr: 1.45e-04
+  Update  131 | Ep   613 | reward:    -40.8 | mean(100):    114.0 | actor_loss: -0.0023 | value_loss: 3.4301 | lr: 2.08e-04
 
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  132 | Ep   618 | reward:    211.7 | mean(100):    118.1 | actor_loss: -0.0013 | value_loss: 6.5578 | lr: 2.08e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  230 | Ep  1045 | reward:    123.8 | mean(100):    111.9 | actor_loss: -0.0034 | value_loss: 3.2546 | lr: 1.44e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4058 | mean p(bad) before update=0.3016
+  Update  133 | Ep   621 | reward:    162.1 | mean(100):    120.0 | actor_loss: -0.0022 | value_loss: 5.1751 | lr: 2.07e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  231 | Ep  1051 | reward:    218.2 | mean(100):    114.8 | actor_loss: -0.0064 | value_loss: 5.5896 | lr: 1.43e-04
+  Update  134 | Ep   626 | reward:   -162.7 | mean(100):    114.5 | actor_loss: -0.0011 | value_loss: 6.6863 | lr: 2.07e-04
+  Update  135 | Ep   628 | reward:    105.1 | mean(100):    111.2 | actor_loss: 0.0029 | value_loss: 3.8105 | lr: 2.06e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.2913 | mean p(bad) before update=0.2192 | ul_lr=4.57e-05 (scale=0.46)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  232 | Ep  1056 | reward:    222.5 | mean(100):    119.3 | actor_loss: -0.0030 | value_loss: 5.6242 | lr: 1.42e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  136 | Ep   630 | reward:    -32.3 | mean(100):    108.6 | actor_loss: -0.0020 | value_loss: 1.5494 | lr: 2.06e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2840 | mean p(bad) before update=0.2436
+  Update  137 | Ep   634 | reward:    -18.9 | mean(100):    106.9 | actor_loss: -0.0032 | value_loss: 3.8221 | lr: 2.06e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  233 | Ep  1060 | reward:    -58.0 | mean(100):    116.7 | actor_loss: -0.0039 | value_loss: 4.3184 | lr: 1.42e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  138 | Ep   637 | reward:    157.8 | mean(100):    111.3 | actor_loss: -0.0010 | value_loss: 3.5305 | lr: 2.05e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  234 | Ep  1065 | reward:    204.7 | mean(100):    117.8 | actor_loss: -0.0039 | value_loss: 5.3516 | lr: 1.41e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5224 | mean p(bad) before update=0.3841
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  235 | Ep  1070 | reward:      2.5 | mean(100):    113.5 | actor_loss: -0.0029 | value_loss: 5.4249 | lr: 1.40e-04
+  Update  139 | Ep   639 | reward:     97.9 | mean(100):    110.9 | actor_loss: -0.0044 | value_loss: 2.9158 | lr: 2.04e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3144 | mean p(bad) before update=0.2526 | ul_lr=4.26e-05 (scale=0.43)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  236 | Ep  1075 | reward:     15.1 | mean(100):    110.3 | actor_loss: -0.0048 | value_loss: 3.8168 | lr: 1.39e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4118 | mean p(bad) before update=0.2711
+  Update  140 | Ep   641 | reward:    221.6 | mean(100):    114.7 | actor_loss: -0.0009 | value_loss: 1.5428 | lr: 2.04e-04
+  Update  141 | Ep   644 | reward:    138.3 | mean(100):    117.7 | actor_loss: -0.0012 | value_loss: 2.5740 | lr: 2.04e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4453 | mean p(bad) before update=0.3593 | ul_lr=4.07e-05 (scale=0.41)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  237 | Ep  1081 | reward:    -58.5 | mean(100):     99.7 | actor_loss: -0.0040 | value_loss: 5.3706 | lr: 1.39e-04
+  Update  142 | Ep   650 | reward:    -67.4 | mean(100):    118.5 | actor_loss: -0.0009 | value_loss: 6.4254 | lr: 2.03e-04
+  Update  143 | Ep   652 | reward:    112.3 | mean(100):    116.3 | actor_loss: -0.0042 | value_loss: 3.1010 | lr: 2.02e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  238 | Ep  1085 | reward:    210.9 | mean(100):    103.1 | actor_loss: -0.0037 | value_loss: 4.6067 | lr: 1.38e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  144 | Ep   655 | reward:    144.2 | mean(100):    117.9 | actor_loss: -0.0007 | value_loss: 4.1745 | lr: 2.02e-04
 
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  Update  145 | Ep   658 | reward:    104.9 | mean(100):    121.1 | actor_loss: -0.0012 | value_loss: 3.4110 | lr: 2.02e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1669 | mean p(bad) before update=0.1430 | ul_lr=3.98e-05 (scale=0.40)
+  Update  146 | Ep   662 | reward:    168.6 | mean(100):    120.5 | actor_loss: -0.0006 | value_loss: 3.5594 | lr: 2.01e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  239 | Ep  1088 | reward:     41.7 | mean(100):    102.9 | actor_loss: -0.0037 | value_loss: 2.9341 | lr: 1.37e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  147 | Ep   667 | reward:    -45.1 | mean(100):    121.5 | actor_loss: -0.0031 | value_loss: 6.1596 | lr: 2.01e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.0931 | mean p(bad) before update=0.6357
-  Update  240 | Ep  1090 | reward:    132.5 | mean(100):    103.7 | actor_loss: -0.0054 | value_loss: 0.7891 | lr: 1.37e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4030 | mean p(bad) before update=0.3265 | ul_lr=3.95e-05 (scale=0.39)
+  Update  148 | Ep   672 | reward:    -59.7 | mean(100):    121.0 | actor_loss: -0.0043 | value_loss: 7.8909 | lr: 2.00e-04
+  Update  149 | Ep   675 | reward:    188.5 | mean(100):    121.0 | actor_loss: -0.0021 | value_loss: 3.3653 | lr: 1.99e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  150 | Ep   678 | reward:    149.5 | mean(100):    119.8 | actor_loss: -0.0024 | value_loss: 3.6810 | lr: 1.99e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  241 | Ep  1095 | reward:    179.9 | mean(100):    106.7 | actor_loss: -0.0007 | value_loss: 6.1450 | lr: 1.36e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2703 | mean p(bad) before update=0.2351
-  Update  242 | Ep  1100 | reward:    221.6 | mean(100):    110.9 | actor_loss: -0.0043 | value_loss: 6.0810 | lr: 1.36e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  243 | Ep  1106 | reward:     -4.5 | mean(100):    110.5 | actor_loss: -0.0040 | value_loss: 6.1623 | lr: 1.35e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  244 | Ep  1108 | reward:    -17.2 | mean(100):    110.1 | actor_loss: -0.0029 | value_loss: 2.1907 | lr: 1.34e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.8016 | mean p(bad) before update=0.5317
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.5969 | mean p(bad) before update=0.3196 | ul_lr=4.09e-05 (scale=0.41)
+  Update  151 | Ep   682 | reward:    -25.7 | mean(100):    118.2 | actor_loss: -0.0048 | value_loss: 3.8372 | lr: 1.98e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  245 | Ep  1111 | reward:   -104.7 | mean(100):    108.1 | actor_loss: -0.0049 | value_loss: 3.7409 | lr: 1.34e-04
+  Update  152 | Ep   688 | reward:     15.0 | mean(100):    117.8 | actor_loss: -0.0027 | value_loss: 7.0913 | lr: 1.98e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.0859 | mean p(bad) before update=0.6488 | ul_lr=4.08e-05 (scale=0.41)
+  Update  153 | Ep   693 | reward:    207.0 | mean(100):    118.4 | actor_loss: -0.0064 | value_loss: 6.1081 | lr: 1.97e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  246 | Ep  1116 | reward:    220.0 | mean(100):    106.1 | actor_loss: -0.0022 | value_loss: 7.0586 | lr: 1.33e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5985 | mean p(bad) before update=0.3990
+  Update  154 | Ep   696 | reward:    -57.3 | mean(100):    117.0 | actor_loss: -0.0050 | value_loss: 5.6299 | lr: 1.96e-04
+  Update  155 | Ep   698 | reward:    121.9 | mean(100):    116.2 | actor_loss: -0.0010 | value_loss: 1.4448 | lr: 1.96e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.7991 | mean p(bad) before update=0.5306 | ul_lr=4.11e-05 (scale=0.41)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  247 | Ep  1121 | reward:    161.0 | mean(100):    105.4 | actor_loss: -0.0031 | value_loss: 4.3146 | lr: 1.33e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  156 | Ep   702 | reward:    -11.0 | mean(100):    117.8 | actor_loss: -0.0052 | value_loss: 3.9738 | lr: 1.95e-04
 
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  248 | Ep  1127 | reward:     17.0 | mean(100):    106.9 | actor_loss: -0.0030 | value_loss: 5.8027 | lr: 1.32e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  249 | Ep  1129 | reward:    141.4 | mean(100):    105.6 | actor_loss: -0.0010 | value_loss: 3.0803 | lr: 1.31e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.9309 | mean p(bad) before update=0.4187
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  250 | Ep  1132 | reward:    203.5 | mean(100):    104.6 | actor_loss: -0.0047 | value_loss: 3.2244 | lr: 1.31e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  251 | Ep  1137 | reward:    194.0 | mean(100):    108.4 | actor_loss: -0.0018 | value_loss: 4.6445 | lr: 1.30e-04
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.4185 | mean p(bad) before update=0.3342
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  252 | Ep  1142 | reward:    206.0 | mean(100):    106.7 | actor_loss: -0.0033 | value_loss: 5.1921 | lr: 1.29e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  253 | Ep  1148 | reward:    -19.7 | mean(100):    105.9 | actor_loss: -0.0052 | value_loss: 6.6959 | lr: 1.29e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.5137 | mean p(bad) before update=0.6790
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  254 | Ep  1151 | reward:    197.9 | mean(100):    107.6 | actor_loss: -0.0027 | value_loss: 2.8496 | lr: 1.28e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  255 | Ep  1153 | reward:    244.4 | mean(100):    109.4 | actor_loss: -0.0027 | value_loss: 2.1208 | lr: 1.27e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  256 | Ep  1157 | reward:     18.6 | mean(100):    105.5 | actor_loss: -0.0032 | value_loss: 3.9636 | lr: 1.27e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  257 | Ep  1159 | reward:    216.6 | mean(100):    108.1 | actor_loss: -0.0027 | value_loss: 1.6195 | lr: 1.26e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.9187 | mean p(bad) before update=0.5576
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  258 | Ep  1162 | reward:      9.7 | mean(100):    110.9 | actor_loss: -0.0017 | value_loss: 3.1752 | lr: 1.26e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  259 | Ep  1167 | reward:    217.4 | mean(100):    115.9 | actor_loss: -0.0013 | value_loss: 5.0229 | lr: 1.26e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3638 | mean p(bad) before update=0.2786
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  260 | Ep  1170 | reward:    150.9 | mean(100):    117.7 | actor_loss: -0.0035 | value_loss: 2.5689 | lr: 1.25e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  261 | Ep  1172 | reward:    106.8 | mean(100):    117.4 | actor_loss: -0.0067 | value_loss: 1.3038 | lr: 1.24e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  262 | Ep  1177 | reward:    226.4 | mean(100):    123.8 | actor_loss: -0.0018 | value_loss: 5.6480 | lr: 1.24e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3004 | mean p(bad) before update=0.2543
-  Update  263 | Ep  1182 | reward:    154.7 | mean(100):    128.5 | actor_loss: -0.0025 | value_loss: 7.6294 | lr: 1.23e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  264 | Ep  1188 | reward:    -21.3 | mean(100):    128.4 | actor_loss: -0.0027 | value_loss: 6.9499 | lr: 1.23e-04
-
-  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5471 | mean p(bad) before update=0.3969
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  265 | Ep  1193 | reward:    -18.0 | mean(100):    127.9 | actor_loss: -0.0031 | value_loss: 5.9177 | lr: 1.22e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  266 | Ep  1197 | reward:    238.9 | mean(100):    130.9 | actor_loss: -0.0036 | value_loss: 3.9072 | lr: 1.21e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.9085 | mean p(bad) before update=0.4652
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  267 | Ep  1200 | reward:      4.4 | mean(100):    126.4 | actor_loss: -0.0024 | value_loss: 3.0810 | lr: 1.20e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  268 | Ep  1205 | reward:     42.0 | mean(100):    123.8 | actor_loss: -0.0030 | value_loss: 4.0893 | lr: 1.20e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2032 | mean p(bad) before update=0.1774
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  269 | Ep  1216 | reward:     13.2 | mean(100):    125.3 | actor_loss: -0.0037 | value_loss: 14.1019 | lr: 1.19e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.2456 | mean p(bad) before update=0.2120
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  270 | Ep  1223 | reward:    220.2 | mean(100):    116.5 | actor_loss: -0.0080 | value_loss: 10.6443 | lr: 1.18e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  271 | Ep  1226 | reward:    123.7 | mean(100):    117.0 | actor_loss: -0.0037 | value_loss: 2.5770 | lr: 1.17e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3773 | mean p(bad) before update=0.2902
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  272 | Ep  1233 | reward:     -6.3 | mean(100):    111.0 | actor_loss: -0.0030 | value_loss: 9.8040 | lr: 1.16e-04
-
-
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  273 | Ep  1237 | reward:    -22.5 | mean(100):    105.7 | actor_loss: -0.0076 | value_loss: 3.8573 | lr: 1.15e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.6704 | mean p(bad) before update=0.4203
-  Update  274 | Ep  1240 | reward:    240.6 | mean(100):    105.9 | actor_loss: -0.0040 | value_loss: 3.4555 | lr: 1.14e-04
-[AI Agent] Updating 10-point summary with new PPO episodes...
-
+  Update  157 | Ep   705 | reward:    219.8 | mean(100):    118.8 | actor_loss: -0.0024 | value_loss: 4.9714 | lr: 1.95e-04
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  275 | Ep  1242 | reward:      5.8 | mean(100):    103.2 | actor_loss: -0.0022 | value_loss: 2.5500 | lr: 1.14e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  158 | Ep   708 | reward:    251.3 | mean(100):    119.9 | actor_loss: -0.0025 | value_loss: 5.6884 | lr: 1.94e-04
 
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4360 | mean p(bad) before update=0.3498 | ul_lr=3.92e-05 (scale=0.39)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  276 | Ep  1248 | reward:     37.4 | mean(100):     97.6 | actor_loss: -0.0042 | value_loss: 6.8711 | lr: 1.14e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  159 | Ep   713 | reward:    209.8 | mean(100):    121.6 | actor_loss: -0.0018 | value_loss: 6.6595 | lr: 1.94e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=1.1961 | mean p(bad) before update=0.6836
-  Update  277 | Ep  1251 | reward:    -33.7 | mean(100):     95.0 | actor_loss: -0.0028 | value_loss: 3.5643 | lr: 1.13e-04
+  Update  160 | Ep   716 | reward:    214.4 | mean(100):    125.5 | actor_loss: -0.0028 | value_loss: 4.4118 | lr: 1.93e-04
+  Update  161 | Ep   719 | reward:    171.4 | mean(100):    125.1 | actor_loss: -0.0018 | value_loss: 4.7117 | lr: 1.93e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=2.8865 | mean p(bad) before update=0.7779 | ul_lr=3.79e-05 (scale=0.38)
 
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  162 | Ep   721 | reward:    118.0 | mean(100):    124.2 | actor_loss: -0.0013 | value_loss: 2.3033 | lr: 1.92e-04
+
+  Update  163 | Ep   724 | reward:    129.9 | mean(100):    124.2 | actor_loss: -0.0007 | value_loss: 3.1265 | lr: 1.92e-04
+  Update  164 | Ep   727 | reward:    218.8 | mean(100):    130.1 | actor_loss: -0.0083 | value_loss: 3.7016 | lr: 1.91e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.5217 | mean p(bad) before update=0.3270 | ul_lr=3.40e-05 (scale=0.34)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  165 | Ep   730 | reward:    206.2 | mean(100):    131.9 | actor_loss: -0.0050 | value_loss: 2.5799 | lr: 1.91e-04
+
+  Update  166 | Ep   736 | reward:    207.7 | mean(100):    133.7 | actor_loss: -0.0027 | value_loss: 7.1740 | lr: 1.90e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1561 | mean p(bad) before update=0.1446 | ul_lr=3.16e-05 (scale=0.32)
+  Update  167 | Ep   740 | reward:    -32.6 | mean(100):    136.8 | actor_loss: -0.0054 | value_loss: 4.8224 | lr: 1.90e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  168 | Ep   743 | reward:    234.1 | mean(100):    134.1 | actor_loss: -0.0024 | value_loss: 3.2185 | lr: 1.89e-04
+
+  Update  169 | Ep   747 | reward:    195.6 | mean(100):    134.3 | actor_loss: -0.0009 | value_loss: 3.8601 | lr: 1.89e-04
+  Update  170 | Ep   749 | reward:    189.4 | mean(100):    135.6 | actor_loss: -0.0044 | value_loss: 2.8766 | lr: 1.88e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4718 | mean p(bad) before update=0.3227 | ul_lr=3.01e-05 (scale=0.30)
+  Update  171 | Ep   751 | reward:    121.9 | mean(100):    139.8 | actor_loss: -0.0026 | value_loss: 1.4899 | lr: 1.88e-04
 [AI Agent] Updating 10-point summary with new PPO episodes...
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  278 | Ep  1256 | reward:    246.1 | mean(100):     95.9 | actor_loss: -0.0026 | value_loss: 6.1129 | lr: 1.12e-04
+  Update  172 | Ep   754 | reward:    170.0 | mean(100):    138.6 | actor_loss: -0.0030 | value_loss: 4.5155 | lr: 1.87e-04
+  Update  173 | Ep   758 | reward:    209.1 | mean(100):    137.7 | actor_loss: -0.0067 | value_loss: 5.5609 | lr: 1.87e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.5956 | mean p(bad) before update=0.4273 | ul_lr=3.22e-05 (scale=0.32)
 
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  174 | Ep   762 | reward:     19.4 | mean(100):    135.6 | actor_loss: -0.0034 | value_loss: 4.0590 | lr: 1.86e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  279 | Ep  1259 | reward:    114.6 | mean(100):     93.5 | actor_loss: -0.0051 | value_loss: 2.8191 | lr: 1.12e-04
-
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3170 | mean p(bad) before update=0.2670
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  280 | Ep  1261 | reward:    -31.0 | mean(100):     90.2 | actor_loss: -0.0047 | value_loss: 2.0274 | lr: 1.11e-04
-  Update  281 | Ep  1263 | reward:    123.4 | mean(100):     91.0 | actor_loss: -0.0047 | value_loss: 1.8712 | lr: 1.11e-04
-
-[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  175 | Ep   766 | reward:    214.5 | mean(100):    135.8 | actor_loss: -0.0021 | value_loss: 4.2205 | lr: 1.86e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.1543 | mean p(bad) before update=0.5503 | ul_lr=3.28e-05 (scale=0.33)
+  Update  176 | Ep   771 | reward:    205.4 | mean(100):    134.4 | actor_loss: -0.0023 | value_loss: 5.6758 | lr: 1.85e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  282 | Ep  1267 | reward:    146.0 | mean(100):     88.0 | actor_loss: -0.0012 | value_loss: 3.6628 | lr: 1.11e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5622 | mean p(bad) before update=0.4167
+  Update  177 | Ep   774 | reward:   -114.1 | mean(100):    135.3 | actor_loss: -0.0024 | value_loss: 4.3720 | lr: 1.84e-04
+  Update  178 | Ep   778 | reward:    130.9 | mean(100):    137.0 | actor_loss: -0.0021 | value_loss: 3.9100 | lr: 1.84e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.6440 | mean p(bad) before update=0.4682 | ul_lr=3.00e-05 (scale=0.30)
+  Update  179 | Ep   782 | reward:    145.3 | mean(100):    140.0 | actor_loss: -0.0010 | value_loss: 3.4938 | lr: 1.83e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  283 | Ep  1272 | reward:    186.1 | mean(100):     90.9 | actor_loss: -0.0009 | value_loss: 4.4978 | lr: 1.10e-04
+  Update  180 | Ep   786 | reward:    204.8 | mean(100):    142.8 | actor_loss: -0.0010 | value_loss: 3.6378 | lr: 1.83e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3573 | mean p(bad) before update=0.2987 | ul_lr=2.84e-05 (scale=0.28)
+  Update  181 | Ep   790 | reward:     22.3 | mean(100):    143.3 | actor_loss: -0.0076 | value_loss: 4.3651 | lr: 1.82e-04
+  Update  182 | Ep   792 | reward:     87.9 | mean(100):    143.3 | actor_loss: -0.0083 | value_loss: 1.1220 | lr: 1.81e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  284 | Ep  1279 | reward:    200.6 | mean(100):     86.7 | actor_loss: -0.0034 | value_loss: 9.2089 | lr: 1.09e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  183 | Ep   795 | reward:    200.2 | mean(100):    143.5 | actor_loss: -0.0009 | value_loss: 2.7292 | lr: 1.81e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.5375 | mean p(bad) before update=0.3925
+  Update  184 | Ep   801 | reward:    225.2 | mean(100):    147.7 | actor_loss: -0.0035 | value_loss: 6.2794 | lr: 1.81e-04
+  Update  185 | Ep   803 | reward:    114.7 | mean(100):    147.2 | actor_loss: -0.0004 | value_loss: 1.5333 | lr: 1.80e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  186 | Ep   806 | reward:    200.4 | mean(100):    144.6 | actor_loss: -0.0027 | value_loss: 3.5072 | lr: 1.80e-04
+
+  Update  187 | Ep   808 | reward:    -17.8 | mean(100):    141.3 | actor_loss: -0.0038 | value_loss: 2.6967 | lr: 1.79e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4016 | mean p(bad) before update=0.3249 | ul_lr=2.79e-05 (scale=0.28)
+  Update  188 | Ep   812 | reward:    206.1 | mean(100):    144.2 | actor_loss: -0.0021 | value_loss: 3.3496 | lr: 1.79e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  189 | Ep   815 | reward:    115.4 | mean(100):    142.3 | actor_loss: -0.0023 | value_loss: 2.8405 | lr: 1.78e-04
+
+  Update  190 | Ep   817 | reward:    127.4 | mean(100):    141.7 | actor_loss: -0.0030 | value_loss: 2.7960 | lr: 1.78e-04
+  Update  191 | Ep   819 | reward:    139.6 | mean(100):    140.7 | actor_loss: -0.0080 | value_loss: 0.5025 | lr: 1.77e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4057 | mean p(bad) before update=0.3108 | ul_lr=2.96e-05 (scale=0.30)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  192 | Ep   821 | reward:    191.8 | mean(100):    140.7 | actor_loss: -0.0022 | value_loss: 1.8027 | lr: 1.77e-04
+
+  Update  193 | Ep   825 | reward:    214.6 | mean(100):    139.4 | actor_loss: -0.0046 | value_loss: 4.1029 | lr: 1.77e-04
+  Update  194 | Ep   827 | reward:    110.3 | mean(100):    140.6 | actor_loss: -0.0029 | value_loss: 1.8773 | lr: 1.76e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1018 | mean p(bad) before update=0.0967 | ul_lr=2.76e-05 (scale=0.28)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  195 | Ep   832 | reward:    212.1 | mean(100):    144.8 | actor_loss: -0.0017 | value_loss: 7.9137 | lr: 1.76e-04
+
+  Update  196 | Ep   836 | reward:    207.5 | mean(100):    146.3 | actor_loss: -0.0024 | value_loss: 4.3217 | lr: 1.75e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=2.4873 | mean p(bad) before update=0.7353 | ul_lr=2.78e-05 (scale=0.28)
+  Update  197 | Ep   840 | reward:    -27.0 | mean(100):    144.3 | actor_loss: -0.0041 | value_loss: 5.5404 | lr: 1.75e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  198 | Ep   844 | reward:    206.4 | mean(100):    146.9 | actor_loss: -0.0013 | value_loss: 3.0753 | lr: 1.74e-04
+
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3521 | mean p(bad) before update=0.2922 | ul_lr=2.74e-05 (scale=0.27)
+  Update  199 | Ep   850 | reward:     20.4 | mean(100):    145.2 | actor_loss: -0.0054 | value_loss: 8.0008 | lr: 1.73e-04
+  Update  200 | Ep   853 | reward:    133.8 | mean(100):    145.8 | actor_loss: -0.0048 | value_loss: 3.2451 | lr: 1.72e-04
+  Update  201 | Ep   856 | reward:    -16.0 | mean(100):    142.5 | actor_loss: -0.0059 | value_loss: 3.5239 | lr: 1.72e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.6891 | mean p(bad) before update=0.5208 | ul_lr=2.99e-05 (scale=0.30)
+  Update  202 | Ep   860 | reward:    -25.0 | mean(100):    140.3 | actor_loss: -0.0018 | value_loss: 3.7665 | lr: 1.72e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  Update  203 | Ep   862 | reward:    -11.9 | mean(100):    139.1 | actor_loss: -0.0033 | value_loss: 1.2553 | lr: 1.71e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  204 | Ep   867 | reward:     32.2 | mean(100):    137.9 | actor_loss: -0.0069 | value_loss: 4.3816 | lr: 1.71e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3742 | mean p(bad) before update=0.2975 | ul_lr=3.27e-05 (scale=0.33)
+  Update  205 | Ep   871 | reward:    -34.8 | mean(100):    134.6 | actor_loss: -0.0053 | value_loss: 3.7942 | lr: 1.70e-04
+  Update  206 | Ep   873 | reward:    157.2 | mean(100):    133.4 | actor_loss: -0.0041 | value_loss: 1.3049 | lr: 1.69e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  285 | Ep  1284 | reward:    -19.8 | mean(100):     83.1 | actor_loss: -0.0026 | value_loss: 4.8668 | lr: 1.08e-04
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.7717 | mean p(bad) before update=0.4755
+  Update  207 | Ep   878 | reward:     -3.6 | mean(100):    131.2 | actor_loss: -0.0029 | value_loss: 4.1378 | lr: 1.69e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3608 | mean p(bad) before update=0.3017 | ul_lr=3.69e-05 (scale=0.37)
+  Update  208 | Ep   885 | reward:    217.7 | mean(100):    126.1 | actor_loss: -0.0025 | value_loss: 9.6534 | lr: 1.68e-04
+  Update  209 | Ep   889 | reward:    105.8 | mean(100):    128.1 | actor_loss: -0.0047 | value_loss: 3.3790 | lr: 1.67e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.2249 | mean p(bad) before update=0.2014 | ul_lr=3.57e-05 (scale=0.36)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  210 | Ep   896 | reward:    -43.1 | mean(100):    128.5 | actor_loss: -0.0016 | value_loss: 7.3541 | lr: 1.67e-04
+
+  Update  211 | Ep   898 | reward:    140.7 | mean(100):    127.5 | actor_loss: -0.0021 | value_loss: 1.3407 | lr: 1.66e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.5064 | mean p(bad) before update=0.6503 | ul_lr=3.83e-05 (scale=0.38)
+  Update  212 | Ep   902 | reward:    135.3 | mean(100):    123.5 | actor_loss: -0.0012 | value_loss: 3.6080 | lr: 1.65e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  213 | Ep   904 | reward:    203.6 | mean(100):    125.9 | actor_loss: -0.0012 | value_loss: 1.6072 | lr: 1.65e-04
+
+  Update  214 | Ep   906 | reward:    134.7 | mean(100):    125.0 | actor_loss: -0.0051 | value_loss: 1.5277 | lr: 1.64e-04
+  Update  215 | Ep   908 | reward:    126.2 | mean(100):    126.7 | actor_loss: -0.0030 | value_loss: 1.8152 | lr: 1.64e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3774 | mean p(bad) before update=0.2967 | ul_lr=3.78e-05 (scale=0.38)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  286 | Ep  1293 | reward:      6.0 | mean(100):     80.4 | actor_loss: -0.0055 | value_loss: 9.5753 | lr: 1.07e-04
+  Update  216 | Ep   911 | reward:    237.0 | mean(100):    124.4 | actor_loss: -0.0033 | value_loss: 3.1440 | lr: 1.64e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  Update  217 | Ep   915 | reward:    211.9 | mean(100):    126.4 | actor_loss: -0.0022 | value_loss: 4.6002 | lr: 1.63e-04
+  Update  218 | Ep   917 | reward:    144.3 | mean(100):    125.6 | actor_loss: -0.0054 | value_loss: 0.2835 | lr: 1.63e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=3.3635 | mean p(bad) before update=0.8378 | ul_lr=3.63e-05 (scale=0.36)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  219 | Ep   921 | reward:    138.4 | mean(100):    127.3 | actor_loss: -0.0013 | value_loss: 4.2047 | lr: 1.62e-04
+  Update  220 | Ep   923 | reward:    223.2 | mean(100):    129.0 | actor_loss: -0.0012 | value_loss: 1.5598 | lr: 1.62e-04
+  Update  221 | Ep   928 | reward:    114.4 | mean(100):    126.5 | actor_loss: -0.0020 | value_loss: 4.8657 | lr: 1.62e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.8853 | mean p(bad) before update=0.5164 | ul_lr=3.67e-05 (scale=0.37)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  222 | Ep   932 | reward:    229.5 | mean(100):    126.7 | actor_loss: -0.0029 | value_loss: 4.3691 | lr: 1.61e-04
+
+  Update  223 | Ep   937 | reward:      6.7 | mean(100):    124.7 | actor_loss: -0.0033 | value_loss: 4.6622 | lr: 1.60e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3270 | mean p(bad) before update=0.2700 | ul_lr=3.85e-05 (scale=0.39)
+  Update  224 | Ep   941 | reward:    125.9 | mean(100):    123.0 | actor_loss: -0.0026 | value_loss: 3.9506 | lr: 1.59e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  225 | Ep   943 | reward:    186.9 | mean(100):    122.6 | actor_loss: -0.0027 | value_loss: 2.1213 | lr: 1.59e-04
+  Update  226 | Ep   945 | reward:    154.4 | mean(100):    123.8 | actor_loss: -0.0040 | value_loss: 0.4016 | lr: 1.59e-04
+  Update  227 | Ep   949 | reward:    127.1 | mean(100):    121.4 | actor_loss: -0.0020 | value_loss: 3.7616 | lr: 1.58e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4720 | mean p(bad) before update=0.3405 | ul_lr=3.80e-05 (scale=0.38)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  228 | Ep   951 | reward:    132.5 | mean(100):    124.0 | actor_loss: -0.0055 | value_loss: 0.4496 | lr: 1.58e-04
+
+  Update  229 | Ep   953 | reward:    143.4 | mean(100):    123.3 | actor_loss: -0.0037 | value_loss: 0.3552 | lr: 1.57e-04
+  Update  230 | Ep   959 | reward:    217.9 | mean(100):    124.0 | actor_loss: -0.0058 | value_loss: 7.4823 | lr: 1.57e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3472 | mean p(bad) before update=0.2564 | ul_lr=3.60e-05 (scale=0.36)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  231 | Ep   963 | reward:    185.0 | mean(100):    128.1 | actor_loss: -0.0015 | value_loss: 3.4030 | lr: 1.56e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  Update  232 | Ep   965 | reward:    203.2 | mean(100):    130.8 | actor_loss: -0.0025 | value_loss: 2.4981 | lr: 1.56e-04
+  Update  233 | Ep   969 | reward:    132.8 | mean(100):    134.7 | actor_loss: -0.0022 | value_loss: 4.1737 | lr: 1.55e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=0.1651 | mean p(bad) before update=0.1322 | ul_lr=3.20e-05 (scale=0.32)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  234 | Ep   971 | reward:    141.6 | mean(100):    136.0 | actor_loss: -0.0013 | value_loss: 0.4298 | lr: 1.55e-04
+
+  Update  235 | Ep   975 | reward:    188.1 | mean(100):    136.4 | actor_loss: -0.0004 | value_loss: 4.2267 | lr: 1.54e-04
+  Update  236 | Ep   978 | reward:    117.6 | mean(100):    135.9 | actor_loss: -0.0060 | value_loss: 2.4154 | lr: 1.54e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.5375 | mean p(bad) before update=0.4111 | ul_lr=3.16e-05 (scale=0.32)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  237 | Ep   981 | reward:    128.4 | mean(100):    136.7 | actor_loss: -0.0051 | value_loss: 3.0089 | lr: 1.53e-04
+  Update  238 | Ep   983 | reward:    130.0 | mean(100):    138.9 | actor_loss: -0.0056 | value_loss: 1.0822 | lr: 1.53e-04
+  Update  239 | Ep   985 | reward:     11.4 | mean(100):    136.6 | actor_loss: -0.0053 | value_loss: 1.3557 | lr: 1.53e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  240 | Ep   989 | reward:    182.3 | mean(100):    134.0 | actor_loss: -0.0019 | value_loss: 3.7077 | lr: 1.52e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1824 | mean p(bad) before update=0.1665 | ul_lr=3.35e-05 (scale=0.34)
+  Update  241 | Ep   994 | reward:    188.7 | mean(100):    132.9 | actor_loss: -0.0014 | value_loss: 4.3852 | lr: 1.52e-04
+  Update  242 | Ep   999 | reward:    226.6 | mean(100):    137.8 | actor_loss: -0.0032 | value_loss: 4.9213 | lr: 1.51e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  243 | Ep  1001 | reward:    217.2 | mean(100):    141.0 | actor_loss: -0.0048 | value_loss: 2.1551 | lr: 1.50e-04
+  Update  244 | Ep  1007 | reward:      1.4 | mean(100):    133.2 | actor_loss: -0.0058 | value_loss: 6.8279 | lr: 1.50e-04
+  Update  245 | Ep  1009 | reward:    212.0 | mean(100):    134.0 | actor_loss: -0.0006 | value_loss: 2.5916 | lr: 1.49e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  246 | Ep  1012 | reward:    228.8 | mean(100):    135.9 | actor_loss: -0.0054 | value_loss: 2.5789 | lr: 1.49e-04
+
+  Update  247 | Ep  1017 | reward:    195.8 | mean(100):    135.5 | actor_loss: -0.0014 | value_loss: 4.1457 | lr: 1.48e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.4687 | mean p(bad) before update=0.6919 | ul_lr=3.26e-05 (scale=0.33)
+  Update  248 | Ep  1022 | reward:    -34.7 | mean(100):    134.8 | actor_loss: -0.0034 | value_loss: 4.2062 | lr: 1.47e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  249 | Ep  1024 | reward:    138.7 | mean(100):    135.8 | actor_loss: -0.0016 | value_loss: 1.6378 | lr: 1.47e-04
+  Update  250 | Ep  1027 | reward:    206.7 | mean(100):    134.8 | actor_loss: -0.0056 | value_loss: 2.9746 | lr: 1.46e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3173 | mean p(bad) before update=0.2304 | ul_lr=3.45e-05 (scale=0.34)
+  Update  251 | Ep  1030 | reward:      2.8 | mean(100):    131.0 | actor_loss: -0.0033 | value_loss: 3.0959 | lr: 1.46e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  252 | Ep  1035 | reward:     12.1 | mean(100):    129.4 | actor_loss: -0.0020 | value_loss: 4.8546 | lr: 1.45e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.9891 | mean p(bad) before update=0.6039 | ul_lr=3.54e-05 (scale=0.35)
+  Update  253 | Ep  1042 | reward:    191.2 | mean(100):    129.2 | actor_loss: -0.0042 | value_loss: 7.0826 | lr: 1.45e-04
+  Update  254 | Ep  1044 | reward:    137.1 | mean(100):    128.2 | actor_loss: -0.0050 | value_loss: 1.0463 | lr: 1.44e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.8051 | mean p(bad) before update=0.5035 | ul_lr=3.47e-05 (scale=0.35)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  255 | Ep  1050 | reward:     14.2 | mean(100):    130.6 | actor_loss: -0.0043 | value_loss: 6.5557 | lr: 1.43e-04
+
+  Update  256 | Ep  1052 | reward:    163.0 | mean(100):    130.8 | actor_loss: -0.0046 | value_loss: 2.6185 | lr: 1.42e-04
+  Update  257 | Ep  1054 | reward:    148.7 | mean(100):    129.3 | actor_loss: -0.0013 | value_loss: 1.4667 | lr: 1.42e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  258 | Ep  1059 | reward:     14.2 | mean(100):    128.7 | actor_loss: -0.0078 | value_loss: 4.9070 | lr: 1.42e-04
+
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.1651 | mean p(bad) before update=0.1520 | ul_lr=3.51e-05 (scale=0.35)
+  Update  259 | Ep  1062 | reward:    225.6 | mean(100):    129.8 | actor_loss: -0.0017 | value_loss: 4.0958 | lr: 1.41e-04
+  Update  260 | Ep  1069 | reward:    184.9 | mean(100):    126.6 | actor_loss: -0.0020 | value_loss: 9.5478 | lr: 1.41e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.3067 | mean p(bad) before update=0.7256 | ul_lr=3.64e-05 (scale=0.36)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  261 | Ep  1072 | reward:    139.7 | mean(100):    127.2 | actor_loss: -0.0013 | value_loss: 2.2932 | lr: 1.40e-04
+
+  Update  262 | Ep  1074 | reward:    142.6 | mean(100):    130.2 | actor_loss: -0.0015 | value_loss: 2.8339 | lr: 1.39e-04
+  Update  263 | Ep  1077 | reward:    233.2 | mean(100):    129.5 | actor_loss: -0.0026 | value_loss: 3.4853 | lr: 1.39e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  264 | Ep  1081 | reward:    113.7 | mean(100):    132.5 | actor_loss: -0.0020 | value_loss: 3.9263 | lr: 1.38e-04
+  Update  265 | Ep  1086 | reward:    -12.7 | mean(100):    132.3 | actor_loss: -0.0036 | value_loss: 7.0421 | lr: 1.38e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.8962 | mean p(bad) before update=0.5192 | ul_lr=3.36e-05 (scale=0.34)
+  Update  266 | Ep  1090 | reward:    212.3 | mean(100):    132.7 | actor_loss: -0.0030 | value_loss: 3.1485 | lr: 1.37e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  267 | Ep  1093 | reward:    191.2 | mean(100):    134.5 | actor_loss: -0.0022 | value_loss: 2.7635 | lr: 1.36e-04
+
+  Update  268 | Ep  1096 | reward:    201.8 | mean(100):    132.7 | actor_loss: -0.0020 | value_loss: 2.8119 | lr: 1.36e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.2866 | mean p(bad) before update=0.7193 | ul_lr=3.48e-05 (scale=0.35)
+  Update  269 | Ep  1101 | reward:     -7.0 | mean(100):    130.4 | actor_loss: -0.0024 | value_loss: 5.3407 | lr: 1.36e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  270 | Ep  1106 | reward:    205.5 | mean(100):    132.0 | actor_loss: -0.0049 | value_loss: 5.0636 | lr: 1.35e-04
+
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2543 | mean p(bad) before update=0.2239 | ul_lr=3.33e-05 (scale=0.33)
+  Update  271 | Ep  1110 | reward:    198.2 | mean(100):    133.4 | actor_loss: -0.0017 | value_loss: 5.9215 | lr: 1.34e-04
+  Update  272 | Ep  1117 | reward:    219.0 | mean(100):    132.5 | actor_loss: -0.0036 | value_loss: 7.5963 | lr: 1.33e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.3195 | mean p(bad) before update=0.2369 | ul_lr=3.58e-05 (scale=0.36)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  273 | Ep  1121 | reward:    206.7 | mean(100):    128.4 | actor_loss: -0.0027 | value_loss: 4.0457 | lr: 1.32e-04
+
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  Update  274 | Ep  1123 | reward:    128.3 | mean(100):    129.2 | actor_loss: -0.0030 | value_loss: 2.6599 | lr: 1.32e-04
+  Update  275 | Ep  1128 | reward:    208.2 | mean(100):    132.3 | actor_loss: -0.0027 | value_loss: 5.7152 | lr: 1.32e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.7694 | mean p(bad) before update=0.6124 | ul_lr=3.35e-05 (scale=0.34)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  276 | Ep  1132 | reward:     24.5 | mean(100):    133.0 | actor_loss: -0.0040 | value_loss: 3.5198 | lr: 1.31e-04
+  Update  277 | Ep  1135 | reward:    211.5 | mean(100):    134.8 | actor_loss: -0.0020 | value_loss: 4.2441 | lr: 1.30e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2888 | mean p(bad) before update=0.2470 | ul_lr=3.13e-05 (scale=0.31)
+  Update  278 | Ep  1140 | reward:    222.8 | mean(100):    137.5 | actor_loss: -0.0023 | value_loss: 4.7657 | lr: 1.30e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  279 | Ep  1147 | reward:    216.9 | mean(100):    138.9 | actor_loss: -0.0014 | value_loss: 8.6897 | lr: 1.29e-04
+
+  [Analyzer] 2 episodes -> 4 bad pairs (1 dropped by adv filter) | unlikelihood_loss=1.9547 | mean p(bad) before update=0.6330 | ul_lr=3.00e-05 (scale=0.30)
+  Update  280 | Ep  1150 | reward:    194.6 | mean(100):    140.0 | actor_loss: -0.0021 | value_loss: 3.9417 | lr: 1.28e-04
+  Update  281 | Ep  1159 | reward:     45.0 | mean(100):    136.1 | actor_loss: -0.0067 | value_loss: 9.0186 | lr: 1.28e-04
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2452 | mean p(bad) before update=0.2174 | ul_lr=3.23e-05 (scale=0.32)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  282 | Ep  1162 | reward:    127.9 | mean(100):    135.4 | actor_loss: -0.0005 | value_loss: 2.6100 | lr: 1.26e-04
+
+  Update  283 | Ep  1166 | reward:    247.5 | mean(100):    138.0 | actor_loss: -0.0026 | value_loss: 3.1470 | lr: 1.26e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4571 | mean p(bad) before update=0.3352 | ul_lr=3.27e-05 (scale=0.33)
+  Update  284 | Ep  1172 | reward:    240.7 | mean(100):    134.5 | actor_loss: -0.0012 | value_loss: 4.9546 | lr: 1.25e-04
   Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  287 | Ep  1296 | reward:    120.1 | mean(100):     80.7 | actor_loss: -0.0024 | value_loss: 3.3620 | lr: 1.06e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  285 | Ep  1177 | reward:    -62.5 | mean(100):    130.4 | actor_loss: -0.0064 | value_loss: 4.9647 | lr: 1.24e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.3107 | mean p(bad) before update=0.2558
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.2190 | mean p(bad) before update=0.1885 | ul_lr=3.76e-05 (scale=0.38)
+  Update  286 | Ep  1180 | reward:      6.4 | mean(100):    124.8 | actor_loss: -0.0044 | value_loss: 2.9430 | lr: 1.23e-04
+  Update  287 | Ep  1185 | reward:     25.7 | mean(100):    124.2 | actor_loss: -0.0006 | value_loss: 6.1656 | lr: 1.23e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.8100 | mean p(bad) before update=0.6421 | ul_lr=3.93e-05 (scale=0.39)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  288 | Ep  1191 | reward:    -17.2 | mean(100):    121.3 | actor_loss: -0.0019 | value_loss: 6.4556 | lr: 1.22e-04
+
+  Update  289 | Ep  1198 | reward:     -5.1 | mean(100):    122.7 | actor_loss: -0.0032 | value_loss: 8.1754 | lr: 1.21e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4062 | mean p(bad) before update=0.2589 | ul_lr=4.10e-05 (scale=0.41)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  290 | Ep  1205 | reward:    -10.2 | mean(100):    118.1 | actor_loss: -0.0020 | value_loss: 7.1580 | lr: 1.20e-04
+
+  Update  291 | Ep  1208 | reward:     64.1 | mean(100):    117.8 | actor_loss: -0.0024 | value_loss: 2.6775 | lr: 1.19e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.7567 | mean p(bad) before update=0.4535 | ul_lr=4.36e-05 (scale=0.44)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  292 | Ep  1213 | reward:    216.1 | mean(100):    112.9 | actor_loss: -0.0041 | value_loss: 5.3792 | lr: 1.19e-04
+
+  Update  293 | Ep  1215 | reward:    196.1 | mean(100):    114.2 | actor_loss: -0.0008 | value_loss: 1.5016 | lr: 1.18e-04
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  294 | Ep  1219 | reward:    243.8 | mean(100):    113.8 | actor_loss: -0.0007 | value_loss: 4.7581 | lr: 1.18e-04
+
+  Update  295 | Ep  1224 | reward:    -59.2 | mean(100):    108.4 | actor_loss: -0.0009 | value_loss: 5.3546 | lr: 1.17e-04
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  296 | Ep  1230 | reward:    225.6 | mean(100):    107.4 | actor_loss: -0.0023 | value_loss: 5.2465 | lr: 1.16e-04
+
+  Update  297 | Ep  1232 | reward:    160.5 | mean(100):    109.9 | actor_loss: -0.0036 | value_loss: 3.0196 | lr: 1.15e-04
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  288 | Ep  1302 | reward:      1.3 | mean(100):     81.3 | actor_loss: -0.0024 | value_loss: 6.4424 | lr: 1.06e-04
+  Update  298 | Ep  1239 | reward:      7.4 | mean(100):    100.8 | actor_loss: -0.0069 | value_loss: 7.7678 | lr: 1.15e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.5037 | mean p(bad) before update=0.3625 | ul_lr=5.00e-05 (scale=0.50)
+  Update  299 | Ep  1241 | reward:    217.3 | mean(100):    100.0 | actor_loss: -0.0015 | value_loss: 1.9806 | lr: 1.14e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  289 | Ep  1308 | reward:   -126.3 | mean(100):     79.4 | actor_loss: -0.0046 | value_loss: 8.1016 | lr: 1.05e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  300 | Ep  1246 | reward:    110.3 | mean(100):     97.3 | actor_loss: -0.0033 | value_loss: 5.7479 | lr: 1.14e-04
 
-  [Analyzer] 2 episodes -> 4 bad pairs | unlikelihood_loss=0.7200 | mean p(bad) before update=0.4747
+  Update  301 | Ep  1248 | reward:    248.2 | mean(100):     97.0 | actor_loss: -0.0003 | value_loss: 1.5691 | lr: 1.13e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.8803 | mean p(bad) before update=0.4102 | ul_lr=5.28e-05 (scale=0.53)
 
 [AI Agent] Updating 10-point summary with new PPO episodes...
-  Update  290 | Ep  1310 | reward:    137.7 | mean(100):     82.2 | actor_loss: -0.0024 | value_loss: 0.8070 | lr: 1.04e-04
+  Update  302 | Ep  1251 | reward:    -32.6 | mean(100):     94.4 | actor_loss: -0.0036 | value_loss: 4.5314 | lr: 1.13e-04
+  Update  303 | Ep  1257 | reward:    137.1 | mean(100):     95.4 | actor_loss: -0.0017 | value_loss: 6.3854 | lr: 1.12e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.4793 | mean p(bad) before update=0.2732 | ul_lr=5.67e-05 (scale=0.57)
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  291 | Ep  1315 | reward:    128.5 | mean(100):     82.8 | actor_loss: -0.0016 | value_loss: 4.5623 | lr: 1.03e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  304 | Ep  1265 | reward:    -31.6 | mean(100):     86.7 | actor_loss: -0.0039 | value_loss: 6.9067 | lr: 1.11e-04
 
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.8284 | mean p(bad) before update=0.5477 | ul_lr=5.71e-05 (scale=0.57)
+  Update  305 | Ep  1271 | reward:    -56.1 | mean(100):     85.8 | actor_loss: -0.0045 | value_loss: 6.3817 | lr: 1.10e-04
 
-[AI Agent] Updating 10-point summary with new PPO episodes...  Update  292 | Ep  1319 | reward:     29.1 | mean(100):     91.6 | actor_loss: -0.0022 | value_loss: 3.5102 | lr: 1.03e-04
+[AI Agent] Updating 10-point summary with new PPO episodes...  Update  306 | Ep  1277 | reward:     33.3 | mean(100):     88.4 | actor_loss: -0.0014 | value_loss: 5.0369 | lr: 1.09e-04
 
+  Plot saved to: /home/vijay/Documents/work3/logs/rewards_llm.png
+  [Analyzer] 1 episodes -> 2 bad pairs (0 dropped by adv filter) | unlikelihood_loss=0.8207 | mean p(bad) before update=0.4756 | ul_lr=5.62e-05 (scale=0.56)
+  Update  307 | Ep  1283 | reward:    208.2 | mean(100):     87.7 | actor_loss: -0.0026 | value_loss: 7.9545 | lr: 1.08e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (2 dropped by adv filter) | unlikelihood_loss=0.9207 | mean p(bad) before update=0.5895 | ul_lr=5.64e-05 (scale=0.56)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  308 | Ep  1292 | reward:   -148.5 | mean(100):     87.3 | actor_loss: -0.0030 | value_loss: 12.1639 | lr: 1.08e-04
+  Update  309 | Ep  1298 | reward:    181.5 | mean(100):     83.6 | actor_loss: -0.0048 | value_loss: 5.7795 | lr: 1.06e-04
+  [Analyzer] 2 episodes -> 4 bad pairs (0 dropped by adv filter) | unlikelihood_loss=1.1502 | mean p(bad) before update=0.5316 | ul_lr=5.56e-05 (scale=0.56)
+
+[AI Agent] Updating 10-point summary with new PPO episodes...
+  Update  310 | Ep  1303 | reward:    148.8 | mean(100):     88.9 | actor_loss: -0.0028 | value_loss: 5.2825 | lr: 1.05e-04

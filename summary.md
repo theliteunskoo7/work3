@@ -1,22 +1,13 @@
 # Environment Summary
-Last updated: 2026-06-23 11:29:19
+Last updated: 2026-07-02 13:16:17
 
-1. **Progress in Overall Performance**: Episode 2 demonstrated a notable improvement in total reward (128.5) compared to its predecessor (196.8 in Episode 1). This reflects advancements in the agent’s learning, with a substantial increase in total steps (from 257 to 1000), indicating more experience in handling various flight scenarios.
-
-2. **Heightened Engine Control Challenges**: The agent continues to struggle with appropriate thrust application, particularly in critical phases such as landing. The frequency of penalties related to thrust mismanagement underscores the need for targeted training on engine usage.
-
-3. **Complex Decision-Making Under Various Conditions**: The agent remains inconsistent in evaluating risk and making optimal actions, particularly during complex maneuvers. Penalties associated with poor decision-making (especially during descent) illustrate this ongoing challenge.
-
-4. **Continued Ground Contact Penalties**: There's a persistent issue with ground contact penalties across episodes, suggesting that the agent struggles to execute effective landing strategies. A focused approach to refining landing techniques is imperative for better outcomes.
-
-5. **Variability and Adaptability in Engine Selection**: While some progress has been made in adapting engine use based on flight conditions, the agent’s decisions frequently appear reckless or suboptimal. Reinforcement efforts focusing on engine selection strategies are necessary.
-
-6. **Difficulty Maintaining Motion Stability**: The agent continues to experience difficulties in balancing lateral and vertical motions, with notable penalties for excessive lateral movements. Additional training aimed at maintaining a steady vertical orientation during maneuvers is essential.
-
-7. **Recurring Impact of Negative Rewards**: The agent continues to incur significant penalties for certain high-risk actions, indicating a critical area for analyzing and refining strategies to minimize severe negative outcomes during episodes.
-
-8. **Terrain Adaptation Still Required**: The agent shows difficulty when encountering varied terrain, which points to a need for diverse training scenarios to enhance adaptability and improve overall landing performance.
-
-9. **Imbalance in Exploration and Exploitation**: The agent has not yet achieved a balanced approach between exploring new strategies and exploiting known successful ones, as evidenced by repeated penalties for unexpected actions. Enhanced understanding of action outcomes is needed.
-
-10. **Need for Dynamic Learning Mechanisms**: The ability of the agent to adapt to real-time changes in the environment remains insufficient, as frequent penalties arise from unforeseen situations. Future training should prioritize the development of rapid strategy adjustments in response to dynamic conditions.
+1. Main engine (Action 2) is the primary tool for managing altitude (`y_pos`) and vertical descent velocity (`y_vel`).
+2. Side engines (Actions 1 and 3) provide lateral force for horizontal movement (`x_pos`, `x_vel`) and torque for orientation control (`angle`, `ang_vel`).
+3. The application of the main engine (Action 2) at non-zero `angle` generates significant rotational torque, which can exacerbate `ang_vel` and potentially make rotation unarrestable during descent.
+4. The transition of a single leg from 0.0 to 1.0 (asymmetrical contact) triggers an immediate, high-magnitude spike in angular velocity (`ang_vel`).
+5. The interval between the first leg making contact and the second leg establishing contact is a phase of extreme instability characterized by rapid, continuous acceleration of `ang_vel`.
+6. The rotational impulse during contact is compounded by both the lander's `angle` and its pre-existing `ang_vel` at the moment of impact.
+7. Dual-leg contact (1.0, 1.0) establishes a "grounded" state, but stability in this state is highly dependent on the ability to immediately arrest `ang_vel` using side engines.
+8. If `ang_vel` is high at the moment of the second leg contact, the resulting rotational impulse can cause the lander to bounce or tip, even if both legs are technically engaged.
+9. Leg contact is not a permanent state; significant rotational or vertical kinetic energy can cause a leg to transition from 1.0 back to 0.0, leading to a bouncing or tipping effect.
+10. Maintaining stable dual-leg contact requires continuous management of `ang_vel` to prevent the buildup of energy that triggers leg-rebound events (transitions from 1.0 back to 0.0).

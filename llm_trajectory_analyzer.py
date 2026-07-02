@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime
 
 # Own log file — kept separate from ai_agent.py's logs/interaction_log.md so
@@ -19,6 +20,12 @@ def log_interaction(call_type, prompt_messages, response_text):
         f.write("### Response\n\n")
         f.write(f"```\n{response_text}\n```\n\n")
 
+def strip_markdown_json(text):
+    """Extract the first JSON object from text, stripping markdown code fences."""
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    return match.group() if match else text
+
+
 ANALYZER_SYSTEM_PROMPT_TEMPLATE = """You are an expert reinforcement learning trajectory analyst studying a lunar lander simulation.
 
 STATE: A list of 8 values — [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]
@@ -30,6 +37,12 @@ Current environment understanding (10-point summary built from prior observed tr
 You will be given a batch of full episode trajectories (state, action, reward per step). For each
 trajectory, identify the top {top_k} "bad actions" in it.
 
+TRAJECTORY FORMAT: The state at step N is the state BEFORE the action at step N is taken.
+The state at step N+1 is the direct result of that action. To evaluate whether an action
+was harmful, compare the state at step N with the state at step N+1 — that difference shows
+what the action actually caused. Use the reward as corroborating evidence alongside this
+state transition, not as the primary criterion.
+
 A bad action is NOT simply the step with the lowest immediate reward. It is the action that most
 likely CAUSED the trajectory to end up in a bad state — i.e. the action that pushed the lander away
 from a recoverable path, or had the greatest negative impact on eventually reaching a safe landing.
@@ -37,7 +50,7 @@ Reason about the full arc of the trajectory: ask "which action here was the reas
 ended up bad?", using the environment summary above to judge whether an action was structurally
 harmful given the state it was taken in.
 
-Always respond with valid JSON in this exact format:
+Always respond with valid JSON in this exact format. The "reason" field must be plain English only — no backslashes, LaTeX, math notation, or special characters:
 {{
   "episodes": [
     {{
@@ -65,7 +78,7 @@ def format_trajectories_for_analysis(episodes):
     return "\n".join(lines)
 
 
-def analyze_trajectories(client, episodes, summary_text, top_k=2, model="gpt-4o-mini", seed=None):
+def analyze_trajectories(client, episodes, summary_text, top_k=2, model="unsloth/gemma-4-26B-A4B-it-GGUF", seed=None):
     """
     episodes: list of episode trajectories, each a list of {"state","action","reward"} dicts
               with RAW (unnormalized) physical states.
@@ -100,12 +113,14 @@ def analyze_trajectories(client, episodes, summary_text, top_k=2, model="gpt-4o-
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            response_format={"type": "json_object"},
             seed=seed,
         )
         response_text = response.choices[0].message.content
         log_interaction(f"Trajectory Analysis | {len(episodes)} episodes", messages, response_text)
-        data = json.loads(response_text)
+        json_text = strip_markdown_json(response_text)
+        # Escape any backslash not part of a valid JSON escape sequence
+        json_text = re.sub(r'\\(?!["\\/bfnrtu]|u[0-9a-fA-F]{4})', r'\\\\', json_text)
+        data = json.loads(json_text)
     except Exception as e:
         log_interaction(f"Trajectory Analysis ERROR | {len(episodes)} episodes", messages, str(e))
         print(f"  [Analyzer failed: {e}] — skipping unlikelihood update this round")

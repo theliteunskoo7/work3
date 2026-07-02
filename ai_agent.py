@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import numpy as np
 import gymnasium as gym
 from datetime import datetime
@@ -41,8 +42,15 @@ touch down gently with both legs simultaneously.
 Always respond with valid JSON: {"actions": [a1, a2, ..., a20]} where each value is 0, 1, 2, or 3."""
 
 
-LOG_FILE     = os.path.join(os.path.dirname(__file__), "logs", "interaction_log.md")
-SUMMARY_FILE = os.path.join(os.path.dirname(__file__), "summary.md")
+LOG_FILE              = os.path.join(os.path.dirname(__file__), "logs", "agent_interaction_log.md")
+SUMMARY_FILE          = os.path.join(os.path.dirname(__file__), "summary.md")
+SUMMARY_HISTORY_FILE  = os.path.join(os.path.dirname(__file__), "summary_history.md")
+
+
+def strip_markdown_json(text):
+    """Extract the first JSON object from text, stripping markdown code fences."""
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    return match.group() if match else text
 
 
 def init_log():
@@ -52,9 +60,14 @@ def init_log():
 
 
 def save_summary(summary_text):
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with open(SUMMARY_FILE, "w") as f:
-        f.write(f"# Environment Summary\nLast updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        f.write(f"# Environment Summary\nLast updated: {timestamp}\n\n")
         f.write(summary_text)
+    with open(SUMMARY_HISTORY_FILE, "a") as f:
+        f.write(f"\n---\n\n## {timestamp}\n\n")
+        f.write(summary_text)
+        f.write("\n")
 
 
 def load_summary():
@@ -90,12 +103,12 @@ def format_trajectories_for_summary(trajectories, episode_rewards):
 
 
 class LunarLanderAIAgent:
-    def __init__(self, api_key, chunk_size=20, model="gpt-4o-mini", seed=DEFAULT_SEED):
+    def __init__(self, api_key, base_url, chunk_size=20, model="unsloth/gemma-4-26B-A4B-it-GGUF", seed=DEFAULT_SEED):
         self.seed = seed
         set_global_seed(seed)
         self.env = gym.make("LunarLander-v3")
         self.env.reset(seed=seed)
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=None)
         self.chunk_size = chunk_size
         self.model = model
         self.summary = None
@@ -119,13 +132,12 @@ class LunarLanderAIAgent:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                response_format={"type": "json_object"},
                 seed=self.seed,
             )
             response_text = response.choices[0].message.content
             log_interaction(f"Action Chunk | Episode {episode_num} Chunk {chunk_num}", messages, response_text)
 
-            data = json.loads(response_text)
+            data = json.loads(strip_markdown_json(response_text))
             actions = [int(a) for a in data.get("actions", []) if int(a) in (0, 1, 2, 3)]
             while len(actions) < self.chunk_size:
                 actions.append(0)
@@ -222,8 +234,10 @@ class LunarLanderAIAgent:
                     f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
                     f"Your current 10-point understanding of the environment:\n{self.summary}\n\n"
                     f"New trajectories observed:\n{traj_text}\n\n"
-                    f"Update and refine your 10-point summary. Keep points that are still valid, "
-                    f"update points where you have learned more, and add new insights. "
+                    f"Update and refine your 10-point summary of environment physics and action effects. "
+                    f"Keep points that are still valid, update points where new trajectory data reveals "
+                    f"more about how the environment behaves, and add new physics insights. "
+                    f"Do not comment on agent performance, training progress, or learning trends. "
                     f"Output exactly 10 numbered points."
                 ),
             },
@@ -279,20 +293,20 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="AI Agent warm start on LunarLander-v3.")
     parser.add_argument("--api-key", type=str, default=None,
-                        help="OpenAI API key. Defaults to OPENAI_API_KEY env var.")
-    parser.add_argument("--model", type=str, default="gpt-4o-mini",
-                        help="OpenAI model used for both action chunking and summary generation.")
+                        help="API key for the model server. Defaults to OPENAI_API_KEY env var, or 'sk-no-key-required'.")
+    parser.add_argument("--base-url", type=str, default="http://172.16.180.19:8001/v1",
+                        help="Base URL of the OpenAI-compatible model server.")
+    parser.add_argument("--model", type=str, default="unsloth/gemma-4-26B-A4B-it-GGUF",
+                        help="Model name served by the local inference server.")
     parser.add_argument("--chunk-size", type=int, default=20)
     parser.add_argument("--episodes", type=int, default=5)
     parser.add_argument("--summary-update-every", type=int, default=2)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     args = parser.parse_args()
 
-    api_key = args.api_key or os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("Set OPENAI_API_KEY environment variable or pass --api-key")
+    api_key = args.api_key or os.getenv("OPENAI_API_KEY", "sk-no-key-required")
 
-    agent = LunarLanderAIAgent(api_key=api_key, chunk_size=args.chunk_size, model=args.model, seed=args.seed)
+    agent = LunarLanderAIAgent(api_key=api_key, base_url=args.base_url, chunk_size=args.chunk_size, model=args.model, seed=args.seed)
     try:
         trajectories, rewards, summary = agent.run_warm_start(
             n_episodes=args.episodes, summary_update_every=args.summary_update_every,
