@@ -26,10 +26,14 @@ def strip_markdown_json(text):
     return match.group() if match else text
 
 
-ANALYZER_SYSTEM_PROMPT_TEMPLATE = """You are an expert reinforcement learning trajectory analyst studying a lunar lander simulation.
+ANALYZER_SYSTEM_PROMPT_TEMPLATE = """You are an expert reinforcement learning trajectory analyst studying a cart-pole balancing simulation.
 
-STATE: A list of 8 values — [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]
-ACTIONS: 0=nothing, 1=left engine, 2=main engine, 3=right engine
+STATE: A list of 4 values — [cart_pos, cart_vel, pole_angle, pole_ang_vel]
+  - cart_pos    : position of cart (fails if |cart_pos| > 2.4)
+  - cart_vel    : velocity of cart (negative=moving left, positive=moving right)
+  - pole_angle  : angle of pole in radians (fails if |angle| > 0.2095; 0=upright)
+  - pole_ang_vel: angular velocity of pole (negative=falling left, positive=falling right)
+ACTIONS: 0=push left, 1=push right
 
 Current environment understanding (10-point summary built from prior observed trajectories):
 {summary}
@@ -44,8 +48,8 @@ what the action actually caused. Use the reward as corroborating evidence alongs
 state transition, not as the primary criterion.
 
 A bad action is NOT simply the step with the lowest immediate reward. It is the action that most
-likely CAUSED the trajectory to end up in a bad state — i.e. the action that pushed the lander away
-from a recoverable path, or had the greatest negative impact on eventually reaching a safe landing.
+likely CAUSED the trajectory to end up in a bad state — i.e. the action that failed to counter
+the pole's fall or moved the cart dangerously close to the track edge.
 Reason about the full arc of the trajectory: ask "which action here was the reason this trajectory
 ended up bad?", using the environment summary above to judge whether an action was structurally
 harmful given the state it was taken in.
@@ -56,7 +60,7 @@ Always respond with valid JSON in this exact format. The "reason" field must be 
     {{
       "episode_index": 0,
       "bad_actions": [
-        {{"step": 0, "state": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "action": 0, "reason": "short reason"}}
+        {{"step": 0, "state": [0.0, 0.0, 0.0, 0.0], "action": 0, "reason": "short reason"}}
       ]
     }}
   ]
@@ -85,7 +89,7 @@ def analyze_trajectories(client, episodes, summary_text, top_k=2, model="unsloth
     summary_text: latest summary.md body, or None if not available yet.
 
     Returns a list, same length and order as `episodes`, where each entry is a list of up to
-    `top_k` (state, action) tuples — state is a raw list of 8 floats, action is an int 0-3.
+    `top_k` (state, action) tuples — state is a raw list of 4 floats, action is an int 0-1.
     Returns [] for an episode if parsing/the API call failed for it.
     """
     if not episodes:
@@ -135,7 +139,7 @@ def analyze_trajectories(client, episodes, summary_text, top_k=2, model="unsloth
             try:
                 state = [float(v) for v in bad["state"]]
                 action = int(bad["action"])
-                if len(state) == 8 and action in (0, 1, 2, 3):
+                if len(state) == 4 and action in (0, 1):
                     pairs.append((state, action))
             except (KeyError, TypeError, ValueError):
                 continue

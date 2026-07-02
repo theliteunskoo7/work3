@@ -8,38 +8,30 @@ from openai import OpenAI
 
 from seeding import set_global_seed, DEFAULT_SEED
 
-SYSTEM_PROMPT = """You are an intelligent agent controlling a lunar lander in a physics simulation.
+SYSTEM_PROMPT = """You are an intelligent agent controlling a cart-pole balancing system.
 
-GOAL: Land the spacecraft safely on the landing pad at coordinates (0, 0).
+GOAL: Keep the pole balanced upright as long as possible by moving the cart left or right.
 
-STATE: A list of 8 values — [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]
-  - x_pos      : horizontal position (negative=left of pad, positive=right of pad)
-  - y_pos      : height above ground (starts ~1.4, ground=0)
-  - x_vel      : horizontal velocity (negative=moving left, positive=moving right)
-  - y_vel      : vertical velocity (negative=falling, positive=rising)
-  - angle      : tilt in radians (negative=tilted left, positive=tilted right, 0=upright)
-  - ang_vel    : angular velocity
-  - left_leg_contact  : 1.0 if left leg touches ground, else 0.0
-  - right_leg_contact : 1.0 if right leg touches ground, else 0.0
+STATE: A list of 4 values — [cart_pos, cart_vel, pole_angle, pole_ang_vel]
+  - cart_pos    : position of the cart on the track (0 = center; fails if |cart_pos| > 2.4)
+  - cart_vel    : velocity of the cart (negative=moving left, positive=moving right)
+  - pole_angle  : angle of the pole in radians (0 = upright; fails if |angle| > 0.2095 rad ≈ 12°)
+  - pole_ang_vel: angular velocity of the pole (negative=falling left, positive=falling right)
 
 ACTIONS:
-  0 = Do nothing
-  1 = Fire left orientation engine  (tilts lander clockwise)
-  2 = Fire main engine              (upward thrust, slows descent)
-  3 = Fire right orientation engine (tilts lander counter-clockwise)
+  0 = Push cart LEFT
+  1 = Push cart RIGHT
 
 REWARD STRUCTURE:
-  - Moving toward pad and reducing speed: positive reward
-  - Moving away or crashing: negative reward
-  - Crash: -100 penalty
-  - Safe landing (both legs, low speed): +100 to +140 bonus
-  - Main engine fire cost: ~0.3 per step
-  - Orientation engine fire cost: ~0.03 per step
+  - +1 for every timestep the pole remains upright
+  - Episode ends when pole falls beyond ±12° or cart goes beyond ±2.4
+  - Maximum episode length: 500 steps (reward = 500 = perfect episode)
 
-STRATEGY: Navigate toward the pad, keep angle near 0, reduce velocity as you approach,
-touch down gently with both legs simultaneously.
+STRATEGY: Counter the direction the pole is falling. If pole_angle > 0 (falling right), push right
+(action 1) to move the cart under the pole. If pole_angle < 0 (falling left), push left (action 0).
+Also account for cart_vel to avoid driving the cart off the track edge.
 
-Always respond with valid JSON: {"actions": [a1, a2, ..., a20]} where each value is 0, 1, 2, or 3."""
+Always respond with valid JSON: {"actions": [a1, a2, ..., a20]} where each value is 0 or 1."""
 
 
 LOG_FILE              = os.path.join(os.path.dirname(__file__), "logs", "agent_interaction_log.md")
@@ -93,7 +85,7 @@ def log_interaction(call_type, prompt_messages, response_text):
 def format_trajectories_for_summary(trajectories, episode_rewards):
     lines = []
     for i, (traj, reward) in enumerate(zip(trajectories, episode_rewards)):
-        outcome = "SUCCESS" if reward > 200 else ("PARTIAL" if reward > 0 else "FAILURE")
+        outcome = "SUCCESS" if reward >= 475 else ("PARTIAL" if reward > 100 else "FAILURE")
         lines.append(f"\nEpisode {i+1} | Total Reward: {reward:.1f} | Outcome: {outcome} | Steps: {len(traj)}")
         lines.append("step | state                                                              | action | reward")
         lines.append("-----|-------------------------------------------------------------------|--------|-------")
@@ -102,11 +94,11 @@ def format_trajectories_for_summary(trajectories, episode_rewards):
     return "\n".join(lines)
 
 
-class LunarLanderAIAgent:
+class CartPoleAIAgent:
     def __init__(self, api_key, base_url, chunk_size=20, model="unsloth/gemma-4-26B-A4B-it-GGUF", seed=DEFAULT_SEED):
         self.seed = seed
         set_global_seed(seed)
-        self.env = gym.make("LunarLander-v3")
+        self.env = gym.make("CartPole-v1")
         self.env.reset(seed=seed)
         self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=None)
         self.chunk_size = chunk_size
@@ -138,7 +130,7 @@ class LunarLanderAIAgent:
             log_interaction(f"Action Chunk | Episode {episode_num} Chunk {chunk_num}", messages, response_text)
 
             data = json.loads(strip_markdown_json(response_text))
-            actions = [int(a) for a in data.get("actions", []) if int(a) in (0, 1, 2, 3)]
+            actions = [int(a) for a in data.get("actions", []) if int(a) in (0, 1)]
             while len(actions) < self.chunk_size:
                 actions.append(0)
             return actions[: self.chunk_size]
@@ -174,7 +166,7 @@ class LunarLanderAIAgent:
                 total_reward += reward
                 state = next_state
 
-        outcome = "SUCCESS" if total_reward > 200 else ("PARTIAL" if total_reward > 0 else "FAILURE")
+        outcome = "SUCCESS" if total_reward >= 475 else ("PARTIAL" if total_reward > 100 else "FAILURE")
         print(f"  Episode {episode_num}: steps={len(trajectory)}, reward={total_reward:.1f}, "
               f"outcome={outcome}, api_calls={chunk_num}")
         return trajectory, total_reward
@@ -187,7 +179,7 @@ class LunarLanderAIAgent:
             {
                 "role": "system",
                 "content": (
-                    "You are an expert analyst studying a lunar lander simulation. "
+                    "You are an expert analyst studying a cart-pole balancing simulation. "
                     "Your summaries will be used by an LLM to analyze RL training trajectories "
                     "and identify bad actions."
                 ),
@@ -195,8 +187,8 @@ class LunarLanderAIAgent:
             {
                 "role": "user",
                 "content": (
-                    f"State format: [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]\n"
-                    f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
+                    f"State format: [cart_pos, cart_vel, pole_angle, pole_ang_vel]\n"
+                    f"Actions: 0=push left, 1=push right\n\n"
                     f"Trajectories:\n{traj_text}\n\n"
                     f"Generate exactly 10 concise numbered key points summarizing:\n"
                     f"- Environment physics and dynamics\n"
@@ -222,7 +214,7 @@ class LunarLanderAIAgent:
             {
                 "role": "system",
                 "content": (
-                    "You are an expert analyst studying a lunar lander simulation. "
+                    "You are an expert analyst studying a cart-pole balancing simulation. "
                     "Your summaries will be used by an LLM to analyze RL training trajectories "
                     "and identify bad actions."
                 ),
@@ -230,8 +222,8 @@ class LunarLanderAIAgent:
             {
                 "role": "user",
                 "content": (
-                    f"State format: [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]\n"
-                    f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
+                    f"State format: [cart_pos, cart_vel, pole_angle, pole_ang_vel]\n"
+                    f"Actions: 0=push left, 1=push right\n\n"
                     f"Your current 10-point understanding of the environment:\n{self.summary}\n\n"
                     f"New trajectories observed:\n{traj_text}\n\n"
                     f"Update and refine your 10-point summary of environment physics and action effects. "
@@ -291,7 +283,7 @@ class LunarLanderAIAgent:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="AI Agent warm start on LunarLander-v3.")
+    parser = argparse.ArgumentParser(description="AI Agent warm start on CartPole-v1.")
     parser.add_argument("--api-key", type=str, default=None,
                         help="API key for the model server. Defaults to OPENAI_API_KEY env var, or 'sk-no-key-required'.")
     parser.add_argument("--base-url", type=str, default="http://172.16.180.19:8001/v1",
@@ -306,7 +298,7 @@ if __name__ == "__main__":
 
     api_key = args.api_key or os.getenv("OPENAI_API_KEY", "sk-no-key-required")
 
-    agent = LunarLanderAIAgent(api_key=api_key, base_url=args.base_url, chunk_size=args.chunk_size, model=args.model, seed=args.seed)
+    agent = CartPoleAIAgent(api_key=api_key, base_url=args.base_url, chunk_size=args.chunk_size, model=args.model, seed=args.seed)
     try:
         trajectories, rewards, summary = agent.run_warm_start(
             n_episodes=args.episodes, summary_update_every=args.summary_update_every,

@@ -41,7 +41,7 @@ def init_layer(layer, gain=np.sqrt(2), bias=0.0):
 
 
 class ActorNetwork(nn.Module):
-    def __init__(self, state_dim=8, action_dim=4, hidden_dim=128):
+    def __init__(self, state_dim=4, action_dim=2, hidden_dim=128):
         super().__init__()
         self.net = nn.Sequential(
             init_layer(nn.Linear(state_dim, hidden_dim)),
@@ -56,7 +56,7 @@ class ActorNetwork(nn.Module):
 
 
 class BaselineNetwork(nn.Module):
-    def __init__(self, state_dim=8, hidden_dim=128):
+    def __init__(self, state_dim=4, hidden_dim=128):
         super().__init__()
         self.net = nn.Sequential(
             init_layer(nn.Linear(state_dim, hidden_dim)),
@@ -99,7 +99,7 @@ def collect_rollout(env, actor, baseline, state_normalizer,
     boundaries.  Returns flat arrays suitable for minibatch PPO training, plus
     a list of completed-episode total rewards for logging.
     """
-    obs_buf  = np.zeros((n_steps, 8), dtype=np.float32)
+    obs_buf  = np.zeros((n_steps, 4), dtype=np.float32)
     act_buf  = np.zeros(n_steps,      dtype=np.int64)
     lp_buf   = np.zeros(n_steps,      dtype=np.float32)   # log π_old(a|s)
     rew_buf  = np.zeros(n_steps,      dtype=np.float32)
@@ -246,11 +246,11 @@ def plot_rewards(episode_rewards, save_path, window=50):
         rm = np.convolve(episode_rewards, np.ones(window) / window, mode="valid")
         ax.plot(np.arange(window, len(episode_rewards) + 1), rm,
                 color="steelblue", linewidth=2, label=f"Running mean (w={window})")
-    ax.axhline(y=200, color="green", linestyle="--", linewidth=1.5, label="Solved (200)")
+    ax.axhline(y=475, color="green", linestyle="--", linewidth=1.5, label="Solved (475)")
     ax.axhline(y=0,   color="gray",  linestyle=":",  linewidth=1)
     ax.set_xlabel("Episode")
     ax.set_ylabel("Total Reward")
-    ax.set_title("PPO — LunarLander-v3")
+    ax.set_title("PPO — CartPole-v1")
     ax.legend()
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -266,7 +266,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
           print_every=1, plot_every=50, seed=DEFAULT_SEED):
 
     set_global_seed(seed)
-    env = gym.make("LunarLander-v3")
+    env = gym.make("CartPole-v1")
     env.reset(seed=seed)
 
     # Hybrid device placement: the batched PPO minibatch update genuinely
@@ -293,10 +293,10 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     recent           = deque(maxlen=100)
     best_mean        = -float("inf")
     last_plot_ep     = 0
-    state_normalizer = RunningStateNormalizer(shape=8)
+    state_normalizer = RunningStateNormalizer(shape=4)
     save_dir         = os.path.dirname(os.path.abspath(__file__))
 
-    print(f"Training PPO on LunarLander-v3 (up to {max_episodes} episodes)")
+    print(f"Training PPO on CartPole-v1 (up to {max_episodes} episodes)")
     print(f"  n_steps={n_steps}  n_epochs={n_epochs}  batch_size={batch_size}")
     print(f"  clip_eps={clip_eps}  lr={lr}  gae_lambda={gae_lambda}")
     print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}\n")
@@ -360,7 +360,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             plot_rewards(all_ep_rewards,
                          save_path=os.path.join(save_dir, "logs", "rewards.png"))
 
-        if mean_100 >= 200 and ep_count >= 100:
+        if mean_100 >= 475 and ep_count >= 100:
             print(f"\nSolved at episode {ep_count} (update {update_num}) "
                   f"with mean {mean_100:.1f}!")
             break
@@ -372,7 +372,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="PPO on LunarLander-v3.")
+    parser = argparse.ArgumentParser(description="PPO on CartPole-v1.")
     parser.add_argument("--episodes",   type=int,   default=2000)
     parser.add_argument("--n-steps",    type=int,   default=2048,
                         help="Env steps per rollout before each PPO update.")

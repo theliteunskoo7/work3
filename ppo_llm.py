@@ -45,7 +45,7 @@ def init_layer(layer, gain=np.sqrt(2), bias=0.0):
 
 
 class ActorNetwork(nn.Module):
-    def __init__(self, state_dim=8, action_dim=4, hidden_dim=128):
+    def __init__(self, state_dim=4, action_dim=2, hidden_dim=128):
         super().__init__()
         self.net = nn.Sequential(
             init_layer(nn.Linear(state_dim, hidden_dim)),
@@ -60,7 +60,7 @@ class ActorNetwork(nn.Module):
 
 
 class BaselineNetwork(nn.Module):
-    def __init__(self, state_dim=8, hidden_dim=128):
+    def __init__(self, state_dim=4, hidden_dim=128):
         super().__init__()
         self.net = nn.Sequential(
             init_layer(nn.Linear(state_dim, hidden_dim)),
@@ -107,7 +107,7 @@ def collect_rollout(env, actor, baseline, state_normalizer,
     episode that hasn't finished by the time the rollout ends is dropped (the
     analyzer/summarizer only ever see complete episodes).
     """
-    obs_buf  = np.zeros((n_steps, 8), dtype=np.float32)
+    obs_buf  = np.zeros((n_steps, 4), dtype=np.float32)
     act_buf  = np.zeros(n_steps,      dtype=np.int64)
     lp_buf   = np.zeros(n_steps,      dtype=np.float32)   # log π_old(a|s)
     rew_buf  = np.zeros(n_steps,      dtype=np.float32)
@@ -312,11 +312,11 @@ def plot_rewards(episode_rewards, save_path, window=50):
         rm = np.convolve(episode_rewards, np.ones(window) / window, mode="valid")
         ax.plot(np.arange(window, len(episode_rewards) + 1), rm,
                 color="steelblue", linewidth=2, label=f"Running mean (w={window})")
-    ax.axhline(y=200, color="green", linestyle="--", linewidth=1.5, label="Solved (200)")
+    ax.axhline(y=475, color="green", linestyle="--", linewidth=1.5, label="Solved (475)")
     ax.axhline(y=0,   color="gray",  linestyle=":",  linewidth=1)
     ax.set_xlabel("Episode")
     ax.set_ylabel("Total Reward")
-    ax.set_title("PPO — LunarLander-v3")
+    ax.set_title("PPO+LLM — CartPole-v1")
     ax.legend()
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -339,8 +339,8 @@ def update_summary_from_episodes(client, current_summary, episodes, rewards, mod
     if current_summary is None:
         print("\n[AI Agent] No prior summary found — generating initial summary from PPO episodes...")
         user_content = (
-            f"State format: [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]\n"
-            f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
+            f"State format: [cart_pos, cart_vel, pole_angle, pole_ang_vel]\n"
+            f"Actions: 0=push left, 1=push right\n\n"
             f"Trajectories:\n{traj_text}\n\n"
             f"Generate exactly 10 concise numbered key points summarizing:\n"
             f"- Environment physics and dynamics\n"
@@ -352,8 +352,8 @@ def update_summary_from_episodes(client, current_summary, episodes, rewards, mod
     else:
         print("\n[AI Agent] Updating 10-point summary with new PPO episodes...")
         user_content = (
-            f"State format: [x_pos, y_pos, x_vel, y_vel, angle, ang_vel, left_leg_contact, right_leg_contact]\n"
-            f"Actions: 0=nothing, 1=left engine, 2=main engine, 3=right engine\n\n"
+            f"State format: [cart_pos, cart_vel, pole_angle, pole_ang_vel]\n"
+            f"Actions: 0=push left, 1=push right\n\n"
             f"Your current 10-point understanding of the environment:\n{current_summary}\n\n"
             f"New trajectories observed:\n{traj_text}\n\n"
             f"Update and refine your 10-point summary of environment physics and action effects. "
@@ -368,7 +368,7 @@ def update_summary_from_episodes(client, current_summary, episodes, rewards, mod
         {
             "role": "system",
             "content": (
-                "You are an expert analyst studying a lunar lander simulation. "
+                "You are an expert analyst studying a cart-pole balancing simulation. "
                 "Your summaries will be used by an LLM to analyze RL training trajectories "
                 "and identify bad actions."
             ),
@@ -400,7 +400,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
           analyzer_base_url="http://172.16.180.19:8002/v1",
           llm_model="unsloth/gemma-4-26B-A4B-it-GGUF",
           analyzer_every=10, analyzer_topk=2, analyzer_n_traj=2,
-          analyzer_threshold=200,
+          analyzer_threshold=475,
           unlikelihood_lr=1e-4,
           summary_n_traj=2):
     """
@@ -430,7 +430,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     analyzer_client = OpenAI(base_url=analyzer_base_url, api_key=api_key, timeout=None)  # trajectory analysis
 
     set_global_seed(seed)
-    env = gym.make("LunarLander-v3")
+    env = gym.make("CartPole-v1")
     env.reset(seed=seed)
 
     # Hybrid device placement: the batched PPO minibatch update (and the
@@ -462,7 +462,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     recent           = deque(maxlen=100)
     best_mean        = -float("inf")
     last_plot_ep     = 0
-    state_normalizer = RunningStateNormalizer(shape=8)
+    state_normalizer = RunningStateNormalizer(shape=4)
     save_dir         = os.path.dirname(os.path.abspath(__file__))
 
     # Seed from whatever summary.md already has (e.g. from ai_agent.py warm
@@ -478,7 +478,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     summary_thread: threading.Thread | None = None
     analyzer_buffer = []
 
-    print(f"Training PPO+LLM on LunarLander-v3 (up to {max_episodes} episodes)")
+    print(f"Training PPO+LLM on CartPole-v1 (up to {max_episodes} episodes)")
     print(f"  n_steps={n_steps}  n_epochs={n_epochs}  batch_size={batch_size}")
     print(f"  clip_eps={clip_eps}  lr={lr}  gae_lambda={gae_lambda}")
     print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}")
@@ -662,7 +662,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             plot_rewards(all_ep_rewards,
                          save_path=os.path.join(save_dir, "logs", "rewards_llm.png"))
 
-        if mean_100 >= 200 and ep_count >= 100:
+        if mean_100 >= 475 and ep_count >= 100:
             print(f"\nSolved at episode {ep_count} (update {update_num}) "
                   f"with mean {mean_100:.1f}!")
             break
@@ -674,7 +674,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="PPO + LLM Trajectory Analyzer on LunarLander-v3.")
+    parser = argparse.ArgumentParser(description="PPO + LLM Trajectory Analyzer on CartPole-v1.")
     parser.add_argument("--episodes",   type=int,   default=2000)
     parser.add_argument("--n-steps",    type=int,   default=2048,
                         help="Env steps per rollout before each PPO update.")
@@ -698,7 +698,7 @@ if __name__ == "__main__":
                         help="Of each analyzer window, send only the most recent N episodes to the LLM.")
     parser.add_argument("--analyzer-topk",      type=int,   default=2,
                         help="Top-K bad (state,action) pairs the analyzer extracts per episode.")
-    parser.add_argument("--analyzer-threshold", type=float, default=200,
+    parser.add_argument("--analyzer-threshold", type=float, default=475,
                         help="Only send episodes with return below this threshold to the analyzer.")
     parser.add_argument("--unlikelihood-lr",  type=float, default=1e-4,
                         help="LR for the separate actor-only unlikelihood optimizer.")
