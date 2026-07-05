@@ -28,10 +28,13 @@ Standard RL agents learn purely from numerical reward signals with no semantic u
 ```
 WARM START PHASE  (ai_agent.py, run standalone before training)
 ─────────────────────────────────────────────────────────────
-  AI Agent (GPT-4o mini)
+  AI Agent (self-hosted LLM, default: unsloth/gemma-4-26B-A4B-it-GGUF,
+            served via an OpenAI-compatible local inference server —
+            NOT the OpenAI API/GPT-4o mini, despite using the `openai`
+            Python client as a protocol-compatible wrapper)
     → explores LunarLander with action chunking (20 steps/call)
     → collects full episodes
-    → generates initial 10-point summary → saved to summary.md
+    → generates initial 10-point summary → saved to summary_{seed}.md
     → updates summary every 2 episodes (each update builds on prior summary)
 
 TRAINING PHASE  (ppo_llm.py — main loop + one background thread for summary)
@@ -49,21 +52,36 @@ TRAINING PHASE  (ppo_llm.py — main loop + one background thread for summary)
 
   LLM Trajectory Analyzer + unlikelihood update (every `analyzer_every`
   completed episodes, hyperparam, default 10)
-    → reads the latest summary.md as system context (snapshot under lock)
-    → sends the most recent `analyzer_n_traj` (default 2) episodes of that
-      window to GPT-4o mini (not the full window — the rest were just the
-      cadence trigger)
+    → reads the latest summary_{seed}.md as system context (snapshot under lock)
+    → of that window, drops any episode whose return is >= `analyzer_threshold`
+      (default 200) — only genuinely bad episodes are worth analyzing
+    → sends the most recent `analyzer_n_traj` (default 2) surviving episodes
+      to the LLM (not the full window — the rest were just the cadence
+      trigger); if none survive the threshold filter, the round is skipped
     → receives top `analyzer_topk` (default 2) bad (state, action) pairs
       per episode sent
+    → advantage filter: drops any flagged pair where the policy is already
+      >50% confident in that action AND PPO's own GAE advantage for it was
+      positive — applying the unlikelihood penalty against PPO's own
+      positive signal caused a catastrophic training regression during
+      development, so pairs PPO itself endorses are left alone
     → runs ONE separate gradient step on the actor only (its own optimizer,
       its own lr) minimizing -log(1 - π(bad_action|bad_state)) averaged
-      over all flagged pairs in the batch — synchronous, blocks the loop
-      (because its result feeds directly into the actor before the next
-      rollout)
+      over all surviving flagged pairs in the batch — synchronous, blocks
+      the loop (because its result feeds directly into the actor before
+      the next rollout)
+    → the unlikelihood optimizer's lr is reward-adaptive: scaled by
+      `max(0, 1 - max(0, mean_100)/analyzer_threshold)` (mean_100 clamped
+      to 0 first, so it's exactly 1.0, not >1, whenever mean_100 <= 0),
+      so it runs at full strength while the policy is bad and fades to
+      zero as mean_100 approaches the solve threshold
 
-  AI Agent summary refresh (every PPO update, background thread)
-    → fired once per PPO update immediately after all CUDA work for that
-      update is done (after actor.to(cpu_device))
+  AI Agent summary refresh (background thread, reward-adaptive cadence)
+    → fired every `_summary_gap`-th PPO update, immediately after all CUDA
+      work for that update is done (after actor.to(cpu_device)); the gap
+      scales from 1 (every update, while mean_100 <= 0) up to 5 (every 5th
+      update, as mean_100 approaches analyzer_threshold) — summaries
+      converge early, so high-frequency updates add no value late in training
     → takes the most recent `summary_n_traj` (default 2) episodes from
       the current rollout's completed episodes
     → runs in a daemon thread — the main loop does NOT wait for it and
@@ -88,7 +106,7 @@ TRAINING PHASE  (ppo_llm.py — main loop + one background thread for summary)
 The AI agent's purpose is to build a semantic understanding of the LunarLander environment — how physics work, what actions do, and what patterns lead to success or failure. This understanding is distilled into a 10-point summary that grounds the LLM Trajectory Analyzer's reasoning.
 
 ### Action Mechanism: Chunking
-The AI agent uses GPT-4o mini to select actions. Rather than calling the LLM at every step (which would cost ~500 API calls per episode), it uses **action chunking**: the current state is sent to GPT-4o mini, which returns the next 20 actions at once. This reduces API calls to ~25 per episode while preserving the agent's genuine decision-making nature.
+The AI agent uses an LLM (default: `unsloth/gemma-4-26B-A4B-it-GGUF`, served locally via an OpenAI-compatible inference server — model and server URL are both CLI-overridable) to select actions. Rather than calling the LLM at every step (which would cost ~500 API calls per episode), it uses **action chunking**: the current state is sent to the LLM, which returns the next 20 actions at once. This reduces API calls to ~25 per episode while preserving the agent's genuine decision-making nature.
 
 - Chunk size: **20 steps per API call**
 - State is passed as a **raw numerical array** — no text conversion
@@ -116,7 +134,7 @@ The AI agent uses GPT-4o mini to select actions. Rather than calling the LLM at 
 After every `summary_update_every` episodes, the agent generates or updates the 10-point summary:
 - **Initial summary**: generated from the first batch of episodes
 - **Subsequent updates**: the previous summary is passed as context alongside new trajectory data, so insights accumulate rather than restart
-- The summary is always written to `summary.md` after each update
+- The summary is always written to `summary_{seed}.md` after each update (seed-suffixed so different runs never clobber each other's summary)
 
 ### Trajectory Format for Summary
 Full trajectories are passed (no sampling), in compact format:
@@ -131,7 +149,7 @@ step | state                     | action | reward
 Before PPO training begins, the AI agent runs **5 episodes** to build an initial summary. This ensures the LLM Trajectory Analyzer has meaningful environment context from episode 1 of training.
 
 ### Logging
-Every API call the AI Agent makes — action chunks during warm start, plus summary generation/updates whether triggered during warm start or during PPO training (`ppo_llm.py`'s `update_summary_from_episodes` also writes here) — is logged to `logs/interaction_log.md` with full prompt and response, timestamped. The LLM Trajectory Analyzer logs separately (see Module 3).
+Every API call the AI Agent makes — action chunks during warm start, plus summary generation/updates whether triggered during warm start or during PPO training (`ppo_llm.py`'s `update_summary_from_episodes` also writes here) — is logged to `logs/agent_interaction_log_{seed}.md` with full prompt and response, timestamped. The LLM Trajectory Analyzer logs separately (see Module 3).
 
 ---
 
@@ -188,18 +206,20 @@ The core mechanism is unchanged from the original design: the actor is π(a|s); 
 - Clip epsilon: 0.2, entropy coefficient: 0.01, value coefficient: 0.5
 - Gradient clipping: max norm 0.5 (both PPO and unlikelihood updates)
 - Rollout size: `n_steps`=2048, `n_epochs`=4, `batch_size`=64
-- `analyzer_every`=10, `analyzer_topk`=2, `analyzer_n_traj`=2 — LLM Trajectory Analyzer cadence/episodes-sent/bad-pairs-per-episode
-- `unlikelihood_lr`=1e-4 — separate actor-only optimizer for the unlikelihood step
-- `summary_n_traj`=2 — episodes from the current rollout sent to the AI Agent per update
-- `llm_model`="gpt-4o-mini" — single model used everywhere (warm start, analyzer, summarizer)
-- `api_key` — resolved the same way in `ai_agent.py` and `ppo_llm.py`: `--api-key` CLI flag, else `OPENAI_API_KEY` env var
-- `seed`=1 (`seeding.py`'s `DEFAULT_SEED`) — same default across `ai_agent.py`, `ppo.py`, `ppo_llm.py`; seeds Python `random`, NumPy, PyTorch (CPU+CUDA, deterministic cuDNN), the Gymnasium env's `reset(seed=...)`, and is passed as OpenAI's best-effort `seed` parameter on every API call. Makes a run reproducible across machines/GPUs, not just re-runs on one machine (exact bit-for-bit equality across different GPU hardware still isn't 100% guaranteed by PyTorch, and the LLM-side `seed` is best-effort only — but everything local is exactly reproducible)
+- `analyzer_every`=10, `analyzer_topk`=2, `analyzer_n_traj`=2 — LLM Trajectory Analyzer cadence/bad-pairs-per-episode/episodes-sent
+- `analyzer_threshold`=200 — episodes with return >= this are excluded from analysis (only genuinely bad episodes are worth flagging); also the denominator for the reward-adaptive `unlikelihood_lr` scaling (see Module 3)
+- `unlikelihood_lr`=1e-4 — separate actor-only optimizer for the unlikelihood step; actual applied lr is reward-adaptive (scaled toward 0 as mean_100 approaches `analyzer_threshold`)
+- `summary_n_traj`=2 — episodes from the current rollout sent to the AI Agent per summary refresh
+- `llm_model`="unsloth/gemma-4-26B-A4B-it-GGUF" — single model used everywhere (warm start, analyzer, summarizer); self-hosted, served via an OpenAI-compatible local inference server, not the OpenAI API
+- `base_url`="http://172.16.180.19:8001/v1", `analyzer_base_url`="http://172.16.180.19:8002/v1" — separate local server endpoints for summary-update calls vs. trajectory-analysis calls, both CLI-overridable
+- `api_key` — resolved the same way in `ai_agent.py` and `ppo_llm.py`: `--api-key` CLI flag, else `OPENAI_API_KEY` env var, else the placeholder `"sk-no-key-required"` (the local inference server doesn't require real auth)
+- `seed`=1 (`seeding.py`'s `DEFAULT_SEED`) — same default across `ai_agent.py`, `ppo.py`, `ppo_llm.py`; seeds Python `random`, NumPy, PyTorch (CPU+CUDA, deterministic cuDNN), the Gymnasium env's `reset(seed=...)`, and is passed as the LLM server's best-effort `seed` parameter on every API call. Makes a run reproducible across machines/GPUs, not just re-runs on one machine (exact bit-for-bit equality across different GPU hardware still isn't 100% guaranteed by PyTorch, and the LLM-side `seed` is best-effort only — but everything local is exactly reproducible). Also baked into every generated output filename (see File Structure) so different-seed runs never overwrite each other's artifacts
 
 ### Convergence Tracking
 - Episode rewards logged each episode
 - Running mean over last 100 episodes tracked
-- Plot saved every `plot_every` episodes (raw rewards + running mean + solved threshold at 200) — `logs/rewards.png` for the baseline, `logs/rewards_llm.png` for the LLM-integrated run
-- Best model saved whenever a new best mean-100 is achieved — `actor_best.pt` (baseline) vs `actor_best_llm.pt` (LLM-integrated), kept separate so the two can be compared
+- Plot saved every `plot_every` episodes (raw rewards + running mean + solved threshold at 200) — `logs/rewards_{seed}.png` for the baseline, `logs/rewards_llm_{seed}.png` for the LLM-integrated run
+- Best model saved whenever a new best mean-100 is achieved — `actor_best_{seed}.pt` (baseline) vs `actor_best_llm_{seed}.pt` (LLM-integrated), kept separate so the two can be compared
 - Training stops early if mean-100 ≥ 200 (environment considered solved)
 
 ---
@@ -207,7 +227,7 @@ The core mechanism is unchanged from the original design: the actor is π(a|s); 
 ## Module 3: LLM Trajectory Analyzer (`llm_trajectory_analyzer.py`)
 
 ### Role
-Every `analyzer_every` completed PPO episodes (default 5), the LLM Trajectory Analyzer receives that batch of full trajectories and identifies the **top `analyzer_topk` bad (state, action) pairs** (default 2) per trajectory. These pairs feed the unlikelihood update described in Module 2.
+Every `analyzer_every` completed PPO episodes (default 10), the LLM Trajectory Analyzer receives the most recent `analyzer_n_traj` (default 2) of those episodes — after dropping any with return >= `analyzer_threshold` (default 200) — and identifies the **top `analyzer_topk` bad (state, action) pairs** (default 2) per trajectory. These pairs feed the unlikelihood update described in Module 2.
 
 ### Definition of "Bad Action"
 A bad action is not simply the step with the lowest immediate reward. It is the action that:
@@ -216,10 +236,10 @@ A bad action is not simply the step with the lowest immediate reward. It is the 
 
 This holistic judgment requires reasoning about the full trajectory arc, which is why an LLM is well-suited for it and why full trajectories (not samples) are passed.
 
-### Context: summary.md
-The current 10-point environment summary is read from `summary.md` and placed in the system prompt. This gives the LLM the grounding to reason about *why* an action was bad — e.g., "firing the main engine while angle was high worsened angular momentum and made recovery impossible."
+### Context: summary_{seed}.md
+The current 10-point environment summary is read from `summary_{seed}.md` and placed in the system prompt. This gives the LLM the grounding to reason about *why* an action was bad — e.g., "firing the main engine while angle was high worsened angular momentum and made recovery impossible."
 
-The LLM always reads the **latest version** of `summary.md`, so as the AI agent updates the summary during training, the analyzer's reasoning automatically improves.
+The LLM always reads the **latest version** of `summary_{seed}.md`, so as the AI agent updates the summary during training, the analyzer's reasoning automatically improves.
 
 ### Input Format
 Each trajectory is passed as:
@@ -248,30 +268,32 @@ Structured JSON, one entry per episode in the batch, each carrying its own top-K
 `episode_index` lines up positionally with the order episodes were sent in. Pairs that fail to parse (missing/malformed state or an out-of-range action) are dropped rather than crashing the run; if the whole API call fails, that round's analysis is skipped and the unlikelihood update is simply not run that cycle.
 
 ### Batching
-All `analyzer_every` episodes are sent in a single GPT-4o mini call (one call analyzes the whole batch and returns bad actions for every episode in it). Logged to its own `logs/analyzer_log.md` — kept separate from the AI Agent's `logs/interaction_log.md` so the two roles' logs are never interleaved.
+Of every `analyzer_every`-episode window, only the most recent `analyzer_n_traj` episodes (surviving the `analyzer_threshold` filter) are sent in a single LLM call — the rest of the window is just the cadence trigger, not sent (one call analyzes the whole sent batch and returns bad actions for every episode in it). Logged to its own `logs/analyzer_log_{seed}.md` — kept separate from the AI Agent's `logs/agent_interaction_log_{seed}.md` so the two roles' logs are never interleaved.
 
 ---
 
 ## Data Flow Summary
 
 ```
-summary.md
-    ↑ written by AI Agent (warm start, then once per PPO update via background thread)
+summary_{seed}.md
+    ↑ written by AI Agent (warm start, then on a reward-adaptive cadence via background thread)
     ↓ read by LLM Trajectory Analyzer before each batch analysis (snapshot under lock)
 
 Episode trajectory (state, action, reward per step)
     → produced by the PPO Agent's own rollout collection (collect_rollout)
     → buffered in analyzer_buffer, sent to LLM Trajectory Analyzer every analyzer_every episodes
-      (only the most recent analyzer_n_traj episodes of each window are sent to the LLM)
-    → most recent summary_n_traj episodes also sent to AI Agent background thread each update
+      (only the most recent analyzer_n_traj episodes of each window, below analyzer_threshold
+      return, are sent to the LLM)
+    → most recent summary_n_traj episodes also sent to AI Agent background thread each refresh
     → there is no separate trajectory source — both LLM consumers read the
       exact same completed episodes the PPO agent already collected
 
 (bad_state, bad_action) pairs
     → produced by the LLM Trajectory Analyzer
+    → filtered further by the advantage filter (see Module 2) before being applied
     → consumed by ppo_llm.py's separate unlikelihood update (actor only)
 
-actor_best.pt / actor_best_llm.pt
+actor_best_{seed}.pt / actor_best_llm_{seed}.pt
     → saved whenever a new best mean-100 reward is achieved (baseline vs LLM-integrated, kept separate)
 ```
 
@@ -281,20 +303,29 @@ actor_best.pt / actor_best_llm.pt
 
 ```
 llm_rl_project/
-├── ai_agent.py                # AI Agent: action chunking, summary generation + updates
-├── ppo.py                     # PPO baseline: actor, baseline, training loop — NO LLM involvement, kept for comparison
-├── ppo_llm.py                 # PPO + LLM Trajectory Analyzer + AI Agent integration
-├── llm_trajectory_analyzer.py # LLM Trajectory Analyzer: batch episode analysis -> top-K bad (state,action) pairs
-├── seeding.py                  # set_global_seed(): shared reproducibility helper used by all three runnable scripts
-├── summary.md                 # Living 10-point environment summary (auto-updated)
-├── actor_best.pt               # Best baseline (ppo.py) actor checkpoint
-├── actor_best_llm.pt           # Best LLM-integrated (ppo_llm.py) actor checkpoint
-├── PROJECT.md                  # This file
+├── ai_agent.py                     # AI Agent: action chunking, summary generation + updates
+├── ppo.py                          # PPO baseline: actor, baseline, training loop — NO LLM involvement, kept for comparison
+├── ppo_llm.py                      # PPO + LLM Trajectory Analyzer + AI Agent integration
+├── llm_trajectory_analyzer.py      # LLM Trajectory Analyzer: batch episode analysis -> top-K bad (state,action) pairs
+├── seeding.py                      # set_global_seed(): shared reproducibility helper used by all runnable scripts
+├── testing.py                      # Standalone smoke test: one-off ping to the local LLM inference server + latency check
+├── PROJECT.md                      # This file
+│
+│                                   # Every artifact below is suffixed with the run's --seed (default 1) so that
+│                                   # runs with different seeds never overwrite each other's output.
+├── summary_{seed}.md               # Living 10-point environment summary (auto-updated)
+├── summary_history_{seed}.md       # Full append-only history of every summary version for that seed
+├── actor_best_{seed}.pt            # Best baseline (ppo.py) actor checkpoint for that seed
+├── actor_best_llm_{seed}.pt        # Best LLM-integrated (ppo_llm.py) actor checkpoint for that seed
+├── crash_trace_{seed}.log          # ppo.py: faulthandler SIGSEGV trace (empty unless a crash occurred)
+├── crash_trace_llm_{seed}.log      # ppo_llm.py: faulthandler SIGSEGV trace (empty unless a crash occurred)
+├── terminal_output_{seed}.md       # ppo.py: full mirrored stdout for that run
+├── terminal_output_llm_{seed}.md   # ppo_llm.py: full mirrored stdout for that run
 └── logs/
-    ├── interaction_log.md     # AI Agent API prompts/responses: warm start action chunks + all summary generation/updates
-    ├── analyzer_log.md        # LLM Trajectory Analyzer API prompts/responses
-    ├── rewards.png            # ppo.py baseline training reward curve
-    └── rewards_llm.png        # ppo_llm.py training reward curve
+    ├── agent_interaction_log_{seed}.md  # AI Agent API prompts/responses: warm start action chunks + all summary generation/updates
+    ├── analyzer_log_{seed}.md          # LLM Trajectory Analyzer API prompts/responses
+    ├── rewards_{seed}.png               # ppo.py baseline training reward curve
+    └── rewards_llm_{seed}.png           # ppo_llm.py training reward curve
 ```
 
 ---
@@ -311,13 +342,17 @@ llm_rl_project/
 | Bad action penalty | Unlikelihood loss `-log(1-π(bad_action\|bad_state))`, separate actor-only optimizer step (was: `mean(π(bad\|s))` fused into actor loss with λ) | Self-limiting gradient (strong when p is high, vanishes as p→0); avoids tuning a λ to balance two competing loss terms in one backward pass |
 | Trajectory source for LLM modules | Reuse the PPO agent's own collected episodes (was: a separate, continuously-running AI Agent environment) | One source of truth, no redundant live agent/API usage during training |
 | Analyzer scheduling | Synchronous, interleaved in main loop, triggered every `analyzer_every` completed episodes | Result feeds directly into the unlikelihood update on the actor before the next rollout — must be synchronous |
-| Summary scheduling | Background thread per PPO update, joined before next CUDA phase | OpenAI HTTPS (OpenSSL) and CUDA both install SIGSEGV handlers; running them concurrently in threads crashed the CUDA autograd worker. Fix: thread runs during collect_rollout (CPU-only), joined before actor.to(device) so SSL and CUDA never overlap |
-| Summary persistence | summary.md file | Shared across modules; human-readable |
-| LLM interaction logging | Separate files per role: `logs/interaction_log.md` (AI Agent) vs `logs/analyzer_log.md` (LLM Trajectory Analyzer) | Two different roles/concerns; keeping them apart makes each log readable on its own instead of interleaving unrelated calls |
+| Advantage filter on flagged pairs | Drop a flagged (state,action) pair if the policy is already >50% confident in it AND PPO's own GAE advantage for it was positive | Applying the unlikelihood penalty against PPO's own positive signal caused a catastrophic training regression during development; pairs PPO itself already endorses are left alone |
+| Unlikelihood lr / summary refresh cadence | Both reward-adaptive: unlikelihood lr scales from full strength down to 0 as mean_100 approaches `analyzer_threshold`; summary-refresh gap scales from every update up to every 5th update on the same schedule | Both LLM-driven signals matter most while the policy is bad and add diminishing value as training converges — so their intensity fades automatically instead of running at a fixed rate for the whole run |
+| Summary scheduling | Background thread, reward-adaptive cadence (see above), joined before next CUDA phase | The LLM server's HTTPS client (OpenSSL) and CUDA both install SIGSEGV handlers; running them concurrently in threads crashed the CUDA autograd worker. Fix: thread runs during collect_rollout (CPU-only), joined before actor.to(device) so SSL and CUDA never overlap |
+| Summary persistence | `summary_{seed}.md` file | Shared across modules; human-readable; seed-suffixed so concurrent runs with different seeds don't clobber each other |
+| LLM interaction logging | Separate files per role: `logs/agent_interaction_log_{seed}.md` (AI Agent) vs `logs/analyzer_log_{seed}.md` (LLM Trajectory Analyzer) | Two different roles/concerns; keeping them apart makes each log readable on its own instead of interleaving unrelated calls |
 | Reproducibility | Shared `seeding.py`, default seed = 1 everywhere (`ai_agent.py`, `ppo.py`, `ppo_llm.py`) | One run config should reproduce the same result on any machine/GPU, not just on the one it was first run on; verified bit-identical across independent fresh processes |
-| LLM model | GPT-4o mini, passed as a `model`/`llm_model` parameter everywhere (CLI-overridable) | Cost-efficient; never hardcoded, so it's a true hyperparameter consistent across `ai_agent.py` and `ppo_llm.py` |
-| API key | `--api-key` CLI flag, else `OPENAI_API_KEY` env var — same resolution in `ai_agent.py` and `ppo_llm.py` | Guarantees warm start and main training use the same key without duplicating logic |
-| Summary update strategy | Previous summary + most recent `summary_n_traj` episodes of each `summary_every`-sized window | Knowledge accumulates rather than restarting each time |
+| Generated-file naming | Every output artifact (checkpoints, plots, crash traces, terminal logs, summaries, interaction logs) is suffixed with the run's `--seed`, e.g. `actor_best_1.pt`, `rewards_llm_1.png`, `summary_1.md` | Lets multiple seeds be run and compared side by side without one run's outputs overwriting another's |
+| Rollout device placement | `collect_rollout` always runs on CPU; actor/baseline are moved to GPU only for the batched `ppo_update`/`unlikelihood_update` steps, then back to CPU | Single-sample inference thousands of times per rollout (tiny CUDA kernel launches in a tight loop) proved unstable on this hardware/driver combination; the batched update is the only part of the loop that benefits from (and was stable on) the GPU |
+| LLM model | Self-hosted `unsloth/gemma-4-26B-A4B-it-GGUF` via an OpenAI-compatible local inference server (NOT the OpenAI API), passed as a `model`/`llm_model` parameter everywhere (CLI-overridable) | Cost-free local inference; never hardcoded, so it's a true hyperparameter consistent across `ai_agent.py` and `ppo_llm.py`; the `openai` Python client is used purely as a protocol-compatible wrapper against `base_url`/`analyzer_base_url` |
+| API key | `--api-key` CLI flag, else `OPENAI_API_KEY` env var, else `"sk-no-key-required"` — same resolution in `ai_agent.py` and `ppo_llm.py` | Guarantees warm start and main training use the same key without duplicating logic; the local server doesn't enforce real auth, hence the placeholder fallback |
+| Summary update strategy | Previous summary + most recent `summary_n_traj` episodes, refreshed on a reward-adaptive cadence (not a fixed `summary_every`) | Knowledge accumulates rather than restarting each time; refresh frequency fades as training converges (see cadence row above) |
 | Trajectory format for LLM | Full trajectory, compact (state, action, reward) | Complete picture without doubling tokens with next_state |
 
 ---

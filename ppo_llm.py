@@ -382,17 +382,17 @@ def update_summary_from_episodes(client, current_summary, episodes, rewards, mod
         # closest the API offers.
         response = client.chat.completions.create(model=model, messages=messages, seed=seed)
         response_text = response.choices[0].message.content
-        ai_agent.log_interaction(log_label, messages, response_text)
-        ai_agent.save_summary(response_text)
+        ai_agent.log_interaction(log_label, messages, response_text, seed)
+        ai_agent.save_summary(response_text, seed)
         return response_text
     except Exception as e:
-        ai_agent.log_interaction(log_label + " ERROR", messages, str(e))
+        ai_agent.log_interaction(log_label + " ERROR", messages, str(e), seed)
         print(f"  [Summary update failed: {e}] — keeping previous summary")
         return current_summary
 
 
 def train(n_steps=2048, n_epochs=4, batch_size=64,
-          gamma=0.99, gae_lambda=0.95, clip_eps=0.2,
+          gamma=0.999, gae_lambda=0.98, clip_eps=0.2,
           lr=3e-4, entropy_coef=0.01, value_coef=0.5,
           max_episodes=2000, max_grad_norm=0.5,
           print_every=1, plot_every=50, seed=DEFAULT_SEED,
@@ -465,9 +465,10 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     state_normalizer = RunningStateNormalizer(shape=8)
     save_dir         = os.path.dirname(os.path.abspath(__file__))
 
-    # Seed from whatever summary.md already has (e.g. from ai_agent.py warm
-    # start). None is fine — update_summary_from_episodes will bootstrap one.
-    summary_text = ai_agent.load_summary()
+    # Seed from whatever summary_{seed}.md already has (e.g. from ai_agent.py
+    # warm start with the same seed). None is fine — update_summary_from_episodes
+    # will bootstrap one.
+    summary_text = ai_agent.load_summary(seed)
 
     # summary_text is shared between the main loop (reads it for the analyzer)
     # and the background summary thread (writes a new value after the API call).
@@ -480,7 +481,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
 
     print(f"Training PPO+LLM on LunarLander-v3 (up to {max_episodes} episodes)")
     print(f"  n_steps={n_steps}  n_epochs={n_epochs}  batch_size={batch_size}")
-    print(f"  clip_eps={clip_eps}  lr={lr}  gae_lambda={gae_lambda}")
+    print(f"  clip_eps={clip_eps}  lr={lr}  gamma={gamma}  gae_lambda={gae_lambda}")
     print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}")
     print(f"  analyzer_every={analyzer_every}  analyzer_n_traj={analyzer_n_traj}  analyzer_topk={analyzer_topk}  analyzer_threshold={analyzer_threshold}  unlikelihood_lr={unlikelihood_lr}")
     print(f"  summary_n_traj={summary_n_traj} (AI agent updates summary every PPO update using the last N episodes)  llm_model={llm_model}\n")
@@ -513,7 +514,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             # moved to GPU for the updates below) — .cpu() kept anyway as a
             # cheap safety net.
             torch.save({k: v.cpu() for k, v in actor.state_dict().items()},
-                       os.path.join(save_dir, "actor_best_llm.pt"))
+                       os.path.join(save_dir, f"actor_best_llm_{seed}.pt"))
 
         # OpenSSL (used by the summary thread's HTTPS call) and CUDA both
         # install SIGSEGV handlers. Running them concurrently crashes the CUDA
@@ -660,7 +661,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         if ep_count - last_plot_ep >= plot_every and all_ep_rewards:
             last_plot_ep = ep_count
             plot_rewards(all_ep_rewards,
-                         save_path=os.path.join(save_dir, "logs", "rewards_llm.png"))
+                         save_path=os.path.join(save_dir, "logs", f"rewards_llm_{seed}.png"))
 
         if mean_100 >= 200 and ep_count >= 100:
             print(f"\nSolved at episode {ep_count} (update {update_num}) "
@@ -668,7 +669,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             break
 
     plot_rewards(all_ep_rewards,
-                 save_path=os.path.join(save_dir, "logs", "rewards_llm.png"))
+                 save_path=os.path.join(save_dir, "logs", f"rewards_llm_{seed}.png"))
     env.close()
     return actor, baseline, all_ep_rewards
 
@@ -683,7 +684,11 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int,   default=64)
     parser.add_argument("--clip-eps",   type=float, default=0.2)
     parser.add_argument("--lr",         type=float, default=3e-4)
-    parser.add_argument("--gae-lambda", type=float, default=0.95)
+    parser.add_argument("--gamma",      type=float, default=0.999,
+                        help="Discount factor. LunarLander episodes run up to 1000 steps and the "
+                             "landing bonus is delayed to the very end, so a higher gamma than the "
+                             "0.99 'default default' credits early control decisions much better.")
+    parser.add_argument("--gae-lambda", type=float, default=0.98)
     parser.add_argument("--seed",       type=int,   default=DEFAULT_SEED)
     parser.add_argument("--api-key",          type=str,   default=None,
                         help="API key for the model server. Defaults to OPENAI_API_KEY env var, or 'sk-no-key-required'.")
@@ -716,10 +721,10 @@ if __name__ == "__main__":
     # will tell us which line of Python code (and which thread — e.g. a
     # background CUDA/autograd thread vs the main loop) was executing when
     # the crash hit, instead of just inferring it from training logs.
-    crash_log = open(os.path.join(save_dir, "crash_trace_llm.log"), "w")
+    crash_log = open(os.path.join(save_dir, f"crash_trace_llm_{args.seed}.log"), "w")
     faulthandler.enable(file=crash_log, all_threads=True)
 
-    log_path = os.path.join(save_dir, "terminal_output_llm.md")
+    log_path = os.path.join(save_dir, f"terminal_output_llm_{args.seed}.md")
     log_file = open(log_path, "w")
     sys.stdout = _Tee(sys.__stdout__, log_file)
 
@@ -730,6 +735,7 @@ if __name__ == "__main__":
             batch_size=args.batch_size,
             clip_eps=args.clip_eps,
             lr=args.lr,
+            gamma=args.gamma,
             gae_lambda=args.gae_lambda,
             max_episodes=args.episodes,
             seed=args.seed,

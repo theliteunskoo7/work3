@@ -42,9 +42,16 @@ touch down gently with both legs simultaneously.
 Always respond with valid JSON: {"actions": [a1, a2, ..., a20]} where each value is 0, 1, 2, or 3."""
 
 
-LOG_FILE              = os.path.join(os.path.dirname(__file__), "logs", "agent_interaction_log.md")
-SUMMARY_FILE          = os.path.join(os.path.dirname(__file__), "summary.md")
-SUMMARY_HISTORY_FILE  = os.path.join(os.path.dirname(__file__), "summary_history.md")
+def _log_file(seed):
+    return os.path.join(os.path.dirname(__file__), "logs", f"agent_interaction_log_{seed}.md")
+
+
+def _summary_file(seed):
+    return os.path.join(os.path.dirname(__file__), f"summary_{seed}.md")
+
+
+def _summary_history_file(seed):
+    return os.path.join(os.path.dirname(__file__), f"summary_history_{seed}.md")
 
 
 def strip_markdown_json(text):
@@ -53,35 +60,37 @@ def strip_markdown_json(text):
     return match.group() if match else text
 
 
-def init_log():
-    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-    with open(LOG_FILE, "w") as f:
+def init_log(seed):
+    log_file = _log_file(seed)
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+    with open(log_file, "w") as f:
         f.write(f"# AI Agent Interaction Log\nStarted: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
 
-def save_summary(summary_text):
+def save_summary(summary_text, seed):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    with open(SUMMARY_FILE, "w") as f:
+    with open(_summary_file(seed), "w") as f:
         f.write(f"# Environment Summary\nLast updated: {timestamp}\n\n")
         f.write(summary_text)
-    with open(SUMMARY_HISTORY_FILE, "a") as f:
+    with open(_summary_history_file(seed), "a") as f:
         f.write(f"\n---\n\n## {timestamp}\n\n")
         f.write(summary_text)
         f.write("\n")
 
 
-def load_summary():
-    if not os.path.exists(SUMMARY_FILE):
+def load_summary(seed):
+    summary_file = _summary_file(seed)
+    if not os.path.exists(summary_file):
         return None
-    with open(SUMMARY_FILE, "r") as f:
+    with open(summary_file, "r") as f:
         lines = f.readlines()
     # Strip the header (first 2 lines) and return body
     return "".join(lines[2:]).strip()
 
 
-def log_interaction(call_type, prompt_messages, response_text):
+def log_interaction(call_type, prompt_messages, response_text, seed):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open(LOG_FILE, "a") as f:
+    with open(_log_file(seed), "a") as f:
         f.write(f"---\n\n## [{timestamp}] {call_type}\n\n")
         f.write("### Prompt\n\n")
         for msg in prompt_messages:
@@ -112,7 +121,7 @@ class LunarLanderAIAgent:
         self.chunk_size = chunk_size
         self.model = model
         self.summary = None
-        init_log()
+        init_log(self.seed)
 
     def get_chunk_actions(self, state, episode_num, chunk_num):
         messages = [
@@ -135,7 +144,7 @@ class LunarLanderAIAgent:
                 seed=self.seed,
             )
             response_text = response.choices[0].message.content
-            log_interaction(f"Action Chunk | Episode {episode_num} Chunk {chunk_num}", messages, response_text)
+            log_interaction(f"Action Chunk | Episode {episode_num} Chunk {chunk_num}", messages, response_text, self.seed)
 
             data = json.loads(strip_markdown_json(response_text))
             actions = [int(a) for a in data.get("actions", []) if int(a) in (0, 1, 2, 3)]
@@ -144,7 +153,7 @@ class LunarLanderAIAgent:
             return actions[: self.chunk_size]
 
         except Exception as e:
-            log_interaction(f"Action Chunk ERROR | Episode {episode_num} Chunk {chunk_num}", messages, str(e))
+            log_interaction(f"Action Chunk ERROR | Episode {episode_num} Chunk {chunk_num}", messages, str(e), self.seed)
             print(f"  [Chunk failed: {e}] — defaulting to do-nothing")
             return [0] * self.chunk_size
 
@@ -209,9 +218,9 @@ class LunarLanderAIAgent:
 
         response = self.client.chat.completions.create(model=self.model, messages=messages, seed=self.seed)
         response_text = response.choices[0].message.content
-        log_interaction("Initial Summary Generation", messages, response_text)
+        log_interaction("Initial Summary Generation", messages, response_text, self.seed)
         self.summary = response_text
-        save_summary(self.summary)
+        save_summary(self.summary, self.seed)
         return self.summary
 
     def update_summary(self, new_trajectories, episode_rewards):
@@ -245,9 +254,9 @@ class LunarLanderAIAgent:
 
         response = self.client.chat.completions.create(model=self.model, messages=messages, seed=self.seed)
         response_text = response.choices[0].message.content
-        log_interaction("Summary Update", messages, response_text)
+        log_interaction("Summary Update", messages, response_text, self.seed)
         self.summary = response_text
-        save_summary(self.summary)
+        save_summary(self.summary, self.seed)
         return self.summary
 
     def run_warm_start(self, n_episodes=5, summary_update_every=2):
@@ -279,8 +288,8 @@ class LunarLanderAIAgent:
         print(f"  Mean reward : {np.mean(all_rewards):.1f}")
         print(f"  Best reward : {np.max(all_rewards):.1f}")
         print(f"  Worst reward: {np.min(all_rewards):.1f}")
-        print(f"  Log saved to    : {LOG_FILE}")
-        print(f"  Summary saved to: {SUMMARY_FILE}")
+        print(f"  Log saved to    : {_log_file(self.seed)}")
+        print(f"  Summary saved to: {_summary_file(self.seed)}")
 
         return all_trajectories, all_rewards, self.summary
 

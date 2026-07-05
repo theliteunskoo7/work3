@@ -3,16 +3,21 @@ import os
 import re
 from datetime import datetime
 
-# Own log file — kept separate from ai_agent.py's logs/interaction_log.md so
-# the AI Agent's logs (warm start + summary refresh) and the LLM Trajectory
-# Analyzer's logs are never interleaved in one file.
-LOG_FILE = os.path.join(os.path.dirname(__file__), "logs", "analyzer_log.md")
+from seeding import DEFAULT_SEED
+
+# Own log file — kept separate from ai_agent.py's logs/agent_interaction_log.md
+# so the AI Agent's logs (warm start + summary refresh) and the LLM Trajectory
+# Analyzer's logs are never interleaved in one file. Seed-suffixed so runs
+# with different seeds never clobber each other's log.
+def _log_file(seed):
+    return os.path.join(os.path.dirname(__file__), "logs", f"analyzer_log_{seed}.md")
 
 
-def log_interaction(call_type, prompt_messages, response_text):
-    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+def log_interaction(call_type, prompt_messages, response_text, seed):
+    log_file = _log_file(seed)
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open(LOG_FILE, "a") as f:
+    with open(log_file, "a") as f:
         f.write(f"---\n\n## [{timestamp}] {call_type}\n\n")
         f.write("### Prompt\n\n")
         for msg in prompt_messages:
@@ -91,6 +96,7 @@ def analyze_trajectories(client, episodes, summary_text, top_k=2, model="unsloth
     if not episodes:
         return []
 
+    log_seed = seed if seed is not None else DEFAULT_SEED
     summary_text = summary_text or "No environment summary available yet — use general physical reasoning."
     system_prompt = ANALYZER_SYSTEM_PROMPT_TEMPLATE.format(summary=summary_text, top_k=top_k)
     traj_text = format_trajectories_for_analysis(episodes)
@@ -116,13 +122,13 @@ def analyze_trajectories(client, episodes, summary_text, top_k=2, model="unsloth
             seed=seed,
         )
         response_text = response.choices[0].message.content
-        log_interaction(f"Trajectory Analysis | {len(episodes)} episodes", messages, response_text)
+        log_interaction(f"Trajectory Analysis | {len(episodes)} episodes", messages, response_text, log_seed)
         json_text = strip_markdown_json(response_text)
         # Escape any backslash not part of a valid JSON escape sequence
         json_text = re.sub(r'\\(?!["\\/bfnrtu]|u[0-9a-fA-F]{4})', r'\\\\', json_text)
         data = json.loads(json_text)
     except Exception as e:
-        log_interaction(f"Trajectory Analysis ERROR | {len(episodes)} episodes", messages, str(e))
+        log_interaction(f"Trajectory Analysis ERROR | {len(episodes)} episodes", messages, str(e), log_seed)
         print(f"  [Analyzer failed: {e}] — skipping unlikelihood update this round")
         return results
 

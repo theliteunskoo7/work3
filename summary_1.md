@@ -1,0 +1,13 @@
+# Environment Summary
+Last updated: 2026-07-05 13:09:54
+
+1. **Gravity and Vertical Velocity**: Gravity provides a constant downward acceleration; while the main engine (Action 2) is the primary mechanism to counteract $y\_vel$, it must be applied with sufficient frequency and magnitude to prevent high-velocity impacts that exceed stability thresholds.
+2. **Angular Kinematics**: The lander's $angle$ is the integral of its $ang\_vel$; high $|ang\_vel|$ causes rapid orientation changes that can quickly move the lander into extreme tilt regimes.
+3. **Main Engine Induced Torque**: Applying the main engine (Action 2) when the lander is tilted ($angle \neq 0$) induces rotational torque, which modifies $ang\_vel$ and can exacerbate angular instability.
+4. **Side-Engine Rotational Directionality**: Action 1 (Left Engine) induces counter-clockwise rotation (positive $ang\_vel$), while Action 3 (Right Engine) induces clockwise rotation (negative $ang\_vel$).
+5. **Asymmetric Thrust Coupling**: When the lander is tilted, side-engine thrust (Actions 1 and 3) produces a vertical component that influences $y\_vel$; depending on the tilt direction, this can either assist in deceleration or inadvertently accelerate the descent rate.
+6. **Lateral Velocity Accumulation**: Frequent use of side engines (Actions 1 and 3) to manage rotation causes the accumulation of lateral velocity ($x\_vel$), leading to horizontal drift away from the landing site.
+7. **Rotational Feedback Runaway**: Selecting a side engine that matches the current sign of $ang\_vel$ (e.g., Action 3 when $ang\_vel < 0$) creates a positive feedback loop that accelerates the lander into an uncontrollable tumble.
+8. **Momentum Dominance**: Once $|angle|$ or $|ang\_vel|$ reaches high magnitudes, the rotational momentum can become so dominant that the available engine thrust is insufficient to stabilize the orientation before ground contact occurs.
+9. **Action 0 Momentum Risk**: Selecting Action 0 (no thrust) allows gravity, lateral momentum, and angular momentum to accumulate unchecked, rapidly narrowing the window for successful recovery.
+10. **Multi-Constraint Contact Stability**: A successful landing requires that $|angle|$, $|ang\_vel|$, and $|y\_vel|$ all remain within low-magnitude thresholds simultaneously at the moment of leg contact; even a nominally upright lander ($angle \approx 0$) will result in failure if $|y\_vel|$ or $|ang\_vel|$ are too high upon impact.
