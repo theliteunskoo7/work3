@@ -90,7 +90,14 @@ def analyze_trajectories(client, episodes, summary_text, top_k=2, model="unsloth
     summary_text: latest summary.md body, or None if not available yet.
 
     Returns a list, same length and order as `episodes`, where each entry is a list of up to
-    `top_k` (state, action) tuples — state is a raw list of 8 floats, action is an int 0-3.
+    `top_k` (state, action, step) tuples — state is the raw list of 8 floats the LLM echoed
+    back (kept only for logging/verification, no longer used as a lookup key), action is an
+    int 0-3, step is the 0-based index into that episode's trajectory list (matches the row
+    number the LLM was shown in format_trajectories_for_analysis, which enumerates from 0 --
+    NOT the rollout-global "step" field stored on each trajectory dict, which is a different,
+    larger number). Callers should index the real trajectory as episodes[ep_idx][step] rather
+    than re-matching the echoed state, since the state is retyped by the LLM and can silently
+    drift (rounding, digit swaps, sign flips) in a way a step index cannot.
     Returns [] for an episode if parsing/the API call failed for it.
     """
     if not episodes:
@@ -137,12 +144,14 @@ def analyze_trajectories(client, episodes, summary_text, top_k=2, model="unsloth
         if not isinstance(idx, int) or not (0 <= idx < len(episodes)):
             continue
         pairs = []
+        ep_len = len(episodes[idx])
         for bad in ep_entry.get("bad_actions", [])[:top_k]:
             try:
                 state = [float(v) for v in bad["state"]]
                 action = int(bad["action"])
-                if len(state) == 8 and action in (0, 1, 2, 3):
-                    pairs.append((state, action))
+                step = int(bad["step"])
+                if len(state) == 8 and action in (0, 1, 2, 3) and 0 <= step < ep_len:
+                    pairs.append((state, action, step))
             except (KeyError, TypeError, ValueError):
                 continue
         results[idx] = pairs

@@ -1,13 +1,13 @@
 # Environment Summary
-Last updated: 2026-07-05 13:09:54
+Last updated: 2026-07-06 14:22:16
 
-1. **Gravity and Vertical Velocity**: Gravity provides a constant downward acceleration; while the main engine (Action 2) is the primary mechanism to counteract $y\_vel$, it must be applied with sufficient frequency and magnitude to prevent high-velocity impacts that exceed stability thresholds.
-2. **Angular Kinematics**: The lander's $angle$ is the integral of its $ang\_vel$; high $|ang\_vel|$ causes rapid orientation changes that can quickly move the lander into extreme tilt regimes.
-3. **Main Engine Induced Torque**: Applying the main engine (Action 2) when the lander is tilted ($angle \neq 0$) induces rotational torque, which modifies $ang\_vel$ and can exacerbate angular instability.
-4. **Side-Engine Rotational Directionality**: Action 1 (Left Engine) induces counter-clockwise rotation (positive $ang\_vel$), while Action 3 (Right Engine) induces clockwise rotation (negative $ang\_vel$).
-5. **Asymmetric Thrust Coupling**: When the lander is tilted, side-engine thrust (Actions 1 and 3) produces a vertical component that influences $y\_vel$; depending on the tilt direction, this can either assist in deceleration or inadvertently accelerate the descent rate.
-6. **Lateral Velocity Accumulation**: Frequent use of side engines (Actions 1 and 3) to manage rotation causes the accumulation of lateral velocity ($x\_vel$), leading to horizontal drift away from the landing site.
-7. **Rotational Feedback Runaway**: Selecting a side engine that matches the current sign of $ang\_vel$ (e.g., Action 3 when $ang\_vel < 0$) creates a positive feedback loop that accelerates the lander into an uncontrollable tumble.
-8. **Momentum Dominance**: Once $|angle|$ or $|ang\_vel|$ reaches high magnitudes, the rotational momentum can become so dominant that the available engine thrust is insufficient to stabilize the orientation before ground contact occurs.
-9. **Action 0 Momentum Risk**: Selecting Action 0 (no thrust) allows gravity, lateral momentum, and angular momentum to accumulate unchecked, rapidly narrowing the window for successful recovery.
-10. **Multi-Constraint Contact Stability**: A successful landing requires that $|angle|$, $|ang\_vel|$, and $|y\_vel|$ all remain within low-magnitude thresholds simultaneously at the moment of leg contact; even a nominally upright lander ($angle \approx 0$) will result in failure if $|y\_vel|$ or $|ang\_vel|$ are too high upon impact.
+1. **Main Engine (Action 2) Multidimensionality**: Action 2 serves as the primary regulator for `y_pos` and `y_vel`, but its application is non-linearly coupled with the lander's orientation, inducing significant torque that alters both `angle` and `ang_vel`.
+2. **Body-Fixed Thrust Projection**: All engine actions are body-fixed; the resulting acceleration in the world-frame `x_vel` and `y_vel` is a trigonometric function of the lander's current `angle`.
+3. **Lateral Engine Rotation Duality**: Actions 1 (left) and 3 (right) provide translational thrust to counteract horizontal momentum but simultaneously induce rotation, acting as a double-edged tool for stability.
+4. **Hierarchical Contact State Transitions**: The environment tracks contact through a sequence of states: airborne ($0,0$), single-leg contact ($1,0$ or $0,1$), and dual-leg contact ($1,1$).
+5. **High-Magnitude Transition Rewards**: Significant positive rewards are triggered by transitioning into a contact state (e.g., moving from airborne to single-leg contact), with rewards observed as high as ~13.5.
+6. **Severe Contact Loss Penalty**: Transitioning from a higher contact state (such as dual-leg $1,1$) to a lesser contact state (such as single-leg $1,0$ or $0,1$) triggers massive negative rewards.
+7. **Low-Altitude Lateral Destabilization**: Applying lateral engines (Actions 1 or 3) while a leg is in contact or at very low altitude can induce extreme, catastrophic spikes in `ang_vel`, leading to rapid rotational divergence.
+8. **Persistent Post-Landing Kinetic Oscillations**: Reaching a dual-leg contact state ($1,1$) does not result in a static equilibrium; the lander experiences continuous, non-dampened oscillations in `x_pos`, `y_pos`, `angle`, and `ang_vel` that persist for the remainder of the episode.
+9. **Descent Velocity-Induced Instability**: High-magnitude downward `y_vel` (e.g., $|y\_vel| > 1.0$) during the approach to or during contact states is a critical precursor to terminal failure.
+10. **Terminal Ground Collision Mechanics**: A massive terminal penalty (-100) is triggered when `y_pos` falls below zero, even if a leg contact state is currently active.

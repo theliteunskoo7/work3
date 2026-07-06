@@ -568,36 +568,52 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             bad_pairs_per_ep = analyze_trajectories(
                 analyzer_client, episodes, current_summary, top_k=analyzer_topk, model=llm_model, seed=seed,
             )
-            bad_pairs = [pair for pairs in bad_pairs_per_ep for pair in pairs]
+            # Keep (ep_idx, step) alongside each pair so the advantage lookup below can index
+            # directly into episodes[ep_idx][step] instead of re-matching the LLM's retyped
+            # state floats. ep_idx is this pair's position in the `episodes` list just sent
+            # (not any global episode counter).
+            bad_pairs_located = [
+                (ep_idx, step, state, action)
+                for ep_idx, pairs in enumerate(bad_pairs_per_ep)
+                for (state, action, step) in pairs
+            ]
+            bad_pairs = [(state, action) for _, _, state, action in bad_pairs_located]
 
             # Advantage filter: drop pairs where the policy is already confident
             # (prob > 0.5) AND PPO found the action above average (advantage > 0).
             # Applying unlikelihood against PPO's own positive signal is what caused
             # the catastrophic regression at ep 748.
+            #
+            # Looked up by direct (ep_idx, step) indexing rather than re-matching the LLM's
+            # echoed state floats -- a transcription slip (rounding, digit swap, sign flip)
+            # in those 8 retyped numbers used to make the old exact-match lookup silently
+            # fail, which meant the pair fell through to being suppressed anyway instead of
+            # being protected. A step index can't drift the same way.
             n_raw = len(bad_pairs)
+            n_state_mismatch = 0
             if bad_pairs:
-                raw_states  = np.array([p[0] for p in bad_pairs], dtype=np.float32)
+                raw_states  = np.array([state for _, _, state, _ in bad_pairs_located], dtype=np.float32)
                 norm_states = np.stack([state_normalizer.normalize(s) for s in raw_states])
                 states_t    = torch.FloatTensor(norm_states).to(device)
-                actions_t   = torch.LongTensor([p[1] for p in bad_pairs]).to(device)
+                actions_t   = torch.LongTensor([action for _, _, _, action in bad_pairs_located]).to(device)
                 with torch.no_grad():
                     dist  = Categorical(logits=actor(states_t))
                     probs = dist.probs.gather(1, actions_t.unsqueeze(1)).squeeze(1)
 
                 filtered_pairs = []
-                for i, (state, action) in enumerate(bad_pairs):
+                for i, (ep_idx, step, state, action) in enumerate(bad_pairs_located):
+                    step_data = episodes[ep_idx][step]
+
+                    # Verification: does the LLM's retyped state actually match the real
+                    # recorded state at this index? Logged, not gated on -- this is exactly
+                    # the check the old code silently depended on (and could fail) for safety;
+                    # here it's just visibility into how often the LLM's echo drifts.
+                    if not all(abs(a - b) < 1e-4 for a, b in zip(step_data["state"], state)):
+                        n_state_mismatch += 1
+
                     prob = probs[i].item()
                     if prob > 0.5:
-                        adv = None
-                        for ep in episodes:
-                            for step_data in ep:
-                                if (step_data["action"] == action and
-                                        all(abs(a - b) < 1e-4
-                                            for a, b in zip(step_data["state"], state))):
-                                    adv = step_data.get("advantage")
-                                    break
-                            if adv is not None:
-                                break
+                        adv = step_data.get("advantage") if step_data["action"] == action else None
                         if adv is not None and adv > 0.0:
                             continue  # drop: policy confident + PPO agrees it's good
                     filtered_pairs.append((state, action))
@@ -608,13 +624,13 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
                                         max_grad_norm=max_grad_norm)
             if stats:
                 print(f"  [Analyzer] {len(episodes)} episodes -> {n_raw} bad pairs "
-                      f"({n_dropped} dropped by adv filter) | "
+                      f"({n_dropped} dropped by adv filter, {n_state_mismatch} state-echo mismatches) | "
                       f"unlikelihood_loss={stats['loss']:.4f} | "
                       f"mean p(bad) before update={stats['p_bad_pre']:.4f} | "
                       f"ul_lr={ul_lr_now:.2e} (scale={reward_scale:.2f})")
             else:
                 print(f"  [Analyzer] {len(episodes)} episodes -> {n_raw} bad pairs "
-                      f"({n_dropped} dropped by adv filter, 0 applied)")
+                      f"({n_dropped} dropped by adv filter, {n_state_mismatch} state-echo mismatches, 0 applied)")
 
         # Back to CPU before launching the summary thread — all CUDA ops for
         # this update are now done. The thread will run during the NEXT
