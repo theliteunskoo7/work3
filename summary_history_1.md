@@ -2447,3 +2447,6195 @@
 8. **Persistent Post-Landing Kinetic Oscillations**: Reaching a dual-leg contact state ($1,1$) does not result in a static equilibrium; the lander experiences continuous, non-dampened oscillations in `x_pos`, `y_pos`, `angle`, and `ang_vel` that persist for the remainder of the episode.
 9. **Descent Velocity-Induced Instability**: High-magnitude downward `y_vel` (e.g., $|y\_vel| > 1.0$) during the approach to or during contact states is a critical precursor to terminal failure.
 10. **Terminal Ground Collision Mechanics**: A massive terminal penalty (-100) is triggered when `y_pos` falls below zero, even if a leg contact state is currently active.
+
+---
+
+## 2026-07-07 15:17:52
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, excessive or uncompensated use of the main engine drives high horizontal velocity and uncontrollable rotation.
+5. **Side Engine (Actions 1 & 3) Dynamics**: These actions are critical for managing `angle` and `ang_vel`, but they are often applied too late to counteract high momentum.
+6. **Action 0 (Nothing) Dynamics**: Leads to passive descent where gravity and existing momentum dominate, causing the lander to drift and tilt unchecked.
+7. **Failure Pattern: Engine Spamming**: Continuous, repetitive use of the main engine without stabilizing side-engine corrections leads to terminal tilt and lateral drift.
+8. **Failure Pattern: Uncompensated Tilt**: Using the main engine while the lander is at a significant angle converts vertical thrust into horizontal momentum, accelerating the crash.
+9. **Critical Moment (Episode 1)**: Steps 5–29 demonstrate how early, sustained main engine use causes a permanent tilt and rapid $x\_vel$ increase.
+10. **Critical Moment (Episode 2)**: Steps 67–79 show the lander entering a "death spiral" where main engine use at a high angle creates fatal horizontal velocity.
+
+---
+
+## 2026-07-07 15:24:37
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, the main engine becomes a primary driver of $x\_vel$ and `ang_vel` when used at significant `angle` deviations.
+5. **Side Engine (Action 3) Dynamics**: These actions are critical for managing `angle`, but their effectiveness at arresting rotation diminishes as `ang_vel` and `angle` magnitude increase.
+6. **Action 0 (Nothing) Dynamics**: This action leads to passive descent where existing $x\_vel$, $y\_vel$, and `ang_vel` persist unchecked, allowing momentum to carry the lander into terminal states.
+7. **Failure Pattern: Momentum Conversion**: Using the main engine at extreme angles (e.g., $|angle| > 0.5$) effectively converts intended vertical lift into massive horizontal momentum ($x\_vel$).
+8. **Failure Pattern: Angular Saturation**: At high angular velocities, the lander can enter a state where side engine thrust is insufficient to counteract the accumulated rotation, leading to a "death spiral."
+9. **Critical Moment (Episode 1)**: Steps 0–25 show how early, frequent main engine use creates an initial tilt that compounds into an unrecoverable angular state.
+10. **Critical Moment (Episode 2)**: Steps 70–79 demonstrate how a period of inaction (Action 0) allows high existing horizontal and angular momentum to proceed toward failure unchecked.
+
+---
+
+## 2026-07-07 15:29:06
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, the main engine becomes a primary driver of $x\_vel$ and `ang_vel` when used at significant `angle` deviations.
+5. **Side Engine (Action 3) Dynamics**: These actions can exacerbate rotation if the thrust direction aligns with the current `ang_vel`; if used incorrectly, they accelerate the increase in `angle` rather than arresting it.
+6. **Action 0 (Nothing) Dynamics**: This action leads to passive descent where existing $x\_vel$, $y\_vel$, and `ang_vel` persist unchecked, allowing momentum to carry the lander into terminal states.
+7. **Failure Pattern: Momentum Conversion**: Using the main engine at extreme angles (e.g., $|angle| > 0.5$) effectively converts intended vertical lift into massive horizontal momentum ($x\_vel$).
+8. **Failure Pattern: Angular Saturation**: At high angular velocities, the lander can enter a state where side engine thrust is insufficient to counteract the accumulated rotation, leading to a "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` increases, the lander's control authority diminishes; engines that previously provided stabilization begin to act as drivers of further angular and horizontal instability.
+10. **Terminal Momentum Persistence**: High $x\_vel$ and `ang_vel` are highly persistent and can continue to grow even when the lander is attempting to manage vertical descent ($y\_vel$) via the main engine.
+
+---
+
+## 2026-07-07 15:44:06
+
+1. **Gravity-Driven Descent**: Gravity causes a continuous increase in downward vertical velocity ($y\_vel$). The main engine is required to counteract this, but vertical descent often accelerates despite engine use if the lander is not perfectly upright.
+2. **Angular-Angular Velocity Coupling**: Any deviation in `angle` from zero tends to generate or exacerbate `ang_vel` (angular velocity), creating a feedback loop where rotational momentum becomes increasingly difficult to arrest as it accumulates.
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a primary indicator of imminent failure. Even if vertical descent is managed, high horizontal velocity often leads to a crash upon contact.
+4. **Main Engine (Action 2) Dual-Role**: While the main engine provides necessary upward thrust to mitigate $y\_vel$, its application at non-zero `angle` values effectively converts vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`).
+5. **Side Engine (Action 1 & 3) Functional Constraints**: Side engines are the primary tools for manipulating `angle` and `ang_vel`, but they provide no vertical thrust and no direct horizontal translation correction, meaning they cannot arrest $y\_vel$ or $x\_vel$.
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows all existing velocities ($x\_vel, y\_vel, ang\_vel$) and the current `angle` to persist unchecked, allowing gravity and existing momentum to drive the lander toward a terminal state.
+7. **The Stability Trade-off**: Attempts to correct `angle` using side engines often result in an uncorrected drift in $y\_vel$ or $x\_vel$, as the engines' primary purpose is angular stabilization rather than translational control.
+8. **Angular Momentum Saturation**: If `ang_vel` reaches high magnitudes, the corrective torque from side engines may become insufficient to counteract the rotation, leading to an irrecoverable "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` increases, the lander's ability to use the main engine for vertical lift diminishes, as a larger portion of the thrust is diverted into horizontal and angular instability.
+10. **Terminal State Sensitivity**: High $x\_vel$, $y\_vel$, or `ang_vel` at the moment of contact (even if the lander is relatively upright) results in a failure state, meaning stabilization must be achieved well before ground contact.
+
+---
+
+## 2026-07-07 15:47:45
+
+1. **Gravity-Driven Descent and Velocity Thresholds**: Gravity causes continuous downward acceleration. Once $|y\_vel|$ exceeds a certain threshold, the main engine (Action 2) may struggle to provide sufficient net upward thrust to reverse the descent, often only slowing the rate of acceleration.
+2. **Angular-Angular Velocity Coupling**: Any deviation in `angle` from zero generates `ang_vel`. This creates a feedback loop where rotational momentum can accumulate rapidly, making the lander increasingly difficult to stabilize.
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a primary indicator of failure. The lander's horizontal momentum is difficult to arrest, and high $|x\_vel|$ at the moment of contact leads to failure regardless of vertical stability.
+4. **Main Engine (Action 2) Vectoring**: When the lander is not perfectly upright, the main engine's thrust is diverted; a portion of the vertical lift is converted into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), reducing its efficiency in controlling $y\_vel$.
+5. **Side Engine (Action 1 & 3) Momentum Risk**: While side engines are the primary tool for manipulating `angle`, improper application can rapidly drive `ang_vel` to high magnitudes, inadvertently accelerating the lander's rotation instead of correcting it.
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows all existing velocities and the current `angle` to persist unchecked, allowing gravity and existing momentum to drive the lander toward a terminal state.
+7. **The Stability-Translation Trade-off**: Attempts to correct `angle` using side engines often result in uncorrected drift in $y\_vel$ or $x\_vel$, as these engines provide no vertical thrust or direct horizontal translation correction.
+8. **Angular Momentum Saturation**: If `ang_vel` reaches high magnitudes, the corrective torque from side engines becomes insufficient to counteract the rotation, leading to an irrecoverable "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` or `ang_vel` increases, the lander's ability to use the main engine for effective vertical lift diminishes, as more thrust is diverted into horizontal and angular instability.
+10. **Terminal State Sensitivity**: Failure occurs if $x\_vel$, $y\_vel$, or `ang_vel` are high at the moment of contact. Achieving a near-zero $y$ position is insufficient for success if the lander has not also stabilized its other velocities.
+
+---
+
+## 2026-07-07 15:51:07
+
+1. **Gravity-Driven Descent and Vertical Velocity**: Gravity causes continuous downward acceleration. If $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, especially if the lander's orientation is not vertical.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide no direct horizontal translation correction, making horizontal momentum difficult to arrest once established.
+
+4. **Main Engine (Action 2) Thrust Vectoring**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of the vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), reducing its effectiveness for altitude control.
+
+5. **Side Engine (Action 1 & 3) Torque Risks**: While side engines are intended to control `angle`, applying them while `ang_vel` is already high or in the wrong direction can accelerate the rotation (increasing $|ang\_vel|$) rather than dampening it.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but can exacerbate horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the corrective torque available from side engines becomes insufficient to counteract the rotational momentum, leading to an irrecoverable "death spiral."
+
+9. **Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-07 15:55:58
+
+1. **Gravity-Driven Descent and Vertical Velocity**: Gravity causes continuous downward acceleration. If $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, particularly as the lander's tilt increases.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt, which is often insufficient to arrest high established momentum.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), creating a coupling between altitude control and stability.
+
+5. **Side Engine Torque vs. Angular Inertia**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is high, the corrective torque from side engines may be insufficient to dampen the rotation, or may even exacerbate it if the timing/direction is misaligned with the momentum.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the rotational momentum can exceed the total corrective torque available from the side engines, leading to an irrecoverable "death spiral" where the lander cannot return to a vertical orientation.
+
+9. **Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-07 16:00:11
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, especially as the lander's tilt increases.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt, which is often insufficient to arrest high established momentum.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), creating a coupling between altitude control and stability.
+
+5. **Side Engine Torque vs. Angular Momentum**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is high, the corrective torque from side engines may be insufficient to reverse the direction of rotation, allowing the `angle` to continue increasing despite continuous corrective thrust.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the rotational momentum can exceed the total corrective torque available from the side engines, leading to an irrecoverable "death spiral" where the lander cannot return to a vertical orientation.
+
+9. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-07 16:04:33
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of $y\_vel$. If $|y\_vel|$ is not arrested by the main engine, the descent rate will eventually exceed the lander's ability to stabilize.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any non-zero `angle` generates `ang_vel`, which in turn exacerbates the tilt. This creates a self-reinforcing instability that requires active torque to interrupt.
+
+3. **Horizontal Momentum Persistence and Side Engine Limitation**: Side engines (Actions 1 and 3) provide torque for rotational control but offer no capability for horizontal ($x\_vel$) translation correction. Horizontal momentum remains persistent unless modified by the main engine's thrust vector.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is tilted ($\text{angle} \neq 0$), the main engine's (Action 2) thrust is vectorially split. A portion of the thrust provides vertical lift, while the remainder contributes to horizontal acceleration ($x\_vel$) and angular acceleration (`ang_vel`).
+
+5. **Torque-Momentum Competition**: The ability of side engines to correct `angle` is dependent on the current `ang_vel`. If angular momentum is sufficiently high, the corrective torque provided by side engines may be insufficient to reverse the direction of rotation, allowing the tilt to increase despite corrective actions.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows the current state of translational and angular velocities to evolve purely under the influence of gravity and existing momentum, leading to a deterministic progression of the current trajectory.
+
+7. **Decoupled Control Specialization**: The control system is specialized: side engines primarily manipulate the rotational state (`angle` and `ang_vel`), whereas the main engine primarily manages the vertical state (`y_pos` and `y_vel`) and secondarily influences horizontal and angular stability through thrust vector misalignment.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the lander may enter a "death spiral" where the total corrective torque available from the side engines is lower than the existing angular momentum, making orientation recovery impossible.
+
+9. **Vertical Control Authority Degradation**: The effective vertical lift provided by the main engine decreases as the `angle` increases. As the thrust vector tilts further from the vertical axis, a larger percentage of the engine's power is diverted into horizontal and angular acceleration rather than altitude maintenance.
+
+10. **Terminal State Sensitivity**: The outcome of the simulation is determined by the state variables at the exact moment of leg contact. High magnitudes of $|x\_vel|$, $|y\_vel|$, `ang_vel`, or `angle` at the moment of contact trigger failure, regardless of the lander's altitude.
+
+---
+
+## 2026-07-07 16:08:16
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$. Successful altitude management requires the main engine to provide sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Rotational Specialization**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel` but have no direct influence on translational velocities ($x\_vel$ or $y\_vel$).
+
+6. **Horizontal Momentum Persistence**: Horizontal velocity ($x\_vel$) is persistent and cannot be corrected by side engines; it can only be modified by the main engine (Action 2) through thrust vectoring when the lander is tilted.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration and reducing the ability to arrest $y\_vel$.
+
+9. **Decoupled Control Requirement**: Stabilization requires a coordinated approach: side engines must manage orientation (`angle`/`ang_vel`) while the main engine manages descent rate ($y\_vel$) and horizontal drift ($x\_vel$).
+
+10. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|angle|$, or $|x\_vel|$ at this instant trigger failure.
+
+---
+
+## 2026-07-07 16:12:32
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Rotational Specialization**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel` but have no direct influence on translational velocities ($x\_vel$ or $y\_vel$).
+
+6. **Thrust-Induced Horizontal Acceleration**: If the `angle` is oriented such that the thrust vector aligns with the direction of current $x\_vel$, the main engine (Action 2) will exacerbate horizontal drift rather than counteracting it.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration and reducing the ability to arrest $y\_vel$.
+
+9. **Decoupled Control Requirement**: Stabilization requires a coordinated approach: side engines must manage orientation (`angle`/`ang_vel`) while the main engine must be precisely angled to manage both descent rate ($y\_vel$) and horizontal drift ($x\_vel$).
+
+10. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure.
+
+---
+
+## 2026-07-07 16:16:33
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Rotational Specialization**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel` but have no direct influence on translational velocities ($x\_vel$ or $y\_vel$).
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure.
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time, the velocity at the moment of contact may exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-07 17:28:45
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure.
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time, the velocity at the moment of contact may exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-07 17:33:56
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, meaning rotational corrections inherently alter the lander's trajectory.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact; high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure, typically resulting in a large negative reward penalty (e.g., -100).
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time and at a near-vertical orientation, terminal velocities will exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-07 17:39:14
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, meaning rotational corrections inherently alter the lander's trajectory.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact; high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ at this instant trigger failure, typically resulting in a large negative reward penalty (e.g., -100).
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time and at a near-vertical orientation, terminal velocities or angular states will exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-07 17:42:53
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, meaning rotational corrections inherently alter the lander's trajectory.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity and Contact Phase**: The simulation outcome is determined by the lander's state variables during the contact phase; high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ during the steps following initial leg contact trigger a failure penalty (e.g., -100).
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time and at a near-vertical orientation, terminal velocities or angular states will exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-07 17:46:17
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity and Contact Phase**: The simulation outcome is determined by the stability of the state variables during the contact phase (when `left_leg_contact` or `right_leg_contact` is 1.0); high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ during these steps trigger a failure penalty.
+
+10. **Rotational Stability at Landing**: Managing $y\_vel$ is insufficient for a successful landing; the lander must also minimize `ang_vel` and `angle` prior to contact, as high rotational momentum at the moment of impact triggers a failure even if vertical velocity is low.
+
+---
+
+## 2026-07-07 17:49:44
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the stability of the state variables during the contact phase (when `left_leg_contact` or `right_leg_contact` is 1.0); high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ during these steps trigger a failure penalty.
+
+10. **Multi-Axis Landing Stability**: Successful landing requires the simultaneous minimization of descent rate ($y\_vel$), horizontal drift ($x\_vel$), and rotational state (`angle` and `ang_vel`); failure can be triggered by high rotational momentum or horizontal velocity even if the vertical descent is controlled.
+
+---
+
+## 2026-07-07 17:53:32
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Triggered Outcome**: The simulation outcome is determined by the state of the lander at the specific moment contact is first detected (`left_leg_contact` or `right_leg_contact` transitions to 1.0).
+
+10. **Multi-Axis Landing Stability**: Successful landing requires the simultaneous minimization of $y\_vel$, $x\_vel$, `angle`, and `ang_vel`; high $|ang\_vel|$ is a particularly critical failure driver, capable of triggering a failure even if the vertical descent rate ($y\_vel$) is relatively low.
+
+---
+
+## 2026-07-07 17:56:53
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being dependent on the lander's current orientation.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Triggered Outcome**: The simulation outcome is determined by the state of the lander at the specific moment contact is first detected (`left_leg_contact` or `right_leg_contact` transitions to 1.0).
+
+10. **Angular Velocity-Induced Failure**: High $|ang\_vel|$ at the moment of contact is a primary driver of failure, capable of triggering a crash even if the lander's vertical descent rate ($y\_vel$) and horizontal velocity ($x\_vel$) are relatively low and stable.
+
+---
+
+## 2026-07-07 18:01:03
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being dependent on the lander's current orientation.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-State Continuity**: The detection of leg contact (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) does not immediately terminate the episode, allowing for continued state evolution and movement while in a contact state.
+
+10. **Angular Velocity-Induced Crash**: Extreme angular velocity ($|ang\_vel|$) is the primary trigger for the terminal failure reward (-100), which can manifest either during descent or as a result of rapid instability following the establishment of leg contact.
+
+---
+
+## 2026-07-07 18:04:56
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being dependent on the lander's current orientation.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Rotational Spikes**: The transition to a contact state (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) can trigger sudden, extreme spikes in `ang_vel`, even when the lander's orientation (`angle`) and vertical velocity ($y\_vel$) appear relatively stable.
+
+10. **Terminal Angular Velocity Failure**: The terminal failure reward (-100) is triggered by extreme angular velocity ($|ang\_vel|$), which frequently manifests as a rapid, uncontrolled escalation immediately following the establishment of leg contact.
+
+---
+
+## 2026-07-07 18:07:06
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, creating a coupling effect where horizontal and angular corrections compete for control authority.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Rotational Spikes**: The transition to a contact state (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) can trigger sudden, extreme, and near-instantaneous spikes in $|ang\_vel|$, even when the lander's orientation and vertical velocity appear relatively stable.
+
+10. **Terminal Angular Velocity Failure**: The terminal failure reward (-100) is triggered by reaching a critical threshold of $|ang\_vel|$, a state that frequently manifests as a rapid, uncontrolled escalation immediately following the establishment of leg contact.
+
+---
+
+## 2026-07-07 18:11:02
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Rotational Instability**: The transition to a contact state (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) can trigger sudden, extreme, and near-instantaneous spikes in $|ang\_vel|$, which frequently leads to terminal failure if the velocity exceeds critical thresholds.
+
+10. **Surface Skidding and Contact Volatility**: At near-zero $y\_pos$, the lander can enter a "skidding" state where leg contact states oscillate rapidly between 0.0 and 1.0. In this state, the lander can maintain low $y\_vel$ despite non-zero lateral or angular momentum, though engine actions during contact result in extreme reward volatility.
+
+---
+
+## 2026-07-07 18:12:04
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Pivot Torque**: The establishment of leg contact transforms the lander into a constrained system where the main engine (Action 2) can act as a pivot, converting vertical thrust into rapid, non-linear increases in `ang_vel`.
+
+10. **Grounded Stability Sensitivity**: Once in a contact state, the lander's stability becomes extremely sensitive to engine inputs; thrusting actions that are effective for descent in free-fall can trigger catastrophic, terminal spikes in `ang_vel` when the lander is grounded.
+
+---
+
+## 2026-07-07 18:15:38
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Fulcrum-Effect Pivot Dynamics**: Establishing leg contact transforms the lander into a constrained system where the contact point serves as a pivot; in this state, any thrust from the main engine (Action 2) is converted into significant, rapid angular acceleration (`ang_vel`).
+
+10. **Grounded-State Thrust Instability**: While the main engine is the primary vertical controller in free-fall, its application during a contact state triggers a high-magnitude coupling between vertical thrust and angular velocity, frequently resulting in terminal rotational instability.
+
+---
+
+## 2026-07-07 18:18:01
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Fulcrum-Effect Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point serves as a pivot; in this state, any thrust from the main engine (Action 2) is converted into high-magnitude, rapid angular acceleration (`ang_vel`).
+
+10. **Grounded-State Rotational Instability**: While the main engine is the primary vertical controller in free-fall, its application during a contact state triggers a high-magnitude coupling between vertical thrust and angular velocity, frequently resulting in extreme, divergent rotational states.
+
+---
+
+## 2026-07-07 18:21:26
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Fulcrum-Effect Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point serves as a pivot; in this state, any thrust from the main engine (Action 2) is converted into high-magnitude, rapid angular acceleration (`ang_vel`).
+
+10. **Grounded-State Rotational Divergence**: While the main engine is the primary vertical controller in free-fall, its application during a contact state triggers a high-magnitude coupling between vertical thrust and angular velocity, frequently resulting in extreme, divergent rotational states and immediate failure.
+
+---
+
+## 2026-07-07 18:22:59
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, the main engine (Action 2) acts as a high-leverage torque source, where the resulting `ang_vel` is highly sensitive to the alignment of the thrust vector relative to the pivot.
+
+10. **Grounded-State Contact Volatility**: The application of Action 2 while in a contact state is highly sensitive to the existing `angle` and `ang_vel`. Depending on the orientation, thrust can either maintain a stable grounded state or cause an immediate loss of contact (transitioning `leg_contact` from 1.0 to 0.0) accompanied by rapid, divergent rotational acceleration.
+
+---
+
+## 2026-07-07 18:25:12
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, the main engine (Action 2) acts as a high-leverage torque source, where the resulting `ang_vel` is highly sensitive to the alignment of the thrust vector relative to the pivot.
+
+10. **Grounded-State Contact Volatility and Chattering**: Contact does not equate to stability. The lander can enter a prolonged state of "chattering" or high-frequency bouncing, where leg contacts oscillate rapidly between 0.0 and 1.0. This state is characterized by extreme reward volatility, where the difference between a stable landing and a catastrophic failure is represented by massive swings in reward within a single timestep.
+
+---
+
+## 2026-07-07 18:28:34
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, the main engine (Action 2) acts as a high-leverage torque source, where the resulting `ang_vel` is highly sensitive to the alignment of the thrust vector relative to the pivot.
+
+10. **Bimodal Contact Termination and Stability Requirements**: The simulation distinguishes between partial contact (one leg) and full contact (both legs = 1.0). The transition to full contact serves as the terminal state trigger; if this occurs while $x\_vel$, $y\_vel$, or $ang\_vel$ are non-negligible, the lander incurs a catastrophic -100 reward, indicating that landing stability requires the simultaneous minimization of all velocity components at the moment of full contact.
+
+---
+
+## 2026-07-07 18:30:58
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, any engine thrust (Action 1, 2, or 3) acts as a high-leverage torque source, making the resulting `ang_vel` extremely sensitive to the alignment of the thrust vector relative to the contact point.
+
+10. **Non-Terminal Contact and Stability Requirements**: The simulation distinguishes between partial contact (one leg) and full contact (both legs = 1.0). Establishing contact does not necessarily terminate the episode, allowing for post-contact maneuvering; however, the stability of the lander (minimization of $x\_vel$, $y\_vel$, and $ang\_vel$ at the moment of contact) is a primary determinant of the total reward and the transition from a "PARTIAL" to a stable landing.
+
+---
+
+## 2026-07-07 18:35:14
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, any engine thrust (Action 1, 2, or 3) acts as a high-leverage torque source, making the resulting `ang_vel` extremely sensitive to the alignment of the thrust vector relative to the contact point.
+
+10. **Contact Fragility and Momentum-Induced Ejection**: Establishing contact does not guarantee a stable landing. If the lander possesses significant angular momentum or if engine thrust is applied while the lander is pivoted on a contact point, the resulting torque can cause the lander to tip or "bounce," leading to an abrupt loss of leg contact and a transition back to an airborne state.
+
+---
+
+## 2026-07-07 18:36:31
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact transforms the lander into a pivot-constrained system. In this state, any engine thrust (Action 1, 2, or 3) acts as a high-leverage torque source, causing the resulting `ang_vel` to be extremely sensitive to the alignment of the thrust vector relative to the contact point.
+
+10. **Contact-Thrust Instability**: Applying significant engine thrust while in a contact state—particularly the main engine—frequently induces violent angular oscillations or "bounces." This results in an abrupt loss of leg contact and a transition back to an airborne state.
+
+---
+
+## 2026-07-07 18:39:26
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Single-Leg Pivot Dynamics**: A state of partial contact (where only one leg contact is 1.0) transforms the lander into a single-point pivot system, making the resulting `ang_vel` extremely sensitive to the alignment of any applied engine thrust relative to the contact point.
+
+10. **Contact-Thrust Instability**: Applying thrust (Actions 1, 2, or 3) while in contact frequently induces violent oscillations or "bounces," resulting in an abrupt loss of contact. In high-momentum or highly tilted contact states, even applying no thrust (Action 0) can fail to prevent these instabilities, leading to significant negative rewards.
+
+---
+
+## 2026-07-07 18:42:27
+
+---
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Single-Leg Pivot Dynamics**: A state of partial contact (where only one leg contact is 1.0) transforms the lander into a single-point pivot system, making the resulting `ang_vel` extremely sensitive to the alignment of any applied engine thrust relative to the contact point.
+
+10. **Contact-State Reward Volatility**: The transition to a contact state (leg contact = 1.0) introduces extreme reward volatility. While specific corrective thrusting (particularly Action 1) can yield massive positive rewards, most thrusting maneuvers (Actions 1, 2, or 3) during high angular or lateral momentum in contact trigger catastrophic negative penalties (often < -15.0). In highly unstable contact states, even inaction (Action 0) can result in significant negative rewards.
+
+---
+
+## 2026-07-07 18:44:03
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-State Reward Volatility**: The transition to a contact state (leg contact = 1.0) introduces extreme reward volatility. While specific corrective thrusting (particularly Actions 1 or 3) can yield large positive rewards, most thrusting maneuvers during high angular or lateral momentum in contact trigger catastrophic negative penalties.
+
+10. **Contact-Phase Kinetic Sensitivity**: During the contact phase, the lander's stability is contingent on the simultaneous minimization of `ang_vel`, `x_vel`, and `y_vel`. Excessive kinetic energy in any of these three axes during contact frequently triggers massive, rapid-fire negative reward spikes, even if the lander remains in contact.
+
+---
+
+## 2026-07-07 18:50:02
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Phase Reward Extremity**: The contact phase (leg contact = 1.0) is characterized by extreme reward polarity. Corrective maneuvers that successfully mitigate residual kinetic energy result in massive positive rewards, while maneuvers that fail to stabilize or that exacerbate angular or lateral motion trigger massive negative penalties.
+
+10. **Multi-Axis Kinetic Stabilization**: To achieve high-magnitude positive rewards during the contact phase, the lander must use active thrust (Actions 1, 2, or 3) to simultaneously minimize the magnitudes of `ang_vel`, `x_vel`, and `y_vel`.
+
+---
+
+## 2026-07-07 18:52:48
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Phase Reward Sensitivity**: The contact phase (leg contact = 1.0) is characterized by extreme reward polarity; the reward signal is highly sensitive to the instantaneous magnitudes of $x\_vel$, $y\_vel$, and $ang\_vel$, where even small residual velocities trigger massive negative penalties.
+
+10. **Multi-Axis Stabilization Conflict**: During the contact phase, thrust actions intended to stabilize a single axis (e.g., reducing `ang_vel`) often inadvertently increase velocities in other axes (e.g., $x\_vel$ or $y\_vel$) due to thrust vector coupling, which frequently results in catastrophic negative rewards.
+
+---
+
+## 2026-07-07 18:59:48
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-State High-Frequency Jitter**: The transition between contact (1.0) and non-contact (0.0) states is highly volatile and sensitive to minute changes in $y\_pos$ and $y\_vel$, often causing rapid, single-step oscillations in the status of individual legs.
+
+10. **Asymmetric Contact-Phase Sensitivity**: The environment supports independent contact states for each leg; asymmetric contact (where only one leg is in contact) introduces complex torque and, when combined with residual $x\_vel$, $y\_vel$, or $ang\_vel$, triggers extreme negative reward penalties.
+
+---
+
+## 2026-07-07 19:02:39
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Velocity Penalty Coupling**: High magnitudes of $x\_vel$ or $y\_vel$ during contact transitions ($0.0 \leftrightarrow 1.0$) or while in a sustained contact state trigger severe negative rewards, penalizing "hard" or "sliding" landings.
+
+10. **Main Engine-Contact Conflict**: Applying the main engine (Action 2) while the lander is in an established contact state ($leg\_contact=1.0$) frequently results in extreme negative rewards, suggesting that engine thrust significantly destabilizes the lander upon ground contact.
+
+---
+
+## 2026-07-07 19:06:56
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Velocity Penalty Coupling**: High magnitudes of $x\_vel$ or $y\_vel$ during contact transitions ($0.0 \leftrightarrow 1.0$) or while in a sustained contact state trigger severe negative rewards, penalizing "hard" or "sliding" landings.
+
+10. **Post-Contact Engine Instability**: Achieving leg contact can yield positive rewards, but the lander enters a volatile state where $y\_pos$ can become negative (ground penetration). In this state, applying any engine thrust (Actions 1, 2, or 3) while `angle` or `ang_vel` are non-zero is highly likely to trigger a terminal failure (-100 reward) via rapid rotational tip-over.
+
+---
+
+## 2026-07-08 18:02:19
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, excessive or uncompensated use of the main engine drives high horizontal velocity and uncontrollable rotation.
+5. **Side Engine (Actions 1 & 3) Dynamics**: These actions are critical for managing `angle` and `ang_vel`, but they are often applied too late to counteract high momentum.
+6. **Action 0 (Nothing) Dynamics**: Leads to passive descent where gravity and existing momentum dominate, causing the lander to drift and tilt unchecked.
+7. **Failure Pattern: Engine Spamming**: Continuous, repetitive use of the main engine without stabilizing side-engine corrections leads to terminal tilt and lateral drift.
+8. **Failure Pattern: Uncompensated Tilt**: Using the main engine while the lander is at a significant angle converts vertical thrust into horizontal momentum, accelerating the crash.
+9. **Critical Moment (Episode 1)**: Steps 5–29 demonstrate how early, sustained main engine use causes a permanent tilt and rapid $x\_vel$ increase.
+10. **Critical Moment (Episode 2)**: Steps 67–79 show the lander entering a "death spiral" where main engine use at a high angle creates fatal horizontal velocity.
+
+---
+
+## 2026-07-08 18:09:06
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, the main engine becomes a primary driver of $x\_vel$ and `ang_vel` when used at significant `angle` deviations.
+5. **Side Engine (Action 3) Dynamics**: These actions are critical for managing `angle`, but their effectiveness at arresting rotation diminishes as `ang_vel` and `angle` magnitude increase.
+6. **Action 0 (Nothing) Dynamics**: This action leads to passive descent where existing $x\_vel$, $y\_vel$, and `ang_vel` persist unchecked, allowing momentum to carry the lander into terminal states.
+7. **Failure Pattern: Momentum Conversion**: Using the main engine at extreme angles (e.g., $|angle| > 0.5$) effectively converts intended vertical lift into massive horizontal momentum ($x\_vel$).
+8. **Failure Pattern: Angular Saturation**: At high angular velocities, the lander can enter a state where side engine thrust is insufficient to counteract the accumulated rotation, leading to a "death spiral."
+9. **Critical Moment (Episode 1)**: Steps 0–25 show how early, frequent main engine use creates an initial tilt that compounds into an unrecoverable angular state.
+10. **Critical Moment (Episode 2)**: Steps 70–79 demonstrate how a period of inaction (Action 0) allows high existing horizontal and angular momentum to proceed toward failure unchecked.
+
+---
+
+## 2026-07-08 18:13:36
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, the main engine becomes a primary driver of $x\_vel$ and `ang_vel` when used at significant `angle` deviations.
+5. **Side Engine (Action 3) Dynamics**: These actions can exacerbate rotation if the thrust direction aligns with the current `ang_vel`; if used incorrectly, they accelerate the increase in `angle` rather than arresting it.
+6. **Action 0 (Nothing) Dynamics**: This action leads to passive descent where existing $x\_vel$, $y\_vel$, and `ang_vel` persist unchecked, allowing momentum to carry the lander into terminal states.
+7. **Failure Pattern: Momentum Conversion**: Using the main engine at extreme angles (e.g., $|angle| > 0.5$) effectively converts intended vertical lift into massive horizontal momentum ($x\_vel$).
+8. **Failure Pattern: Angular Saturation**: At high angular velocities, the lander can enter a state where side engine thrust is insufficient to counteract the accumulated rotation, leading to a "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` increases, the lander's control authority diminishes; engines that previously provided stabilization begin to act as drivers of further angular and horizontal instability.
+10. **Terminal Momentum Persistence**: High $x\_vel$ and `ang_vel` are highly persistent and can continue to grow even when the lander is attempting to manage vertical descent ($y\_vel$) via the main engine.
+
+---
+
+## 2026-07-08 18:38:36
+
+1. **Gravity-Driven Descent**: Gravity causes a continuous increase in downward vertical velocity ($y\_vel$). The main engine is required to counteract this, but vertical descent often accelerates despite engine use if the lander is not perfectly upright.
+2. **Angular-Angular Velocity Coupling**: Any deviation in `angle` from zero tends to generate or exacerbate `ang_vel` (angular velocity), creating a feedback loop where rotational momentum becomes increasingly difficult to arrest as it accumulates.
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a primary indicator of imminent failure. Even if vertical descent is managed, high horizontal velocity often leads to a crash upon contact.
+4. **Main Engine (Action 2) Dual-Role**: While the main engine provides necessary upward thrust to mitigate $y\_vel$, its application at non-zero `angle` values effectively converts vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`).
+5. **Side Engine (Action 1 & 3) Functional Constraints**: Side engines are the primary tools for manipulating `angle` and `ang_vel`, but they provide no vertical thrust and no direct horizontal translation correction, meaning they cannot arrest $y\_vel$ or $x\_vel$.
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows all existing velocities ($x\_vel, y\_vel, ang\_vel$) and the current `angle` to persist unchecked, allowing gravity and existing momentum to drive the lander toward a terminal state.
+7. **The Stability Trade-off**: Attempts to correct `angle` using side engines often result in an uncorrected drift in $y\_vel$ or $x\_vel$, as the engines' primary purpose is angular stabilization rather than translational control.
+8. **Angular Momentum Saturation**: If `ang_vel` reaches high magnitudes, the corrective torque from side engines may become insufficient to counteract the rotation, leading to an irrecoverable "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` increases, the lander's ability to use the main engine for vertical lift diminishes, as a larger portion of the thrust is diverted into horizontal and angular instability.
+10. **Terminal State Sensitivity**: High $x\_vel$, $y\_vel$, or `ang_vel` at the moment of contact (even if the lander is relatively upright) results in a failure state, meaning stabilization must be achieved well before ground contact.
+
+---
+
+## 2026-07-08 18:42:15
+
+1. **Gravity-Driven Descent and Velocity Thresholds**: Gravity causes continuous downward acceleration. Once $|y\_vel|$ exceeds a certain threshold, the main engine (Action 2) may struggle to provide sufficient net upward thrust to reverse the descent, often only slowing the rate of acceleration.
+2. **Angular-Angular Velocity Coupling**: Any deviation in `angle` from zero generates `ang_vel`. This creates a feedback loop where rotational momentum can accumulate rapidly, making the lander increasingly difficult to stabilize.
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a primary indicator of failure. The lander's horizontal momentum is difficult to arrest, and high $|x\_vel|$ at the moment of contact leads to failure regardless of vertical stability.
+4. **Main Engine (Action 2) Vectoring**: When the lander is not perfectly upright, the main engine's thrust is diverted; a portion of the vertical lift is converted into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), reducing its efficiency in controlling $y\_vel$.
+5. **Side Engine (Action 1 & 3) Momentum Risk**: While side engines are the primary tool for manipulating `angle`, improper application can rapidly drive `ang_vel` to high magnitudes, inadvertently accelerating the lander's rotation instead of correcting it.
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows all existing velocities and the current `angle` to persist unchecked, allowing gravity and existing momentum to drive the lander toward a terminal state.
+7. **The Stability-Translation Trade-off**: Attempts to correct `angle` using side engines often result in uncorrected drift in $y\_vel$ or $x\_vel$, as these engines provide no vertical thrust or direct horizontal translation correction.
+8. **Angular Momentum Saturation**: If `ang_vel` reaches high magnitudes, the corrective torque from side engines becomes insufficient to counteract the rotation, leading to an irrecoverable "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` or `ang_vel` increases, the lander's ability to use the main engine for effective vertical lift diminishes, as more thrust is diverted into horizontal and angular instability.
+10. **Terminal State Sensitivity**: Failure occurs if $x\_vel$, $y\_vel$, or `ang_vel` are high at the moment of contact. Achieving a near-zero $y$ position is insufficient for success if the lander has not also stabilized its other velocities.
+
+---
+
+## 2026-07-08 18:45:37
+
+1. **Gravity-Driven Descent and Vertical Velocity**: Gravity causes continuous downward acceleration. If $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, especially if the lander's orientation is not vertical.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide no direct horizontal translation correction, making horizontal momentum difficult to arrest once established.
+
+4. **Main Engine (Action 2) Thrust Vectoring**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of the vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), reducing its effectiveness for altitude control.
+
+5. **Side Engine (Action 1 & 3) Torque Risks**: While side engines are intended to control `angle`, applying them while `ang_vel` is already high or in the wrong direction can accelerate the rotation (increasing $|ang\_vel|$) rather than dampening it.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but can exacerbate horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the corrective torque available from side engines becomes insufficient to counteract the rotational momentum, leading to an irrecoverable "death spiral."
+
+9. **Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-08 18:50:29
+
+1. **Gravity-Driven Descent and Vertical Velocity**: Gravity causes continuous downward acceleration. If $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, particularly as the lander's tilt increases.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt, which is often insufficient to arrest high established momentum.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), creating a coupling between altitude control and stability.
+
+5. **Side Engine Torque vs. Angular Inertia**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is high, the corrective torque from side engines may be insufficient to dampen the rotation, or may even exacerbate it if the timing/direction is misaligned with the momentum.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the rotational momentum can exceed the total corrective torque available from the side engines, leading to an irrecoverable "death spiral" where the lander cannot return to a vertical orientation.
+
+9. **Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-08 18:54:42
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, especially as the lander's tilt increases.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt, which is often insufficient to arrest high established momentum.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), creating a coupling between altitude control and stability.
+
+5. **Side Engine Torque vs. Angular Momentum**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is high, the corrective torque from side engines may be insufficient to reverse the direction of rotation, allowing the `angle` to continue increasing despite continuous corrective thrust.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the rotational momentum can exceed the total corrective torque available from the side engines, leading to an irrecoverable "death spiral" where the lander cannot return to a vertical orientation.
+
+9. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-08 18:58:55
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted, the main engine's thrust is misaligned with the vertical axis, diverting a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`).
+
+5. **Side Engine Torque and Angular Saturation**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation, leading to a state where rotational momentum exceeds the total corrective torque available.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+9. **Terminal State Sensitivity**: Success is determined by $x\_vel$, $y\_vel$, and `ang_vel` being within extremely narrow, near-zero thresholds at the moment of leg contact. Trajectories indicate that even moderate horizontal drift (e.g., $|x\_vel| \approx 0.15$) or high vertical descent (e.g., $|y\_vel| \approx 1.3$) results in FAILURE.
+
+10. **Post-Contact Kinetic Instability**: Leg contact under non-ideal conditions triggers immediate, significant spikes in $x\_vel$ and $ang\_vel$, suggesting that the transition from flight to ground contact is highly unstable and prone to violent bouncing or tumbling if the lander is not nearly stationary and vertical.
+
+---
+
+## 2026-07-08 19:03:07
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted, the main engine's thrust is misaligned with the vertical axis, diverting a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`).
+
+5. **Side Engine Torque and Angular Saturation**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation, leading to a state where rotational momentum exceeds the total corrective torque available.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+9. **Terminal State Sensitivity**: Success is determined by $x\_vel$, $y\_vel$, and `ang_vel` being within extremely narrow, near-zero thresholds at the moment of leg contact. Trajectories indicate that even moderate horizontal drift (e.g., $|x\_vel| \approx 0.3$) or significant angular deviation (e.g., $|angle| > 0.3$) at the time of contact results in failure.
+
+10. **Contact-Induced Terminal Failure**: The transition from flight to ground contact (when `left_leg_contact` or `right_leg_contact` becomes 1.0) is a critical state change. If the lander's orientation or velocity is not nearly ideal at this moment, the simulation triggers a massive negative reward penalty, often terminating the episode immediately upon dual-leg contact.
+
+---
+
+## 2026-07-08 19:06:21
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Side Engine Horizontal Neutrality**: Side engines (Actions 1 and 3) are strictly rotational tools. They provide torque to manipulate `angle` and `ang_vel` but exert zero force on the $x$ or $y$ translational axes, meaning they cannot directly mitigate horizontal drift.
+
+4. **Main Engine Thrust Vectoring/Coupling**: The main engine (Action 2) is the only mechanism capable of horizontal correction, but it functions through coupling: tilting the lander to redirect thrust horizontally inherently introduces angular momentum and reduces vertical lift.
+
+5. **The Horizontal-Angular Control Conflict**: A fundamental trade-off exists in the physics: mitigating high $|x\_vel|$ requires tilting the lander via the main engine, but this tilt directly compromises the stability of the `angle` and `ang_vel` axes, potentially leading to rotational saturation.
+
+6. **Side Engine Torque and Angular Saturation**: Side engines must overcome existing `ang_vel` to rotate the craft. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation.
+
+7. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+9. **Multi-Axis Terminal Threshold Sensitivity**: Success requires the simultaneous convergence of $x\_vel$, $y\_vel$, and `ang_vel` to near-zero. Trajectories confirm that a near-perfect `angle` is insufficient for success if $|x\_vel|$ remains high (e.g., $|x\_vel| \approx 0.35$), establishing horizontal velocity as a primary failure driver.
+
+10. **Contact-Induced Terminal Failure**: The transition from flight to ground contact is a critical state change. If the lander's orientation or velocity is not nearly ideal at the moment of dual-leg contact, the simulation triggers a massive negative reward penalty.
+
+---
+
+## 2026-07-08 19:12:00
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Side Engine Horizontal Neutrality**: Side engines (Actions 1 and 3) are strictly rotational tools. They provide torque to manipulate `angle` and `ang_vel` but exert zero force on the $x$ or $y$ translational axes, meaning they cannot directly mitigate horizontal drift.
+
+4. **Main Engine Thrust Vectoring/Coupling**: The main engine (Action 2) is the only mechanism capable of horizontal correction, but it functions through coupling: tilting the lander to redirect thrust horizontally inherently introduces angular momentum and reduces vertical lift.
+
+5. **The Horizontal-Angular Control Conflict**: A fundamental trade-off exists in the physics: mitigating high $|x\_vel|$ requires tilting the lander via the main engine, but this tilt directly compromises the stability of the `angle` and `ang_vel` axes, potentially leading to rotational saturation.
+
+6. **Side Engine Torque and Angular Saturation**: Side engines must overcome existing `ang_vel` to rotate the craft. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation.
+
+7. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+9. **Multi-Axis Velocity Thresholds**: Success requires the simultaneous convergence of $x\_vel$, $y\_vel$, and $ang\_vel$ to near-zero. Trajectories confirm that even with near-ideal orientation, failure occurs if $|x\_vel| \gtrsim 0.35$ or $|y\_vel| \gtrsim 1.0$ at the moment of contact.
+
+10. **Contact-Induced Terminal Failure**: The transition from flight to ground contact (indicated by `left_leg_contact` and `right_leg_contact` becoming 1.0 as $y$ approaches or crosses 0) is a critical state change. If the velocity vector is not sufficiently attenuated at this precise moment, the simulation triggers a massive negative reward penalty.
+
+---
+
+## 2026-07-08 19:16:00
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Side Engine Horizontal Neutrality**: Side engines (Actions 1 and 3) are strictly rotational tools. They provide torque to manipulate `angle` and `ang_vel` but exert zero force on the $x$ or $y$ translational axes, meaning they cannot directly mitigate horizontal drift.
+
+4. **Main Engine Thrust Vectoring/Coupling**: The main engine (Action 2) is the only mechanism capable of horizontal correction, but it functions through coupling: tilting the lander to redirect thrust horizontally inherently introduces angular momentum and reduces vertical lift.
+
+5. **The Horizontal-Angular Control Conflict**: A fundamental trade-off exists: mitigating high $|x\_vel|$ requires tilting the lander via the main engine, but this tilt directly compromises the stability of the `angle` and `ang_vel` axes, potentially leading to rotational saturation.
+
+6. **Side Engine Torque and Angular Saturation**: Side engines must overcome existing `ang_vel` to rotate the craft. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation.
+
+7. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+9. **Multi-Axis Velocity Convergence**: Success requires the simultaneous convergence of $x\_vel$, $y\_vel$, and $ang\_vel$ to near-zero. Trajectories confirm that failure occurs if $|x\_vel| \gtrsim 0.35$ or $|y\_vel| \gtrsim 1.0$ at the moment of contact.
+
+10. **Contact-Induced Momentum Failure**: The transition to ground contact (indicated by `left_leg_contact` or `right_leg_contact` becoming 1.0) triggers a massive terminal penalty (-100 reward) if the lander possesses excessive vertical ($|y\_vel|$) or angular ($|ang\_vel|$) momentum. Late-stage application of the main engine (Action 2) is insufficient to arrest these velocities once the contact state is initiated.
+
+---
+
+## 2026-07-08 19:19:38
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Side Engine Horizontal Neutrality**: Side engines (Actions 1 and 3) are strictly rotational tools. They provide torque to manipulate `angle` and `ang_vel` but exert zero force on the $x$ or $y$ translational axes, meaning they cannot directly mitigate horizontal drift.
+
+4. **Main Engine Thrust Vectoring/Coupling**: The main engine (Action 2) is the only mechanism capable of horizontal correction, but it functions through coupling: tilting the lander to redirect thrust horizontally inherently reduces the vertical component of that thrust.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating high $|x\_vel|$ requires tilting the lander via the main engine, but this tilt directly compromises the stability of the `angle` and `ang_vel` axes, potentially leading to rotational saturation.
+
+6. **Side Engine Torque and Angular Saturation**: Side engines must overcome existing `ang_vel` to rotate the craft. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation.
+
+7. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` magnitude increases, because a growing percentage of its thrust is redirected into horizontal acceleration rather than upward lift.
+
+9. **Multi-Axis Velocity Convergence**: Success requires the simultaneous convergence of $x\_vel$, $y\_vel$, and $ang\_vel$ to near-zero. Trajectories indicate that while high $|x\_vel|$ is a failure condition, high vertical momentum ($|y\_vel| \gtrsim 1.0$) is a more immediate and frequent driver of terminal failure.
+
+10. **The Horizontal-Vertical Temporal Trade-off**: To mitigate significant $|x\_vel|$, the lander must maintain a sustained tilt; however, this tilt reduces vertical lift, creating a conflict where the time required to nullify horizontal momentum may exceed the time available to arrest vertical descent before contact.
+
+---
+
+## 2026-07-08 19:24:06
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If the vertical velocity $|y\_vel|$ is not managed through upward thrust early in the trajectory, the descent rate can exceed the capacity of the main engine to provide sufficient net upward acceleration.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Side Engine Horizontal Neutrality**: Side engines (Actions 1 and 3) are strictly rotational tools. They provide torque to manipulate `angle` and `ang_vel` but exert zero force on the $x$ or $y$ translational axes, meaning they cannot directly mitigate horizontal drift.
+
+4. **Main Engine Thrust Vectoring and Sign Coupling**: The main engine is the only mechanism for horizontal correction, but it functions by tilting the craft to redirect thrust. The resulting horizontal acceleration is coupled to the sign of the `angle`, requiring a tilt that directs the thrust vector in a direction opposite to the current `x_vel`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating high $|x\_vel|$ requires a sustained tilt via the main engine, but this tilt directly compromises the stability of the `angle` and `ang_vel` axes, potentially leading to rotational saturation.
+
+6. **Side Engine Torque and Angular Saturation**: Side engines must overcome existing `ang_vel` to rotate the craft. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation.
+
+7. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a growing percentage of the available thrust is redirected into horizontal acceleration rather than vertical lift.
+
+9. **Multi-Axis Velocity Convergence**: Success requires the simultaneous convergence of $x\_vel$, $y\_vel$, and $ang\_vel$ to near-zero. Trajectories show that while $|x\_vel|$ is a failure condition, high vertical velocity magnitude ($|y\_vel| \gtrsim 1.0$) is a more immediate driver of terminal failure.
+
+10. **The Horizontal-Vertical Temporal Trade-off**: To mitigate significant $|x\_vel|$, the lander must maintain a sustained tilt; however, this tilt reduces vertical lift, creating a conflict where the time required to nullify horizontal momentum may exceed the time available to arrest vertical descent before ground contact.
+
+---
+
+## 2026-07-08 19:27:58
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If the vertical velocity $|y\_vel|$ is not managed through upward thrust early in the trajectory, the descent rate can exceed the capacity of the main engine to provide sufficient net upward acceleration.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, creating a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Side Engine Horizontal Neutrality**: Side engines (Actions 1 and 3) are strictly rotational tools. They provide torque to manipulate `angle` and `ang_vel` but exert zero force on the $x$ or $y$ translational axes, meaning they cannot directly mitigate horizontal drift.
+
+4. **Main Engine Thrust Vectoring and Sign Coupling**: The main engine is the only mechanism for horizontal correction, but it functions by tilting the craft to redirect thrust. The resulting horizontal acceleration is coupled to the sign of the `angle`, requiring a tilt that directs the thrust vector in a direction opposite to the current `x_vel`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating high $|x\_vel|$ requires a sustained tilt via the main engine, but this tilt directly compromises the stability of the `angle` and `ang_vel` axes, potentially leading to rotational saturation.
+
+6. **Side Engine Torque and Angular Saturation**: Side engines must overcome existing `ang_vel` to rotate the craft. If `ang_vel` is sufficiently high, the corrective torque from side engines may be insufficient to reverse the direction of rotation.
+
+7. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a growing percentage of the available thrust is redirected into horizontal acceleration rather than vertical lift.
+
+9. **Vertical Velocity-Altitude Criticality**: As $y\_pos$ approaches zero, the ability to arrest $|y\_vel|$ is constrained by the remaining time; high vertical velocities ($|y\_vel| \gtrsim 0.8$) at low altitudes ($y\_pos < 0.1$) create a terminal state where upward thrust cannot overcome downward momentum before ground contact.
+
+10. **Terminal Rotational Instability**: High $|ang\_vel|$ at the moment of ground contact ($y\_pos \approx 0$) serves as a critical failure driver, as rotational kinetic energy prevents the craft from achieving the stable, upright orientation necessary for a successful landing, even if translational velocities ($x\_vel$ and $y\_vel$) are relatively low.
+
+---
+
+## 2026-07-08 19:32:07
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration necessitates proactive management of $y\_vel$ via the main engine; failing to provide sufficient upward thrust early in the descent results in descent rates that exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability that is difficult to arrest.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Terminal Velocity-Altitude Criticality**: Successful landing requires minimizing both $|y\_vel|$ and $|ang\_vel|$ before $y\_pos$ approaches zero; high magnitudes in either velocity at low altitudes result in catastrophic failure, even if leg contact is achieved.
+
+10. **Horizontal Drift Accumulation**: Because correcting $x\_vel$ requires risky angular manipulation (the Horizontal-Angular Conflict), horizontal drift tends to persist or grow over time if not addressed early, making late-stage corrections increasingly prone to causing rotational failure.
+
+---
+
+## 2026-07-08 19:36:22
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration necessitates proactive management of $y\_vel$ via the main engine; failing to provide sufficient upward thrust early in the descent results in descent rates that exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability that is difficult to arrest.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Velocity-Contact Criticality**: Achieving leg contact (left/right leg = 1.0) does not guarantee a successful landing; if $|y\_vel|$ or $|ang\_vel|$ exceed safety thresholds at the moment of contact, the landing is classified as a failure.
+
+10. **Translational Momentum Debt**: High initial $x\_vel$ or $y\_vel$ creates a "momentum debt" that, if not addressed early in the descent, necessitates aggressive, high-angle engine firing that often triggers the Horizontal-Angular Conflict and subsequent Rotational Saturation.
+
+---
+
+## 2026-07-08 19:40:29
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration necessitates proactive management of $y\_vel$ via the main engine; failing to provide sufficient upward thrust early in the descent results in descent rates that exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Angular Spikes**: Achieving leg contact (left/right leg = 1.0) can act as a mechanical fulcrum; if the craft possesses significant `angle` or `y_vel` at the moment of impact, the contact can trigger rapid, non-linear surges in `ang_vel`.
+
+10. **Post-Contact Stability Requirements**: Leg contact is a state transition rather than a terminal success; the simulation continues post-contact, and a failure can be triggered by rapid rotational divergence even after both legs have established contact if `angle`, `ang_vel`, or `y_vel` are not stabilized near zero.
+
+---
+
+## 2026-07-08 19:43:51
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration necessitates proactive management of $y\_vel$ via the main engine; failing to provide sufficient upward thrust early in the descent results in descent rates that exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Angular Spikes**: Achieving leg contact (left/right leg = 1.0) acts as a mechanical fulcrum; if the craft possesses significant `angle` or `y_vel` at the moment of impact, the contact can trigger rapid, non-linear surges in `ang_vel`.
+
+10. **Post-Contact Stability Requirements**: Leg contact is a state transition rather than a terminal success; the simulation continues post-contact, and a terminal failure is triggered if the craft fails to immediately stabilize `angle`, `ang_vel`, and `y_vel` near zero, often due to the aforementioned contact-induced rotational surges.
+
+---
+
+## 2026-07-08 19:46:42
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration necessitates proactive management of $y\_vel$ via the main engine; failing to provide sufficient upward thrust early in the descent results in descent rates that exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Angular Divergence**: Initial leg contact (either `left_leg_contact` or `right_leg_contact`) functions as a mechanical pivot; if the craft possesses non-zero `angle` or `y_vel` at the moment of impact, the contact triggers immediate and significant non-linear surges in `ang_vel`.
+
+10. **Dual-Contact Transition Volatility**: The state transition from single-leg contact to dual-leg contact (both legs = 1.0) is a critical instability window. The impact of the second leg can cause a secondary, massive surge in `ang_vel` that often exceeds the corrective capacity of the side engines, leading to immediate terminal failure.
+
+---
+
+## 2026-07-08 19:48:55
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration necessitates proactive management of $y\_vel$ via the main engine; failing to provide sufficient upward thrust early in the descent results in descent rates that exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Angular Momentum Conversion**: Initial leg contact acts as a mechanical pivot that converts existing translational momentum ($x\_vel$, $y\_vel$) and tilt (`angle`) into rotational momentum, causing a sudden, non-linear spike in `ang_vel`.
+
+10. **Dual-Contact Transition Volatility**: The transition from single-leg contact to dual-leg contact (both legs = 1.0) is the most volatile state transition; the impact of the second leg can induce a secondary `ang_vel` surge that frequently exceeds the corrective torque capacity of the side engines, regardless of whether the `angle` is near zero.
+
+---
+
+## 2026-07-08 19:53:02
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that eventually exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Angular Momentum Conversion**: The transition to single-leg contact (one leg = 1.0) acts as a mechanical pivot that can cause an immediate, significant, and often polarity-reversing spike in `ang_vel` (e.g., transitioning from a negative `ang_vel` to a positive `ang_vel` upon impact).
+
+10. **Dual-Contact Transition Volatility**: The transition from single-leg contact to dual-leg contact (both legs = 1.0) triggers a secondary, extreme surge in `ang_vel` that frequently exceeds the corrective torque capacity of the side engines, often occurring even if the `angle` was relatively stable prior to the second impact.
+
+---
+
+## 2026-07-08 19:56:08
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that eventually exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Torque Exclusivity**: Side engines (Actions 1 and 3) are strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel` but exert zero translational force on the $x$ or $y$ axes.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Single-Leg Pivot-Induced Polarity Reversal**: The transition to single-leg contact (one leg = 1.0) acts as a mechanical pivot that can cause an immediate, significant, and often polarity-reversing spike in `ang_vel` (e.g., transitioning from a negative `ang_vel` to a positive `ang_vel` upon impact).
+
+10. **Dual-Contact Angular Divergence**: The transition from single-leg contact to dual-leg contact (both legs = 1.0) triggers a secondary, extreme surge in `ang_vel`. This surge can lead to rapid, uncontrollable angular divergence that may exceed the corrective torque capacity of the side engines, even if the `angle` was near-zero prior to the second impact.
+
+---
+
+## 2026-07-08 20:00:38
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that eventually exceed the main engine's vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide both torque to manipulate `angle` and `ang_vel` and a lateral translational force that contributes to changes in $x\_vel$.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` is sufficiently high, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Single-Leg Impact-Induced Angular Acceleration**: The transition from zero to single-leg contact (one leg = 1.0) acts as an impulsive mechanical force that can cause an immediate and significant increase in the magnitude of `ang_vel`.
+
+10. **Compounding Angular Instability via Dual-Leg Contact**: The transition from single-leg contact to dual-leg contact (both legs = 1.0) triggers a secondary, additive surge in `ang_vel`. This secondary impulse can escalate rotational velocity to levels that exceed the corrective torque capacity of the side engines.
+
+---
+
+## 2026-07-08 20:03:52
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Single-Leg Impact-Induced Angular Acceleration**: The transition from zero to single-leg contact (one leg = 1.0) acts as an impulsive mechanical force that triggers an immediate and significant increase in the magnitude of `ang_vel`.
+
+10. **Compounding Angular Instability via Dual-Leg Contact**: The transition from single-leg contact to dual-leg contact (both legs = 1.0) triggers a secondary, additive impulsive surge in `ang_vel`, which can escalate rotational velocity to levels that exceed the corrective torque capacity of the side engines.
+
+---
+
+## 2026-07-08 20:06:58
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Multi-Stage Impact-Induced Angular Surges**: The transition from zero contact to single-leg contact, and subsequently to dual-leg contact, triggers successive impulsive mechanical forces that significantly increase the magnitude of `ang_vel`.
+
+10. **Contact-State Stability Threshold**: Achieving leg contact (leg = 1.0) is not a terminal success state; the lander must actively manage `angle` and `ang_vel` post-impact to prevent a terminal crash (massive negative reward) caused by rotational instability during ground contact.
+
+---
+
+## 2026-07-08 20:09:15
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Impulsive Angular Momentum Injection**: The transition to single-leg contact ($leg\_contact = 1.0$) acts as a source of impulsive torque, causing an immediate and significant spike in the magnitude of `ang_vel` that can rapidly escalate the craft's rotational instability.
+
+10. **Post-Contact Terminal Sensitivity**: Achieving leg contact is not a stable landing state; the lander is highly vulnerable to a terminal crash (massive negative reward) if the impact-induced `ang_vel` is not immediately suppressed before the transition to dual-leg contact or further rotational divergence.
+
+---
+
+## 2026-07-08 20:11:00
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Angular Momentum Spikes**: The transition to a single-leg contact state ($leg\_contact = 1.0$) acts as a source of impulsive torque, causing an immediate and significant spike in the magnitude of `ang_vel`. This impulse can cause angular velocity to escalate non-linearly (e.g., increasing from 0.36 to 1.07 within three steps of contact), rapidly overwhelming corrective capabilities.
+
+10. **Post-Contact Terminal Instability**: Achieving leg contact is not a stable landing state. If the lander possesses significant `ang_vel` or a non-zero `angle` at the moment of contact, the system is highly susceptible to a terminal crash (reward -100), even if dual-leg contact is subsequently achieved. Successful landing requires the immediate suppression of impact-induced rotation.
+
+---
+
+## 2026-07-08 20:13:30
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Angular Momentum Spikes**: The transition to a contact state ($leg\_contact = 1.0$) introduces impulsive torque, causing immediate and significant spikes in `ang_vel`. These spikes can trigger a rapid, non-linear escalation of angular velocity that can quickly overwhelm the corrective capacity of the side engines.
+
+10. **Post-Contact Terminal Vulnerability**: Achieving dual-leg contact ($leg\_contact = [1.0, 1.0]$) does not guarantee a successful landing. If the lander possesses significant $x\_vel$, $angle$, or $ang\_vel$ at the moment of contact, the system is highly susceptible to terminal instability, where impact-induced rotation or subsequent corrective overshoots trigger a terminal crash (reward -100).
+
+---
+
+## 2026-07-08 20:16:20
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the magnitude of the `angle` increases, as a larger percentage of available thrust is redirected into horizontal acceleration.
+
+9. **Contact-Induced Pivot Torque**: The transition to a contact state ($leg\_contact = 1.0$) effectively creates a pivot point. Applying thrust (Actions 1, 2, or 3) while in a partial contact state (e.g., `[1.0, 0.0]`) generates extreme impulsive torque around that point, causing non-linear escalations in `ang_vel` that can quickly overwhelm the corrective capacity of the side engines.
+
+10. **Dynamic Contact Instability**: Contact is a transient and highly unstable state. Achieving contact (whether partial or dual-leg) does not guarantee stability; high `ang_vel`, `angle`, or $x\_vel$ during contact can trigger a "tripping" effect, resulting in the rapid loss of contact, sudden inversion, or a terminal crash.
+
+---
+
+## 2026-07-08 20:18:05
+
+---
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation and Rotational Coupling**: The effectiveness of the main engine for vertical stabilization decreases as the magnitude of the `angle` increases; furthermore, at high tilt angles, the main engine introduces a rotational component that can exacerbate `ang_vel`, making simultaneous vertical and angular correction extremely difficult.
+
+9. **Contact-Induced Pivot Torque**: Applying any thrust (Actions 1, 2, or 3) while in a partial contact state (e.g., `[1.0, 0.0]` or `[0.0, 1.0]`) generates extreme impulsive torque around the contact point, causing non-linear escalations in `ang_vel` that can quickly overwhelm the corrective capacity of the side engines.
+
+10. **Dynamic Contact Instability and Terminality**: The contact state is highly unstable. Achieving dual-leg contact (`[1.0, 1.0]`) does not guarantee stability; high `ang_vel`, `angle`, or $x\_vel$ during contact can trigger a "tripping" effect, resulting in the rapid loss of contact, sudden inversion, or a terminal crash, often characterized by significant negative reward penalties.
+
+---
+
+## 2026-07-08 20:20:24
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation and Rotational Coupling**: The effectiveness of the main engine for vertical stabilization decreases as the magnitude of the `angle` increases; furthermore, at high tilt angles, the main engine introduces a rotational component that can exacerbate `ang_vel`, making simultaneous vertical and angular correction extremely difficult.
+
+9. **Single-Leg Pivot Torque**: Contact with only one leg (`[1.0, 0.0]` or `[0.0, 1.0]`) creates a rotational fulcrum; existing translational momentum ($x\_vel$) or angular velocity (`ang_vel`) is converted into rapid, non-linear angular acceleration that can continue to escalate even during periods of zero thrust (Action 0).
+
+10. **Contact-Induced Terminality**: Achieving contact (single or dual-leg) does not guarantee stability; high $x\_vel$, `angle`, or `ang_vel` at the moment of contact triggers a "tripping" effect, leading to sudden craft inversion and the terminal -100 reward.
+
+---
+
+## 2026-07-08 20:21:54
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation and Rotational Coupling**: The effectiveness of the main engine for vertical stabilization decreases as the magnitude of the `angle` increases; furthermore, at high tilt angles, the main engine introduces a rotational component that can exacerbate `ang_vel`, making simultaneous vertical and angular correction extremely difficult.
+
+9. **Single-Leg Pivot and Contact Transition**: Contact with only one leg (`[1.0, 0.0]` or `[0.0, 1.0]`) creates a rotational fulcrum; existing angular momentum is converted into rapid, non-linear angular acceleration that can cause the craft to "trip," resulting in a complete loss of leg contact (`[0.0, 0.0]`) as the craft is launched off the surface.
+
+10. **Contact-Induced Terminality**: Achieving contact does not guarantee stability; high $x\_vel$, `angle`, or `ang_vel` at the moment of contact triggers a "tripping" effect, leading to sudden craft inversion, uncontrolled bouncing, or rapid loss of control, resulting in the terminal -100 reward.
+
+---
+
+## 2026-07-08 20:23:37
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation and Rotational Coupling**: The effectiveness of the main engine for vertical stabilization decreases as the magnitude of the `angle` increases; furthermore, at high tilt angles, the main engine introduces a rotational component that can exacerbate `ang_vel`, making simultaneous vertical and angular correction extremely difficult.
+
+9. **The Single-Leg Fulcrum Effect**: Contact with only one leg (`[1.0, 0.0]` or `[0.0, 1.0]`) transforms the craft from a free-falling body into a pivoting system. The contact point acts as a fulcrum, causing existing translational or angular momentum to manifest as a rapid, non-linear spike in `ang_vel`.
+
+10. **Contact-Induced Terminality and Dual-Leg Instability**: Achieving dual-leg contact (`[1.0, 1.0]`) is not inherently stabilizing. If the craft possesses high `ang_vel` or `angle` at the moment of contact, the transition to dual-leg contact often triggers immediate terminal failure (-100 reward) due to uncontrolled bouncing or rapid craft inversion.
+
+---
+
+## 2026-07-08 20:25:11
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation and Rotational Coupling**: The effectiveness of the main engine for vertical stabilization decreases as the magnitude of the `angle` increases; furthermore, at high tilt angles, the main engine introduces a rotational component that can exacerbate `ang_vel`, making simultaneous vertical and angular correction extremely difficult.
+
+9. **The Single-Leg Fulcrum Effect**: Contact with only one leg (`[1.0, 0.0]` or `[0.0, 1.0]`) transforms the craft from a free-falling body into a pivoting system. The contact point acts as a fulcrum, causing existing translational or angular momentum to manifest as a rapid, non-linear spike in `ang_vel`.
+
+10. **Kinetic-Dependent Grounding Stability**: Achieving dual-leg contact (`[1.0, 1.0]`) does not transition the craft into a static state; the craft remains a dynamic body subject to ongoing momentum and engine-induced oscillations. However, the stability of the landing is highly sensitive to kinetic energy at the moment of impact; high $y\_vel$ or $ang\_vel$ during contact often triggers immediate terminal failure (-100 reward) due to uncontrolled bouncing or inversion.
+
+---
+
+## 2026-07-08 20:26:55
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) are not strictly rotational tools; they provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation and Rotational Coupling**: The effectiveness of the main engine for vertical stabilization decreases as the magnitude of the `angle` increases; furthermore, at high tilt angles, the main engine introduces a rotational component that can exacerbate `ang_vel`, making simultaneous vertical and angular correction extremely difficult.
+
+9. **The Single-Leg Fulcrum Effect**: Contact with only one leg (`[1.0, 0.0]` or `[0.0, 1.0]`) transforms the craft from a free-falling body into a pivoting system. The contact point acts as a fulcrum, causing existing translational or angular momentum to manifest as a rapid, non-linear spike in `ang_vel`.
+
+10. **Ground-Interaction Dynamics**: Ground contact is a dynamic rather than static state; the craft can transition between single-leg contact, dual-leg contact, and free-fall states as it pivots or slides across the surface. Stability is contingent on kinetic energy: high $y\_vel$ or $ang\_vel$ at the moment of contact triggers immediate terminal failure (-100 reward), whereas lower velocities allow for prolonged, non-linear ground-skipping or oscillating contact patterns.
+
+---
+
+## 2026-07-08 20:29:42
+
+1. **Gravity-Driven Vertical Acceleration**: Continuous downward acceleration requires proactive management of $y\_vel$ via the main engine (Action 2); failing to provide sufficient upward thrust results in descent rates that can eventually exceed the main engine's maximum vertical lift capacity.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`, which in turn increases the tilt, creating a self-reinforcing cycle of rotational instability.
+
+3. **Side Engine Translational-Rotational Duality**: Side engines (Actions 1 and 3) provide torque to manipulate `angle` and `ang_vel`, a lateral force that modifies $x\_vel$, and a minor vertical force component resulting from the thrust vectoring effect of the craft's tilt.
+
+4. **Main Engine-Angle Coupling**: Horizontal correction is achieved by tilting the craft with the main engine; the direction of the resulting horizontal acceleration is strictly coupled to the sign of the `angle`.
+
+5. **The Horizontal-Angular Control Conflict**: Mitigating horizontal velocity ($x\_vel$) requires a sustained tilt via the main engine, which inherently introduces angular momentum and compromises the stability of the `angle` and `ang_vel` axes.
+
+6. **Rotational Saturation**: If `ang_vel` reaches a critical magnitude, the corrective torque provided by the side engines may be insufficient to reverse the direction of rotation, leading to uncontrollable angular divergence.
+
+7. **Action 0 (Inertial Persistence)**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression of the current state.
+
+8. **Vertical Authority Degradation and Rotational Coupling**: The effectiveness of the main engine for vertical stabilization decreases as the magnitude of the `angle` increases; at high tilt angles, the main engine introduces a rotational component that can exacerbate `ang_vel`, making simultaneous vertical and angular correction extremely difficult.
+
+9. **The Single-Leg Fulcrum Effect**: Transitioning from free-fall to single-leg contact (`[1.0, 0.0]` or `[0.0, 1.0]`) transforms the craft into a pivoting system where the contact point acts as a massive angular accelerator. This causes existing `ang_vel` to undergo non-linear, rapid amplification, often converting negligible rotation into extreme angular velocities within a few timesteps.
+
+10. **Kinetic-Threshold Terminal Failure**: Landing stability is contingent on a strict kinetic threshold; high `ang_vel` or `y_vel` at the moment of contact—or the rapid acceleration of these values immediately following a single-leg pivot—triggers immediate terminal failure, even if the craft subsequently achieves dual-leg contact.
+
+---
+
+## 2026-07-08 20:31:12
+
+---
+
+
+---
+
+## 2026-07-08 20:34:50
+
+1. Main engine (Action 2) provides upward vertical thrust, increasing the vertical velocity (`y_vel`).
+2. Left engine (Action 1) generates clockwise torque, which reduces the lander's `angle`.
+3. Right engine (Action 3) generates counter-clockwise torque, which increases the lander's `angle`.
+4. Side engines (Action 1 and 3) produce lateral thrust that affects the horizontal velocity (`x_vel`) based on the lander's current `angle`.
+5. Constant gravity causes the vertical velocity (`y_vel`) to decrease continuously whenever no engine thrust is applied (Action 0).
+6. The environment tracks independent contact states for the left and right legs, allowing for single-leg touchdown scenarios.
+7. Contact stability is sensitive to vertical velocity; high-velocity impacts or engine bursts can cause a loss of leg contact (bouncing).
+8. Engine torques can either increase or decrease the magnitude of the angular velocity (`ang_vel`), depending on whether the torque aligns with or opposes the current rotation.
+9. The main engine's thrust is coupled to the lander's orientation, such that a non-zero `angle` results in both vertical and lateral acceleration.
+10. Firing the side engines causes an immediate change in the angular velocity (`ang_vel`) due to the torque applied.
+
+---
+
+## 2026-07-08 20:43:47
+
+---
+1. Main engine (Action 2) provides upward vertical thrust, primarily increasing the vertical velocity (`y_vel`).
+2. Left engine (Action 1) generates torque that increases the angular velocity (`ang_vel`).
+3. Right engine (Action 3) generates torque that decreases the angular velocity (`ang_vel`).
+4. Side engines (Action 1 and 3) produce lateral thrust; Action 1 tends to decrease the horizontal velocity (`x_vel`) and Action 3 tends to increase it.
+5. Constant gravity causes the vertical velocity (`y_vel`) to decrease continuously whenever no engine thrust is applied (Action 0).
+6. The main engine's thrust is coupled to the lander's orientation, such that a non-zero `angle` results in both vertical and lateral acceleration.
+7. The environment tracks independent contact states for the left and right legs, allowing for single-leg touchdown scenarios.
+8. Contact stability is sensitive to vertical velocity; high-velocity impacts or sudden engine bursts can cause a loss of leg contact (bouncing).
+9. Firing the side engines (Action 1 and 3) causes an immediate change in the angular velocity (`ang_vel`) due to the torque applied.
+10. The vertical efficiency of the main engine decreases as the `angle` deviates from zero, as thrust is diverted into lateral acceleration.
+
+---
+
+## 2026-07-08 20:45:53
+
+1. Main engine (Action 2) provides upward vertical thrust, primarily increasing the vertical velocity (`y_vel`).
+2. Left engine (Action 1) generates torque that increases the angular velocity (`ang_vel`).
+3. Right engine (Action 3) generates torque that decreases the angular velocity (`ang_vel`).
+4. Side engines (Action 1 and 3) produce lateral thrust; Action 1 tends to decrease the horizontal velocity (`x_vel`) and Action 3 tends to increase it.
+5. Constant gravity causes the vertical velocity (`y_vel`) to decrease continuously whenever no engine thrust is applied (Action 0).
+6. The vertical efficiency of the main engine decreases as the magnitude of the `angle` increases, as thrust is diverted into lateral acceleration.
+7. Landing stability is highly sensitive to the combination of `angle` and `ang_vel`; high values of either during descent or ground contact significantly increase the risk of failure.
+8. When the lander is at or very near ground level (`y_pos` $\approx$ 0), firing side engines (Actions 1 or 3) or applying no thrust (Action 0) results in massive negative rewards, indicating a crash or unstable contact.
+9. When the lander is at or very near ground level (`y_pos` $\approx$ 0), applying the main engine (Action 2) can result in high positive rewards, suggesting successful landing stabilization.
+10. Extreme angular velocities (`ang_vel`) coupled with non-zero `angle` during descent can lead to catastrophic failure and massive negative penalties.
+
+---
+
+## 2026-07-08 20:46:38
+
+---
+
+
+---
+
+## 2026-07-08 20:49:12
+
+1. Main engine (Action 2) provides significant upward thrust to counteract gravity and increase `y_pos`.
+2. Side engines (Actions 1 and 3) are used to modulate the lander's orientation by applying torque to adjust `angle` and `ang_vel`.
+3. Applying the main engine (Action 2) while the lander is tilted (non-zero `angle`) induces torque, creating a coupling between vertical thrust and angular momentum.
+4. Gravity causes continuous downward acceleration, which steadily reduces `y_vel` and `y_pos` in the absence of upward thrust.
+5. High-velocity ground impacts or crashes caused by extreme orientation instability trigger significant negative reward penalties.
+6. Landing rewards are contingent on leg contact (indicated by `left_leg_contact` and `right_leg_contact`) occurring while the lander is stable.
+7. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines to control the landing $x\_pos$.
+8. Large `ang_vel` values can lead to rapid, difficult-to-correct deviations in the lander's `angle`.
+9. Action 0 (nothing) results in purely ballistic motion governed by gravity and current momentum.
+10. Successful landing requires the simultaneous management of the descent rate (`y_vel`) and the orientation (`angle`) at the moment of contact.
+
+---
+
+## 2026-07-08 20:54:23
+
+1. Main engine (Action 2) provides upward thrust to counteract gravity and modulate the descent rate (`y_vel`).
+2. Side engines (Actions 1 and 3) apply torque to adjust the lander's orientation (`angle`) and angular velocity (`ang_vel`).
+3. Activating the main engine (Action 2) while the lander is tilted (non-zero `angle`) creates a coupling between vertical thrust and angular momentum.
+4. Gravity causes continuous downward acceleration, which steadily reduces `y_vel` and `y_pos` in the absence of upward thrust.
+5. Side engine activation (Actions 1 and 3) is frequently associated with immediate negative rewards, likely representing fuel costs or the penalty for induced torque.
+6. High-velocity ground impacts or crashes caused by extreme orientation instability trigger significant negative reward penalties.
+7. Leg contact (indicated by `left_leg_contact` and `right_leg_contact`) is a requirement for landing, but contact occurring while the lander is unstable (high `angle` or `ang_vel`) results in severe negative penalties.
+8. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines to control the landing $x\_pos$.
+9. Large `ang_vel` values can lead to rapid, difficult-to-correct deviations in the lander's `angle`.
+10. Action 0 (nothing) results in purely ballistic motion governed by gravity and the lander's current momentum.
+
+---
+
+## 2026-07-08 20:57:14
+
+---
+1. Main engine (Action 2) provides upward thrust to counteract gravity and modulate the descent rate (`y_vel`).
+2. Side engines (Actions 1 and 3) apply torque to adjust the lander's orientation (`angle`) and angular velocity (`ang_vel`).
+3. Side engine rewards are state-dependent; they are penalized if the action increases instability or deviates from a controlled descent, but can provide significant positive rewards if the action successfully stabilizes the lander.
+4. Activating the main engine (Action 2) while the lander is tilted (non-zero `angle`) creates a coupling between vertical thrust and angular momentum.
+5. Gravity causes continuous downward acceleration, which steadily reduces `y_vel` and `y_pos` in the absence of upward thrust.
+6. Sudden transitions in leg contact status (e.g., transitioning from a grounded state to an airborne state) are associated with massive negative penalties.
+7. Leg contact (`left_leg_contact` and `right_leg_contact`) is a requirement for landing, but contact occurring during high-velocity transitions or while the lander is unstable triggers severe penalties.
+8. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines or tilting the main engine to control the landing $x\_pos$.
+9. Large `ang_vel` values can lead to rapid, difficult-to-correct deviations in the lander's `angle`.
+10. Action 0 (nothing) results in purely ballistic motion, where the reward is determined by whether the resulting trajectory moves the lander toward a stable landing or controlled descent profile.
+
+---
+
+## 2026-07-08 21:00:34
+
+1. Main engine (Action 2) provides upward thrust to counteract gravity and modulate the descent rate (`y_vel`).
+2. Side engines (Actions 1 and 3) apply torque to adjust the lander's orientation (`angle`) and angular velocity (`ang_vel`).
+3. Side engine rewards are highly state-dependent; they are penalized if the action increases instability (e.g., increasing `ang_vel`) but can yield significant positive rewards if the action successfully stabilizes the lander.
+4. Activating the main engine (Action 2) while the lander is tilted (non-zero `angle`) creates a coupling between vertical thrust and angular momentum, complicating orientation control.
+5. Gravity causes continuous downward acceleration, which must be managed via thrust to control `y_vel` and prevent high-velocity impacts.
+6. Transitions in leg contact status (e.g., switching from dual-leg to single-leg or zero-leg contact) are associated with extreme reward volatility, including massive negative penalties for losing contact.
+7. Successful landing is characterized by achieving and maintaining dual-leg contact (`left_leg_contact` and `right_leg_contact` both 1.0) with low `y_vel` and `ang_vel`.
+8. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines or by tilting the main engine to control the landing $x\_pos$.
+9. Large `ang_vel` values can lead to rapid, difficult-to-correct deviations in `angle`, which can destabilize leg contact and lead to contact loss.
+10. Action 0 (nothing) results in purely ballistic motion; if used while the lander is grounded, it can trigger a "bounce" (loss of leg contact), resulting in severe negative penalties.
+
+---
+
+## 2026-07-08 21:04:19
+
+---
+1. Main engine (Action 2) provides upward thrust to modulate descent rate (`y_vel`) and can be used to facilitate leg contact, which yields substantial positive rewards.
+2. Side engines (Actions 1 and 3) apply torque to adjust orientation (`angle`) and angular velocity (`ang_vel`).
+3. Side engine rewards are highly state-dependent; they can yield significant positive rewards if used to stabilize the lander's orientation, but cause massive penalties if the torque disrupts established leg contact.
+4. Activating the main engine (Action 2) while the lander is tilted creates a coupling between vertical thrust and angular momentum, complicating orientation control.
+5. Gravity causes continuous downward acceleration, which must be managed via thrust to control `y_vel` and prevent high-velocity impacts.
+6. Transitions in leg contact status (e.g., moving from zero-leg to single-leg or dual-leg contact) are the primary drivers of reward volatility, including large rewards for successful contact and massive penalties for contact loss.
+7. Successful landing is characterized by achieving and maintaining dual-leg contact (`left_leg_contact` and `right_leg_contact` both 1.0) with low `y_vel` and `ang_vel`.
+8. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines or by tilting the main engine to control the landing $x\_pos$.
+9. Large `ang_vel` values can lead to rapid, difficult-to-correct deviations in `angle`, which can destabilize leg contact and lead to immediate contact loss.
+10. Action 0 (nothing) can trigger instability or "bounces" (sudden loss of leg contact) if used while the lander is already grounded, resulting in severe negative penalties.
+
+---
+
+## 2026-07-08 21:08:35
+
+---
+1. Main engine (Action 2) provides upward thrust to modulate descent rate (`y_vel`) and can be used to facilitate leg contact.
+2. Side engines (Actions 1 and 3) apply torque to adjust orientation (`angle`) and angular velocity (`ang_vel`).
+3. Side engine usage is extremely hazardous once leg contact is established; even minor torque can disrupt contact and trigger massive penalties.
+4. Activating the main engine (Action 2) while the lander is tilted creates a coupling between vertical thrust and angular momentum, complicating orientation control.
+5. Gravity causes continuous downward acceleration, necessitating active thrust management to prevent high-velocity impacts.
+6. Transitions in leg contact status (e.g., moving from zero-leg to dual-leg contact) are the primary drivers of reward volatility and stability.
+7. Successful landing requires achieving and maintaining dual-leg contact (`left_leg_contact` and `right_leg_contact` both 1.0) with low `y_vel` and `ang_vel`.
+8. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines or main engine tilting to control landing $x\_pos$.
+9. High `ang_vel` values can lead to rapid, difficult-to-correct deviations in `angle`; extreme angular velocities during or near contact can trigger catastrophic failure penalties (e.g., -100).
+10. Once grounded, the lander is highly unstable; activating any engine (Actions 1, 2, or 3) or using no action (Action 0) can cause the lander to bounce or tip, leading to immediate loss of leg contact.
+
+---
+
+## 2026-07-08 21:11:44
+
+1. Main engine (Action 2) modulates vertical descent rate (`y_vel`) and can be used to facilitate leg contact.
+2. Side engines (Actions 1 and 3) provide torque to adjust orientation (`angle`) and angular velocity (`ang_vel`).
+3. Activating the main engine while the lander is tilted creates a coupling between vertical thrust and angular momentum, complicating orientation control.
+4. Continuous gravitational acceleration necessitates active thrust management to prevent high-velocity impacts.
+5. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines or main engine tilting to control landing $x\_pos$.
+6. Successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) with low `y_vel` and `ang_vel`.
+7. High `ang_vel` values near the ground can lead to rapid, difficult-to-correct orientation deviations and trigger catastrophic failure penalties.
+8. Transitions in leg contact status (e.g., moving from dual-leg to zero-leg contact) are the primary drivers of reward volatility.
+9. Once dual-leg contact is established, the lander becomes extremely sensitive; side engines, the main engine, or even no action (Action 0) can trigger a bounce or tip that disrupts contact.
+10. Breaking leg contact while grounded (transitioning contact values from 1.0 to 0.0) is associated with massive, immediate negative rewards, frequently exceeding -10.
+
+---
+
+## 2026-07-08 21:14:35
+
+---
+1. Main engine (Action 2) modulates vertical descent rate (`y_vel`) and can be used to facilitate leg contact.
+2. Side engines (Actions 1 and 3) provide torque to adjust orientation (`angle`) and angular velocity (`ang_vel`).
+3. Activating the main engine while the lander is tilted creates a coupling between vertical thrust and angular momentum, complicating orientation control.
+4. Continuous gravitational acceleration necessitates active thrust management to prevent high-velocity impacts.
+5. Horizontal velocity ($x\_vel$) persists during flight and must be managed via side engines or main engine tilting to control landing $x\_pos$.
+6. Successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) with low `y_vel` and `ang_vel`.
+7. High `ang_vel` values near the ground can lead to rapid, difficult-to-correct orientation deviations and trigger catastrophic failure penalties.
+8. Transitions in leg contact status (e.g., moving from dual-leg to zero-leg contact) are the primary drivers of reward volatility.
+9. Once leg contact is established, the lander's equilibrium is extremely fragile; any action (0, 1, 2, or 3) can trigger a tip or bounce.
+10. Breaking leg contact while grounded (transitioning contact values from 1.0 to 0.0) is associated with massive, immediate negative rewards, frequently ranging between -10 and -25.
+
+---
+
+## 2026-07-08 21:15:47
+
+1. Main engine (Action 2) modulates vertical descent rate (`y_vel`) and is critical for managing impact velocity during the transition to leg contact.
+2. Side engines (Actions 1 and 3) provide torque to adjust orientation (`angle`) and angular velocity (`ang_vel`).
+3. Activating the main engine while the lander is tilted creates a coupling between vertical thrust and angular momentum, complicating orientation control.
+4. Continuous gravitational acceleration necessitates active thrust management to prevent high-velocity impacts and uncontrolled descent.
+5. Horizontal velocity ($x\_vel$) persists throughout flight and causes lateral drift ($x\_pos$), which must be managed to achieve a precise landing.
+6. Successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) with minimal `y_vel`, `ang_vel`, and `x_vel`.
+7. Achieving single-leg contact is often a highly unstable intermediate state; if `ang_vel` is not immediately arrested, the lander frequently tips, leading to a total loss of contact.
+8. Transitions in leg contact status (e.g., moving from dual-leg to zero-leg contact) are the primary drivers of extreme reward volatility.
+9. Once dual-leg contact is established, the lander's equilibrium is extremely fragile; maintaining stability requires continuous, often low-magnitude, corrective actions to prevent tipping or bouncing.
+10. Breaking leg contact while grounded (transitioning contact values from 1.0 to 0.0) is associated with massive, immediate negative rewards, often exceeding -20.
+
+---
+
+## 2026-07-08 21:17:42
+
+---
+1. Main engine (Action 2) modulates vertical descent rate (`y_vel`) and is critical for managing impact velocity during the transition to leg contact.
+2. Side engines (Actions 1 and 3) provide torque to adjust orientation (`angle`) and angular velocity (`ang_vel`), but their activation incurs frequent, immediate negative rewards (likely representing fuel consumption).
+3. Activating the main engine while the lander is tilted creates a coupling between vertical thrust and angular momentum, complicating orientation control.
+4. Continuous gravitational acceleration necessitates active thrust management to prevent high-velocity impacts and uncontrolled descent.
+5. Horizontal velocity ($x\_vel$) persists throughout flight and causes lateral drift ($x\_pos$), which must be managed to achieve a precise landing.
+6. Successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) with minimal `y_vel`, `ang_vel`, and `x_vel`.
+7. Achieving single-leg contact is an unstable intermediate state; if `ang_vel` is not immediately arrested, the lander frequently tips, leading to a total loss of contact.
+8. Transitions in leg contact status (e.g., moving from dual-leg to zero-leg contact) are the primary drivers of extreme reward volatility.
+9. Once dual-leg contact is established, the lander's equilibrium is extremely fragile; maintaining stability requires continuous, often low-magnitude, corrective actions to prevent tipping or bouncing.
+10. Breaking leg contact while grounded (transitioning contact values from 1.0 to 0.0) results in massive, immediate negative rewards, typically ranging between -17 and -19.
+
+---
+
+## 2026-07-08 21:23:07
+
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is vital for minimizing impact velocity during the transition to leg contact.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control, but their use is penalized, likely representing fuel consumption.
+3. A significant coupling exists between main engine thrust and angular momentum; firing the main engine while the lander is tilted induces angular disturbances that complicate stability.
+4. Continuous gravitational acceleration necessitates active and consistent thrust management to prevent uncontrolled descent and high-velocity impacts.
+5. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed to ensure a precise landing.
+6. A successful landing is defined by achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, and `x_vel`.
+7. Single-leg contact is a highly unstable intermediate state; failure to immediately arrest angular velocity during this transition often results in the lander tipping and losing all contact.
+8. Extreme reward volatility is driven primarily by transitions in leg contact status, particularly the sudden loss of contact during or after landing.
+9. Once dual-leg contact is established, the lander's equilibrium is extremely fragile; maintaining stability requires continuous, low-magnitude corrections, as even periods of inactivity (Action 0) can trigger a tipping event.
+10. Breaking leg contact while grounded (transitioning leg contact values from 1.0 to 0.0) results in catastrophic, immediate negative rewards, typically ranging between -17 and -19.
+
+---
+
+## 2026-07-08 21:24:38
+
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity during the transition to leg contact.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control, but their use is penalized, representing fuel consumption.
+3. A significant coupling exists between main engine thrust and angular momentum; firing the main engine while the lander is tilted induces angular disturbances that complicate stability.
+4. Continuous gravitational acceleration necessitates active and consistent thrust management to prevent uncontrolled descent and high-velocity impacts.
+5. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed to ensure a precise landing.
+6. A successful landing is defined by achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, and `x_vel`.
+7. Single-leg contact is a highly unstable intermediate state; failure to arrest high angular velocity (`ang_vel`) during this transition often results in the lander tipping and losing all leg contact.
+8. Extreme reward volatility is driven primarily by transitions in leg contact status, particularly the sudden loss of contact during or after landing.
+9. Once dual-leg contact is established, the lander's equilibrium is extremely fragile; maintaining stability requires continuous corrections, as even minor angular disturbances can trigger a tipping event.
+10. Negative rewards are scale-dependent based on the failure mode: breaking leg contact while grounded typically results in rewards between -17 and -20, whereas terminal high-velocity impacts/crashes result in a -100 reward.
+
+---
+
+## 2026-07-08 21:26:18
+
+---
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity during the transition to leg contact.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control, but their use is penalized, representing fuel consumption.
+3. A significant coupling exists between main engine thrust and angular momentum; firing the main engine while the lander is tilted induces angular disturbances that complicate stability.
+4. Continuous gravitational acceleration necessitates active and consistent thrust management to prevent uncontrolled descent and high-velocity impacts.
+5. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed to ensure a precise landing.
+6. A successful landing is defined by achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, and `x_vel`.
+7. Leg contact transitions, including the unstable intermediate of single-leg contact, drive extreme reward volatility; losing contact while grounded incurs penalties (approx. -17 to -20) while regaining it can trigger large positive rewards.
+8. Tipping is a non-terminal state where a lander loses contact but can potentially recover stability and dual-leg contact if angular momentum is arrested.
+9. Once dual-leg contact is established, the lander's equilibrium is extremely fragile; maintaining stability requires continuous corrections, as even minor angular disturbances can trigger a tipping event.
+10. Terminal high-velocity impacts/crashes result in a -100 reward, distinguishing them from the non-terminal penalties associated with losing leg contact while grounded.
+
+---
+
+## 2026-07-08 21:29:03
+
+---
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity during the transition to leg contact.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control, but their use is penalized, representing fuel consumption.
+3. A significant coupling exists between main engine thrust and angular momentum; firing the main engine while the lander is tilted induces angular disturbances that complicate stability.
+4. Continuous gravitational acceleration necessitates active and consistent thrust management to prevent uncontrolled descent and high-velocity impacts.
+5. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed to ensure a precise landing.
+6. A successful landing is defined by achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, and `x_vel`.
+7. Leg contact transitions, including the unstable intermediate of single-leg contact, drive extreme reward volatility; losing contact while grounded (tipping) incurs significant penalties, while regaining dual-leg contact can trigger large positive rewards.
+8. Tipping is a non-terminal state where a lander loses contact but can potentially recover stability and dual-leg contact if angular momentum is arrested.
+9. Once dual-leg contact is established, the lander's equilibrium is extremely fragile; maintaining stability requires precise corrections, as even minor angular disturbances or poorly timed side-engine bursts can trigger a tipping event.
+10. Terminal high-velocity impacts/crashes result in a -100 reward, distinguishing them from the non-terminal penalties associated with losing leg contact while grounded.
+
+---
+
+## 2026-07-08 21:31:39
+
+---
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity during the transition to leg contact.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control, but their use is penalized for fuel consumption.
+3. A significant coupling exists between main engine thrust and angular momentum; firing the main engine while the lander is tilted induces angular disturbances.
+4. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed to ensure a precise landing.
+5. A successful landing is defined by achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, and `x_vel`.
+6. The landing surface is located at approximately $y \approx -0.2$; maintaining contact with this level is essential for a stable landing.
+7. Once dual-leg contact is established, the lander's equilibrium is extremely fragile; firing any engine (Actions 1, 2, or 3) while grounded can immediately trigger a tipping event and loss of contact.
+8. Tipping (losing leg contact while $y\_pos \approx -0.2$) is a non-terminal state that incurs heavy negative rewards, though the lander can potentially recover stability if angular momentum is arrested.
+9. The reward structure provides significant positive reinforcement for achieving and maintaining dual-leg contact on the ground, but this state is highly susceptible to disruption by poorly timed thrust.
+10. Terminal high-velocity impacts/crashes result in a -100 reward, distinguishing them from the non-terminal penalties associated with losing leg contact while grounded.
+
+---
+
+## 2026-07-08 21:36:52
+
+---
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control.
+3. A significant coupling exists where firing the main engine while the lander is tilted induces angular disturbances, complicating orientation control.
+4. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed for a precise landing.
+5. A successful landing is defined by achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, and `x_vel`.
+6. The landing surface is located near $y \approx 0$; maintaining contact at this level is essential for a stable landing.
+7. Firing any engine (Actions 1, 2, or 3) while in a dual-leg contact state is highly disruptive and frequently triggers a tipping event.
+8. Tipping (losing leg contact while near the surface) is a non-terminal state; stability can potentially be recovered if angular momentum is arrested.
+9. Side engine usage can cause a partial loss of stability, such as losing contact with only one leg, before a total tipping event occurs.
+10. Terminal high-velocity impacts/crashes result in a -100 reward, distinguishing them from the non-terminal penalties associated with losing leg contact while grounded.
+
+---
+
+## 2026-07-08 21:38:26
+
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control.
+3. A significant coupling exists where firing the main engine while the lander is tilted induces angular disturbances, complicating orientation control.
+4. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed for a precise landing.
+5. A successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, `x_vel`, and `angle`.
+6. The landing surface is located near $y \approx 0$; maintaining contact at this level is essential for a stable landing.
+7. Firing any engine (Actions 1, 2, or 3) while in a dual-leg contact state is highly disruptive and can cause a "bouncing" effect, leading to a loss of contact with the surface.
+8. Achieving leg contact is insufficient for stability if the lander possesses high angular velocity (`ang_vel`); excessive angular momentum can trigger a crash even when vertical velocity is low.
+9. Losing contact with one or both legs while near the surface is a precursor to a total tipping event or a terminal crash.
+10. Terminal high-velocity impacts/crashes result in a -100 reward, distinguishing them from the non-terminal penalties associated with losing leg contact while grounded.
+
+---
+
+## 2026-07-08 21:39:50
+
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control.
+3. A significant coupling exists where firing the main engine while the lander is tilted induces angular disturbances, complicating orientation control.
+4. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed for a precise landing.
+5. A successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, `x_vel`, and `angle`.
+6. The landing surface is located near $y \approx 0$; maintaining contact at this level is essential for a stable landing.
+7. Firing any engine (Actions 1, 2, or 3) while in contact with the surface induces a "bouncing" effect, causing the lander to oscillate rapidly between dual-leg and single-leg contact states.
+8. High angular velocity (`ang_vel`) is a primary driver of terminal crashes; the lander can crash (reward -100) even while maintaining dual-leg contact if rotational momentum is excessive.
+9. Losing contact with one leg (transitioning to `[1.0, 0.0]` or `[0.0, 1.0]`) while near the surface is a precursor to a total tipping event or a terminal crash.
+10. Terminal high-velocity impacts or crashes result in a -100 reward, which can be triggered by either excessive vertical velocity or excessive angular velocity during or immediately after ground contact.
+
+---
+
+## 2026-07-08 21:41:48
+
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`), which is critical for minimizing impact velocity.
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control.
+3. A significant coupling exists where firing the main engine (Action 2) induces substantial angular disturbances, which can lead to rapid, high-magnitude increases in `ang_vel`.
+4. Horizontal velocity ($x\_vel$) persists throughout the flight and causes lateral drift ($x\_pos$), which must be managed for a precise landing.
+5. A successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, `x_vel`, and `angle`.
+6. The landing surface is located near $y \approx 0$; maintaining contact at this level is extremely sensitive to vertical velocity fluctuations.
+7. Firing any engine (Actions 1, 2, or 3) while in contact with the surface induces a "bouncing" effect, causing the lander to oscillate rapidly between dual-leg and single-leg contact states.
+8. High angular velocity (`ang_vel`) is a primary driver of terminal crashes; excessive rotational momentum can trigger massive negative rewards (-100) even while maintaining dual-leg contact.
+9. During the contact phase, even small positive vertical velocities (`y_vel`) can cause the lander to lose contact with the surface, resulting in immediate and significant reward penalties.
+10. Side engines (Actions 1 and 3) are effective for counteracting angular velocity, but misapplication—especially when rotational momentum is already high—can lead to uncontrolled angular acceleration and tipping.
+
+---
+
+## 2026-07-08 21:46:56
+
+---
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`).
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control.
+3. Firing the main engine (Action 2) induces angular disturbances that can lead to increases in `ang_vel`.
+4. Horizontal velocity ($x\_vel$) persists throughout the flight and causes continuous lateral drift ($x\_pos$).
+5. A successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, `x_vel`, and `angle`.
+6. The landing surface is located near $y \approx 0$; maintaining contact at this level is extremely sensitive to vertical velocity fluctuations.
+7. Firing any engine (Actions 1, 2, or 3) while in contact with the surface (legs = 1.0) induces a "bouncing" effect, causing the lander to lose contact (legs = 0.0) and gain upward vertical velocity (`y_vel`).
+8. High angular velocity (`ang_vel`) is a primary driver of terminal crashes, which can trigger massive negative rewards (-100) even if dual-leg contact is momentarily achieved.
+9. During the contact phase, positive vertical velocities (`y_vel`) cause the lander to lose contact with the surface, resulting in immediate and significant reward penalties.
+10. Side engines (Actions 1 and 3) can be counterproductive when rotational momentum is already high, potentially leading to rapid, uncontrolled angular acceleration rather than damping.
+
+---
+
+## 2026-07-08 21:50:20
+
+1. Main engine (Action 2) is the primary tool for modulating vertical descent rate (`y_vel`).
+2. Side engines (Actions 1 and 3) provide the torque necessary for orientation (`angle`) and angular velocity (`ang_vel`) control.
+3. Firing the main engine (Action 2) induces angular disturbances that increase `ang_vel`.
+4. Horizontal velocity ($x\_vel$) persists throughout the flight and causes continuous lateral drift ($x\_pos$).
+5. A successful landing requires achieving and maintaining dual-leg contact (both legs = 1.0) while simultaneously minimizing `y_vel`, `ang_vel`, `x_vel`, and `angle`.
+6. The landing surface is located near $y \approx 0$; maintaining contact at this level is extremely sensitive to vertical velocity and angular velocity fluctuations.
+7. Firing the main engine (Action 2) while in contact with the surface (legs = 1.0) induces a "bouncing" effect, causing immediate loss of contact (legs = 0.0) and significant reward penalties.
+8. During the contact phase, side engines (Actions 1 and 3) can be used to adjust orientation or help regain contact, whereas Action 0 is the most stable action for maintaining contact.
+9. High angular velocity (`ang_vel`) is a primary driver of terminal crashes, which trigger a massive -100 reward even if dual-leg contact is momentarily achieved.
+10. During the contact phase, positive vertical velocities (`y_vel > 0`) cause the lander to lose contact with the surface, resulting in immediate and significant reward penalties.
+
+---
+
+## 2026-07-08 21:54:08
+
+---
+
+
+---
+
+## 2026-07-08 21:56:49
+
+1. Main engine (Action 2) provides upward thrust, increasing vertical velocity ($y\_vel$).
+2. Left engine (Action 1) provides lateral thrust that decreases horizontal velocity ($x\_vel$) and torque that increases angular velocity (`ang_vel`).
+3. Right engine (Action 3) provides lateral thrust that increases horizontal velocity ($x\_vel$) and torque that decreases angular velocity (`ang_vel`).
+4. Gravity exerts a constant downward acceleration, reducing $y\_vel$ in the absence of upward thrust.
+5. Side engines (Actions 1 and 3) are the primary mechanisms for controlling both the lander's horizontal position ($x\_pos$) and its orientation (`angle`).
+6. Large negative rewards are heavily associated with landing instability, such as having high $y\_vel$, `ang_vel`, or `angle` while legs are in contact with the ground.
+7. Leg contact (`left_leg_contact`, `right_leg_contact`) is required for a successful landing, ideally with both legs engaged simultaneously.
+8. High horizontal velocity ($x\_vel$) at low altitudes significantly increases the difficulty of maintaining a stable, upright orientation.
+9. A stable landing requires $x\_vel$, $y\_vel$, `ang_vel`, and `angle` to approach zero at the moment of leg contact.
+10. Rapid or unexpected changes in leg contact status (e.g., bouncing or tipping) are associated with significant negative rewards.
+
+---
+
+## 2026-07-08 22:33:12
+
+---
+
+
+---
+
+## 2026-07-08 22:53:47
+
+1. The main engine (Action 2) is the primary mechanism for controlling vertical descent (`y_vel`) and is the most frequent source of positive reward during descent.
+2. Side engines (Actions 1 and 3) are used to manage orientation (`angle`), but can cause rapid changes in angular velocity (`ang_vel`) that result in negative rewards if used excessively.
+3. The "nothing" action (Action 0) often results in negative rewards when the lander is in a state of uncontrolled descent or significant tilt.
+4. Extreme negative penalties are associated with abrupt, high-magnitude changes in state variables, particularly velocity or angle, signaling a loss of stability.
+5. Landing stability is marked by the transition of leg contact states (`left_leg_contact`, `right_leg_contact`) from 0.0 to 1.0.
+6. Maintaining a low angular velocity (`ang_vel`) is crucial to prevent the lander from tilting beyond a recoverable angle.
+7. Vertical velocity (`y_vel`) must be actively managed, especially as the lander approaches the ground, to avoid high-velocity impacts.
+8. The lander's angular orientation (`angle`) is highly sensitive to side engine applications, requiring precise thrust to maintain a near-vertical posture.
+9. Corrective actions for lateral drift (`x_vel`) and tilt (`angle`) are coupled, requiring a careful balance between translational and rotational control.
+10. Significant positive rewards are accumulated when the lander maintains stable orientation and manageable velocities during both the flight and ground contact phases.
+
+---
+
+## 2026-07-08 22:55:11
+
+---
+
+
+---
+
+## 2026-07-08 22:57:13
+
+1. Gravity causes vertical velocity (y_vel) to decrease continuously when no engines are active.
+2. The main engine (Action 2) provides substantial upward force, counteracting descent and influencing both horizontal (x_vel) and angular (ang_vel) motion.
+3. Side engines (Action 1 for left, Action 3 for right) are the primary tools for controlling the lander's angle and angular velocity.
+4. Extreme angular velocity (ang_vel) or large deviations in the lander's angle result in significant negative rewards, indicating instability.
+5. Leg contact flags (left/right) track when the lander's legs touch the ground, allowing for single-leg or dual-leg contact states.
+6. A stable landing is characterized by both leg contact flags being 1.0 while the angle and angular velocity remain near zero.
+7. Side engines are required to counteract the rotational torque produced by the main engine during vertical thrusting.
+8. All engine actions influence the horizontal trajectory (x_pos and x_vel), meaning attitude corrections cause lateral displacement.
+9. The lander can remain in a dual-contact state (1, 1) for an extended period of time.
+10. Large reward spikes (both positive and negative) occur during the transition to or from contact, particularly when stability is lost or maintained.
+
+---
+
+## 2026-07-08 22:58:38
+
+---
+
+
+---
+
+## 2026-07-08 23:03:14
+
+1. Gravity exerts a constant downward acceleration, reducing $y\_vel$ by approximately 0.026 to 0.027 units per step when no engines are active.
+2. The main engine (Action 2) provides positive thrust in both the $y$ direction ($+y\_vel$) and the $x$ direction ($+x\_vel$).
+3. The left engine (Action 1) provides lateral thrust in the $-x$ direction.
+4. The right engine (Action 3) provides lateral thrust in the $+x$ direction.
+5. Side engines (Actions 1 and 3) have negligible vertical ($y$) thrust compared to the main engine and the effect of gravity.
+6. Engine actions induce torque: Action 1 and Action 2 increase the angular velocity ($ang\_vel$), while Action 3 decreases it.
+7. Leg contact flags (`left_leg_contact`, `right_leg_contact`) transition to 1.0 when the lander's $y\_pos$ reaches 0 or becomes negative.
+8. A "PARTIAL" outcome indicates that the lander made contact with the ground, but did not meet all success criteria such as stable angle or low velocity.
+9. The lander's angle is the integral of its angular velocity ($ang\_vel$).
+10. All available actions (0-3) are discrete and mutually exclusive.
+
+---
+
+## 2026-07-08 23:09:58
+
+1. Gravity exerts a constant downward acceleration, reducing $y\_vel$ by approximately 0.026 to 0.027 units per step.
+2. The main engine (Action 2) provides significant positive thrust in the $y$ direction ($+y\_vel$).
+3. The main engine (Action 2) provides lateral thrust that is coupled with the lander's angle: positive angles result in $-x$ thrust, while negative angles result in $+x$ thrust.
+4. Side engines provide lateral thrust, where Action 1 (left) provides $-x$ thrust and Action 3 (right) provides $+x$ thrust, with negligible vertical ($y$) thrust compared to the main engine.
+5. Engine actions induce torque: Actions 1 and 2 increase the angular velocity ($ang\_vel$), while Action 3 decreases it.
+6. The lander's angle is the integral of its angular velocity ($ang\_vel$).
+7. Leg contact flags (`left_leg_contact`, `right_leg_contact`) can transition to 1.0 independently and may trigger while the $y\_pos$ (center of mass) is still above zero.
+8. All available actions (0-3) are discrete and mutually exclusive.
+9. A "PARTIAL" outcome indicates the lander made contact with the ground but did not meet all success criteria.
+10. Episodes conclude with a terminal state and a final reward, which can be a large negative value in the event of a crash.
+
+---
+
+## 2026-07-08 23:12:57
+
+1. Gravity exerts a constant downward acceleration, reducing $y\_vel$ by approximately 0.026 units per step in the absence of thrust.
+2. The main engine (Action 2) provides significant upward thrust, increasing $y\_vel$.
+3. The main engine (Action 2) also provides lateral thrust coupled to the lander's orientation: positive angles result in $-x$ thrust, while negative angles result in $+x$ thrust.
+4. Side engines provide lateral thrust (Action 1 provides $-x$ thrust and Action 3 provides $+x$ thrust) with negligible vertical ($y$) thrust compared to the main engine.
+5. Engine actions induce torque that modifies angular velocity ($ang\_vel$), with the direction and magnitude of the torque being dependent on the lander's current angle.
+6. The lander's angle is the integral of its angular velocity ($ang\_vel$).
+7. Leg contact flags (`left_leg_contact`, `right_leg_contact`) can transition to 1.0 while the lander's $y\_pos$ is still significantly above zero.
+8. All available actions (0-3) are discrete and mutually exclusive.
+9. The outcome of an episode (PARTIAL vs. FAILURE) is determined by whether the lander meets specific stability criteria (such as vertical velocity and angle) at the moment of ground contact.
+10. Episodes conclude in a terminal state with a final reward, which can be a large negative value in the event of a crash.
+
+---
+
+## 2026-07-08 23:15:44
+
+1. Gravity: A constant downward acceleration reduces $y\_vel$ by approximately 0.026 units per step.
+2. Main Engine (Action 2): Provides significant upward vertical thrust and lateral thrust coupled to the lander's orientation (positive angles result in $-x$ thrust, while negative angles result in $+x$ thrust).
+3. Side Engines (Actions 1 and 3): Provide lateral thrust (Action 1 provides $-x$ thrust and Action 3 provides $+x$ thrust) with negligible vertical ($y$) thrust compared to the main engine.
+4. Torque: Side engine actions (Actions 1 and 3) induce torque that modifies angular velocity ($ang\_vel$), with the two engines providing torque in opposite directions.
+5. Angular Dynamics: The lander's angle is the integral of its angular velocity ($ang\_vel$).
+6. Leg Contact: Leg contact flags (`left_leg_contact`, `right_leg_contact`) can transition to 1.0 while the lander's $y\_pos$ is still significantly above zero.
+7. Action Space: All available actions (0-3) are discrete and mutually exclusive.
+8. Outcome Determination: The outcome of an episode (PARTIAL vs. FAILURE) is determined by whether the lander meets specific stability criteria (such as vertical velocity and angle) at the moment of ground contact.
+9. Terminal Penalties: A FAILURE outcome can result in a large negative terminal reward (e.g., -100.0).
+10. Reward Structure: Rewards are provided at each step, where controlled flight can accumulate positive rewards, while unstable maneuvers or crashes result in negative rewards.
+
+---
+
+## 2026-07-08 23:18:14
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$) at each step.
+2. Main Engine (Action 2): Provides significant vertical thrust and orientation-dependent lateral thrust.
+3. Side Engines (Actions 1 and 3): Provide lateral thrust and torque in opposite directions to control the lander's angular velocity ($ang\_vel$).
+4. Angular Dynamics: The lander's angle is the integral of its angular velocity, which is directly modified by the side engine torques.
+5. Leg Contact: The `left_leg_contact` and `right_leg_contact` flags transition to 1.0 when the lander's $y\_pos$ reaches approximately 0.
+6. Landing Rewards: Large positive step rewards are awarded during ground contact (when leg contact flags are 1.0), incentivizing successful landing.
+7. Instability Penalties: Significant negative rewards are frequently associated with high angular velocity or extreme tilt angles.
+8. Outcome Determination: The distinction between PARTIAL and FAILURE outcomes is determined by the lander's orientation and velocities at the moment of ground contact.
+9. Action Space: The action space is discrete and mutually exclusive, consisting of four possible commands (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+10. Terminality: Episodes conclude upon ground contact or when the lander fails to satisfy the required stability criteria.
+
+---
+
+## 2026-07-08 23:19:31
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$) at each step.
+2. Main Engine (Action 2): Provides significant vertical thrust and orientation-dependent lateral thrust.
+3. Side Engines (Actions 1 and 3): Provide lateral thrust and torque in opposite directions to control the lander's angular velocity ($ang\_vel$).
+4. Angular Dynamics: The lander's angle is the integral of its angular velocity, which is directly modified by the side engine torques.
+5. Leg Contact: The `left_leg_contact` and `right_leg_contact` flags transition to 1.0 when the lander's $y\_pos$ reaches approximately 0.
+6. Landing Phase: Ground contact (leg flags = 1.0) transitions the lander into a landing phase rather than immediately terminating the episode.
+7. Post-Contact Stability: During the landing phase, the lander must maintain low angular velocity and a minimal tilt angle to avoid triggering a failure.
+8. Terminal Failure: A large negative terminal penalty is applied if the lander's angular velocity or tilt becomes excessive while in contact with the ground.
+9. Action Space: The action space is discrete and mutually exclusive, consisting of four possible commands (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+10. Reward Structure: Positive step rewards are granted during ground contact, but these are subject to massive negative terminal penalties if stability is lost.
+
+---
+
+## 2026-07-08 23:24:31
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$) at each step.
+2. Main Engine (Action 2): Provides vertical thrust and orientation-dependent lateral thrust.
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$) in opposite directions; Action 1 increases $\omega$, while Action 3 decreases $\omega$.
+4. Reward Profile: Side engine actions (1 and 3) are frequently associated with negative step rewards, whereas the main engine (Action 2) can generate significant positive step rewards depending on the state.
+5. Angular Dynamics: The lander's angle is the integral of its angular velocity, which is directly modified by the torques from side engines.
+6. Leg Contact: `left_leg_contact` and `right_leg_contact` flags transition to 1.0 when the lander's $y\_pos$ reaches approximately 0.
+7. Landing Phase Stability: Once ground contact is made, the lander enters a landing phase where it must maintain low angular velocity and a minimal tilt angle to remain stable.
+8. Terminal Failure: Large negative terminal penalties (typically ranging from -10 to -25) are applied if stability is lost (excessive $\omega$ or tilt) while in contact with the ground.
+9. Terminal Success: A large positive terminal reward of 100.0 is granted upon achieving a stable landing.
+10. Action Space: The action space is discrete and mutually exclusive, consisting of four possible commands (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:27:39
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$) of the lander.
+2. Main Engine (Action 2): Provides vertical thrust to counteract gravity and manage the descent rate ($y\_vel$).
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$); Action 1 increases $\omega$, while Action 3 decreases $\omega$.
+4. Angular Dynamics: The lander's tilt angle is the integral of its angular velocity ($\omega$), which is directly modified by the side engine torques.
+5. Leg Contact: The `left_leg_contact` and `right_leg_contact` flags transition to 1.0 when the lander's $y\_pos$ reaches approximately 0.
+6. Landing Phase Sensitivity: Once ground contact is established, the lander becomes extremely sensitive to angular velocity and tilt; even minute non-zero values can lead to immediate instability.
+7. Terminal Failure: Large negative penalties (typically ranging from -10 to -25) are applied if stability is lost (due to excessive $\omega$ or tilt) while the legs are in contact with the ground.
+8. Reward Profile: Side engine actions (1 and 3) are frequently associated with negative step rewards, whereas the main engine (Action 2) can generate significant positive or negative step rewards depending on the state.
+9. Terminal Success: A large positive terminal reward of 100.0 is granted upon achieving a stable landing.
+10. Action Space: The action space is discrete and mutually exclusive, consisting of four possible commands (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:30:00
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Provides vertical thrust to counteract gravity and manage the descent rate ($y\_vel$).
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$); Action 1 increases $\omega$, while Action 3 decreases $\omega$.
+4. Angular Dynamics: The lander's tilt angle is the integral of its angular velocity ($\omega$), which is directly modified by the side engine torques.
+5. Leg Contact: The `left_leg_contact` and `right_leg_contact` flags transition to 1.0 when the lander's $y\_pos \leq 0$.
+6. Single-Leg Contact: Ground contact physics and instability sensitivities apply even if only a single leg (either left or right) is in contact with the ground.
+7. Instability Triggers: Large negative penalties are applied if excessive angular velocity ($\omega$) or tilt angle is present while ground contact is established.
+8. Reward Profile: Side engine actions (1 and 3) are frequently associated with negative step rewards, whereas the main engine (Action 2) can generate significant positive or negative step rewards depending on the state.
+9. Terminal Success: A large positive terminal reward of 100.0 is granted upon achieving a stable landing.
+10. Action Space: The action space is discrete and mutually exclusive, consisting of four possible commands (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:41:46
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Provides vertical thrust to counteract gravity and manage the descent rate ($y\_vel$).
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$); Action 1 increases $\omega$, while Action 3 decreases $\omega$.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$), which is modified by side engine torques.
+5. Leg Contact: The `left_leg_contact` and `right_leg_contact` flags transition to 1.0 when the lander's $y\_pos \leq 0$.
+6. Single-Leg Contact: Ground contact physics and instability-related sensitivities apply even if only a single leg (either left or right) is in contact with the ground.
+7. Instability Penalties: During ground contact, large negative penalties are applied if the lander exhibits a significant tilt angle ($\theta$) or excessive angular velocity ($\omega$). These penalties are action-agnostic and can be triggered regardless of the command issued (0, 1, 2, or 3).
+8. Reward Profile: Side engine actions (1 and 3) are frequently associated with negative step rewards. The main engine (2) can generate significant positive or negative rewards. Once ground contact is established, the reward profile is heavily dominated by stability penalties related to $\theta$ and $\omega$.
+9. Terminal Success: A large positive terminal reward of 100.0 is granted upon achieving a stable landing.
+10. Action Space: The action space is discrete and mutually exclusive, consisting of four possible commands (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:44:34
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Provides vertical thrust to manage descent and is the primary source of positive step rewards during the descent phase.
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$); these actions are frequently associated with negative step rewards.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$), which is modified by side engine torques.
+5. Contact States: The environment tracks `left_leg_contact` and `right_leg_contact` independently, allowing for states of single-leg contact.
+6. Contact Trigger: Leg contact flags transition to 1.0 when the lander's $y\_pos \leq 0$ or upon physical impact.
+7. Instability Penalties: Once ground contact is established, the lander is subject to significant negative penalties. These penalties are sensitive to tilt angle ($\theta$) and angular velocity ($\omega$), and can be triggered even at relatively low angular magnitudes.
+8. Reward Profile: Descent rewards are primarily driven by the main engine, while the reward profile once contact is made is heavily dominated by stability-related penalties.
+9. Terminal Success: A large positive terminal reward of 100.0 is granted upon achieving a stable landing.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:50:12
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Provides vertical thrust to manage descent and is the primary source of positive step rewards during the descent phase.
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$); while they can be used for control, they are frequently associated with negative step rewards when they induce instability.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$), which is modified by the application of side engine torques.
+5. Contact Trigger: Leg contact flags transition to 1.0 when the lander's $y\_pos \leq 0$ or upon physical impact.
+6. Post-Contact Control: Actions remain functional after ground contact is established; the agent can still apply thrust (Action 2) or torque (Actions 1 and 3) to modify the lander's state.
+7. Instability Penalties: Once ground contact is established, the lander is subject to highly dynamic and severe instability penalties. Large negative rewards (often ranging from -10 to -25) are triggered by high angular velocity ($\omega$) or tilt ($\theta$) while on the ground.
+8. Reward Profile: The reward profile transitions from being primarily driven by main engine thrust during descent to being heavily dominated by volatile, state-dependent stability penalties post-contact.
+9. Terminal Success: A large positive terminal reward of 100.0 is granted upon achieving a stable landing.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:52:08
+
+1. Gravity: A constant downward acceleration reduces the vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Provides vertical thrust to manage descent and is the primary source of positive step rewards during the descent phase.
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$); while used for orientation control, they can trigger rapid instability if not carefully coordinated with the lander's descent.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Contact Trigger: Leg contact flags transition to 1.0 when the lander's $y\_pos \leq 0$ or upon physical impact.
+6. Post-Contact Sensitivity: Once ground contact is established, the lander becomes extremely sensitive to motion; even minimal angular velocity ($\omega$) or tilt ($\theta$) can trigger significant negative rewards.
+7. Instability Scaling: Post-contact instability can escalate from moderate negative rewards to severe, high-magnitude penalties (often ranging from -10 to -25) depending on the lander's state.
+8. Terminal Outcomes: A large positive terminal reward of 100.0 is granted for a stable landing, whereas a catastrophic failure or crash results in a terminal penalty of -100.0.
+9. Reward Profile Shift: The reward profile transitions from being driven by main engine thrust during descent to being dominated by volatile, state-dependent stability penalties once ground contact is established.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:53:55
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): The primary source of positive step rewards during descent, though significant instantaneous reward spikes can occur upon initial leg contact.
+3. Side Engines (Actions 1 and 3): Provide torque to modify angular velocity ($\omega$).
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Independent Contact Triggers: Leg contact flags transition to 1.0 when $y\_pos \leq 0$; legs can establish contact independently rather than simultaneously.
+6. Post-Contact Sensitivity: Once ground contact is established, the lander becomes extremely sensitive to motion; even minimal angular velocity ($\omega$) or tilt ($\theta$) can trigger significant negative rewards.
+7. Instability Scaling: Post-contact instability can escalate to severe, high-magnitude penalties (often ranging from -15 to -25) depending on the lander's angular state.
+8. Terminal Outcomes: A stable landing grants a terminal reward of 100.0, whereas a catastrophic failure or crash results in a terminal penalty of -100.0.
+9. Reward Profile Shift: The reward profile transitions from being driven by main engine thrust during descent to being dominated by volatile, state-dependent stability penalties once ground contact is established.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:55:35
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): The primary driver of positive step rewards during descent, though its benefits are highly susceptible to being negated by post-contact instability.
+3. Side Engine Dynamics: Actions 1 and 3 provide torque to modify angular velocity ($\omega$), but they frequently incur immediate negative step rewards during the descent phase.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Asymmetric Contact: Leg contact flags can transition to 1.0 independently, allowing the lander to establish contact with one leg before the other.
+6. Post-Contact Sensitivity: Once ground contact is established, the reward profile becomes extremely sensitive to any non-zero angular velocity ($\omega$) or tilt ($\theta$).
+7. Instability Scaling: High $\omega$ or $\theta$ following contact can trigger severe, high-magnitude negative rewards, often ranging from -15 to -25 per step.
+8. Terminal Outcomes: A stable landing grants a terminal reward of 100.0, whereas catastrophic failure (often characterized by extreme instability post-contact) results in a terminal penalty of -100.0.
+9. Reward Regime Shift: The environment transitions from a descent-driven reward regime (focused on thrust) to a stability-driven penalty regime (focused on minimizing $\omega$ and $\theta$) once contact is made.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-08 23:57:09
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily drives positive rewards during descent by managing velocity, but its use during or after contact can exacerbate post-contact instability and trigger massive penalties.
+3. Side Engine Penalties: Actions 1 and 3 provide torque to modify angular velocity ($\omega$) but frequently incur immediate negative step rewards during the descent phase, typically ranging from -1.5 to -3.0.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Asymmetric Contact: Leg contact flags can transition to 1.0 independently, allowing for states where only one leg has established ground contact while the other remains at 0.0.
+6. Post-Contact Sensitivity: Once ground contact is established, the reward profile becomes extremely sensitive to angular velocity ($\omega$), tilt ($\theta$), and any engine actions that disrupt the lander's equilibrium.
+7. Instability Scaling: High $\omega$, high $\theta$, or disruptive engine usage following contact triggers severe negative rewards, often ranging from -10 to -25 per step.
+8. Terminal Outcomes: A stable landing grants a terminal reward of 100.0, whereas catastrophic failure (characterized by extreme post-contact instability) results in a terminal penalty of -100.0.
+9. Reward Regime Shift: The environment transitions from a descent-driven reward regime (focused on thrust and vertical velocity management) to a stability-driven penalty regime (focused on minimizing $\omega$ and $\theta$) once contact is made.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:01:51
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Critical for managing descent velocity; post-contact, it is highly volatile, capable of providing large positive rewards for stabilization or triggering massive penalties (up to -23.0+) if it exacerbates instability.
+3. Side Engine (Actions 1 & 3) Reward Dynamics: During the descent phase, side engines typically incur negative step rewards (approx. -1.5 to -3.0) as a fuel penalty. Post-contact, these actions can transition to providing significant positive rewards if they effectively mitigate angular velocity ($\omega$) and tilt ($\theta$).
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Asymmetric Contact: Leg contact flags can transition to 1.0 independently, allowing for states where only one leg has established ground contact.
+6. Reward Regime Transition: The environment transitions from a descent-driven reward regime (focused on vertical velocity management) to a stability-driven penalty regime (focused on minimizing $\omega$ and $\theta$) once ground contact is established.
+7. Post-Contact Penalty Scaling: Once ground contact is made, high $\omega$, high $\theta$, or improper engine usage triggers severe negative rewards, often ranging from -10 to -25 per step.
+8. State-Dependent Penalties: Post-contact, even taking no action (Action 0) can result in massive negative rewards if the lander's state (angle or angular velocity) is unstable, indicating that penalties are heavily driven by the resulting state rather than just the action taken.
+9. Terminal Outcomes: A stable landing grants a terminal reward of 100.0, whereas catastrophic failure (characterized by extreme post-contact instability) results in a terminal penalty of -100.0.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:04:14
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Critical for managing descent velocity; post-contact, it becomes highly volatile, capable of providing large positive rewards for stabilization or triggering massive penalties if instability is exacerbated.
+3. Side Engine (Actions 1 & 3) Reward Dynamics: During descent, these actions typically incur fuel penalties; post-contact, they transition to providing significant positive rewards if they effectively mitigate angular velocity ($\omega$) and tilt ($\theta$).
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Asymmetric Contact: Leg contact flags can transition to 1.0 independently, allowing for states where only one leg has established ground contact.
+6. Reward Regime Transition: The environment transitions from a descent-driven reward regime (focused on vertical velocity management) to a stability-driven regime (focused on minimizing $\omega$ and $\theta$) once ground contact is established.
+7. Post-Contact Scale: Once ground contact is established, the reward magnitude increases significantly, with individual steps frequently yielding high-magnitude values ranging from approximately -25.0 to +25.0.
+8. Action-State Interdependency: Post-contact, rewards are heavily driven by the resulting state; a corrective action taken during an unstable state (high $\omega$ or $\theta$) can pivot the reward from a massive penalty to a massive positive reward.
+9. Terminal Outcomes: A stable landing grants a terminal reward of 100.0, whereas catastrophic failure (characterized by extreme post-contact instability) results in a terminal penalty of -100.0.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:05:56
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Critical for managing descent velocity; post-contact, it becomes highly volatile, capable of providing large positive rewards for stabilization or triggering massive penalties if instability is exacerbated.
+3. Side Engine (Actions 1 & 3) Reward Dynamics: During descent, these actions typically incur fuel penalties; post-contact, they transition to providing significant positive rewards if they effectively mitigate angular velocity ($\omega$) and tilt ($\theta$).
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Asymmetric Contact: Leg contact flags can transition to 1.0 independently, allowing for states where only one leg has established ground contact.
+6. Reward Regime Transition: The environment transitions from a descent-driven reward regime (focused on vertical velocity management) to a stability-driven regime (focused on minimizing $\omega$ and $\theta$) once ground contact is established.
+7. Post-Contact Scale: Once ground contact is established, the reward magnitude increases significantly, with individual steps frequently yielding high-magnitude values often exceeding $\pm 20.0$.
+8. Action-State Interdependency: Post-contact, rewards are heavily driven by the resulting state; a corrective action taken during an unstable state (high $\omega$ or $\theta$) can pivot the reward from a massive penalty to a massive positive reward.
+9. Terminal Outcomes: Outcomes can be SUCCESS (terminal reward of 100.0), catastrophic failure (terminal penalty of -100.0), or PARTIAL (likely indicating episode truncation due to reaching the maximum step limit).
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:09:50
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily used for managing descent velocity; post-contact, it becomes highly volatile, capable of providing large rewards for stabilization or triggering extreme penalties if instability is exacerbated.
+3. Side Engines (Actions 1 & 3): During descent, these actions typically incur fuel penalties; post-contact, they transition into essential tools for managing angular velocity ($\omega$) and tilt ($\theta$).
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Leg Contact Independence: Leg contact flags can transition to 1.0 independently, allowing for asymmetric ground-contact states (e.g., only one leg is in contact).
+6. Asymmetry-Action Coupling: Applying side-engine thrust to the side of the lander not currently in contact with the ground induces high angular momentum and tilt, which can trigger severe negative rewards.
+7. Reward Regime Transition: The environment transitions from a descent-driven reward regime (focused on vertical velocity) to a stability-driven regime (focused on $\omega$ and $\theta$) once ground contact is established.
+8. Post-Contact Reward Scaling: Once ground contact is established, reward magnitudes increase significantly, with individual steps frequently yielding values exceeding $\pm 20.0$.
+9. Terminal Outcomes: Outcomes are classified as SUCCESS (terminal reward of 100.0), catastrophic failure (terminal penalty of -100.0), or PARTIAL (episode truncation).
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:11:28
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily used for managing descent velocity; post-contact, it becomes highly volatile, capable of providing large rewards for stabilization or triggering significant negative rewards if it disrupts grounded stability.
+3. Side Engines (Actions 1 & 3): During descent, these actions typically incur fuel penalties; post-contact, they transition into essential tools for managing angular velocity ($\omega$) and tilt ($\theta$), but are extremely sensitive and can trigger large per-step negative rewards (often $\pm 10.0$ to $20.0$) even with relatively low angular deviations.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Leg Contact Independence: Leg contact flags can transition to 1.0 independently, allowing for asymmetric ground-contact states (e.g., only one leg is in contact).
+6. Asymmetry-Action Coupling: Applying side-engine thrust to the side of the lander not currently in contact with the ground induces high angular momentum and tilt, which can trigger severe negative rewards.
+7. Reward Regime Transition: The environment transitions from a descent-driven reward regime (focused on vertical velocity) to a stability-driven regime (focused on $\omega$ and $\theta$) once ground contact is established.
+8. Post-Contact Reward Scaling: Once ground contact is established, reward magnitudes increase significantly, with individual steps frequently yielding values exceeding $\pm 10.0$.
+9. Terminal Failure Mode: A catastrophic terminal penalty of -100.0 is triggered by extreme instability, specifically high angular velocity ($\omega$) during the landing/contact phase.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:12:15
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily used for managing descent velocity; post-contact, it is used for fine-tuned altitude control and can contribute to stabilization or contribute to instability if not timed with angular corrections.
+3. Side Engines (Actions 1 & 3): During descent, these actions incur fuel penalties; post-contact, they are essential for counteracting angular velocity ($\omega$) and tilt ($\theta$), though they can trigger large negative rewards if they exacerbate instability.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Asymmetric Contact States: Leg contact flags can transition to 1.0 independently, allowing for asymmetric ground-contact states (e.g., [1.0, 0.0]); these states often precede the transition to full stabilization ([1.0, 1.0]).
+6. Asymmetry-Action Coupling: Applying side-engine thrust to the side of the lander not currently in contact with the ground induces rapid angular momentum and tilt, which can lead to severe instability.
+7. Reward Regime Transition: The environment transitions from a descent-driven reward regime (focused on vertical velocity) to a stability-driven regime (focused on $\omega$ and $\theta$) once ground contact is established.
+8. Post-Contact Reward Scaling: Once ground contact is established, reward magnitudes increase significantly, with individual steps frequently yielding values exceeding $\pm 10.0$.
+9. Terminal Outcome Extremes: High angular velocity ($\omega$) during the contact phase triggers a catastrophic -100.0 failure penalty, while achieving a stable, grounded state with both legs in contact ([1.0, 1.0]) triggers a +100.0 success reward.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:14:14
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily used for managing descent velocity and altitude; post-contact, it is used for stabilization, though improper timing can contribute to contact loss (bouncing).
+3. Side Engines (Actions 1 & 3): Essential for managing tilt ($\theta$) and angular velocity ($\omega$); they incur fuel penalties during descent and can induce rapid instability if applied asymmetrically.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Contact State Volatility: Ground contact states are dynamic; the lander can transition between grounded ([1.0, 1.0]), asymmetric ([1.0, 0.0] or [0.0, 1.0]), and airborne ([0.0, 0.0]) states, allowing for bouncing.
+6. Contact-Loss Penalties: Transitions from a grounded state ([1.0, 1.0]) to an airborne state ([0.0, 0.0]) are associated with significant negative rewards (e.g., $\approx -17.0$ to $-22.0$).
+7. Reward Regime Transition: The environment transitions from a descent-driven regime (focused on vertical velocity) to a stability-driven regime (focused on $\theta$ and $\omega$) once ground contact is established.
+8. Post-Contact Reward Scaling: Reward magnitudes increase significantly once contact is established, with large positive reward spikes (e.g., $> 20.0$) occurring during specific contact transitions or velocity/angle thresholds.
+9. Terminal Outcome Extremes: High angular velocity ($\omega$) during the contact phase triggers a catastrophic -100.0 failure penalty.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:22:11
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily used for managing descent velocity and altitude; it is also used during the contact phase to maintain stability.
+3. Side Engines (Actions 1 & 3): Essential for managing the lander's tilt angle ($\theta$) and angular velocity ($\omega$); they can induce instability if applied asymmetrically.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Contact States: The lander transitions between airborne ([0.0, 0.0]), asymmetric ([1.0, 0.0] or [0.0, 1.0]), and grounded ([1.0, 1.0]) states.
+6. Grounded Instability Penalty: Significant negative rewards (e.g., $\approx -17.0$ to $-22.0$) are associated with being in a grounded state ([1.0, 1.0]) while maintaining significant vertical velocity ($y\_vel \neq 0$).
+7. Landing Reward Spikes: Large positive rewards (e.g., $> 10.0$) are triggered by actions that successfully transition the lander from an airborne state to a contact state (grounded or asymmetric).
+8. Reward Regime Transition: The environment transitions from a descent-driven regime (characterized by small negative rewards for being airborne) to a stability-driven regime once ground contact is established.
+9. Terminal Outcome Extremes: High angular velocity ($\omega$) during the contact phase triggers a catastrophic -100.0 failure penalty.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:24:22
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily used for managing descent velocity and altitude; it is also used during the contact phase to maintain stability.
+3. Side Engines (Actions 1 & 3): Essential for managing the lander's tilt angle ($\theta$) and angular velocity ($\omega$); they can induce instability if applied asymmetrically.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Contact States: The lander transitions between airborne ([0.0, 0.0]), asymmetric ([1.0, 0.0] or [0.0, 1.0]), and grounded ([1.0, 1.0]) states.
+6. Contact Instability Penalty: Significant negative rewards (e.g., $\approx -10.0$ to $-23.0$) are associated with being in an asymmetric or grounded state while maintaining non-negligible vertical velocity ($y\_vel$) or angular velocity ($\omega$).
+7. Landing Reward Spikes: Large positive rewards (e.g., $> 10.0$) are triggered by actions that successfully transition the lander from an airborne state to a contact state.
+8. Reward Regime Transition: The environment transitions from a descent-driven regime (characterized by small negative rewards for being airborne) to a stability-driven regime once ground contact is established.
+9. Terminal Outcome Extremes: A catastrophic -100.0 failure penalty is triggered upon episode termination in a failure state, frequently associated with high angular velocity ($\omega$) during the contact phase.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 00:26:19
+
+1. Gravity: A constant downward acceleration reduces vertical velocity ($y\_vel$).
+2. Main Engine (Action 2): Primarily used for managing descent velocity and altitude; it is also used during the contact phase to maintain stability.
+3. Side Engines (Actions 1 & 3): Essential for managing the lander's tilt angle ($\theta$) and angular velocity ($\omega$); they can induce instability if applied asymmetrically or if they fail to counteract high angular momentum during contact.
+4. Angular Dynamics: The lander's tilt angle ($\theta$) is the integral of its angular velocity ($\omega$).
+5. Contact States: The lander transitions between airborne ([0.0, 0.0]), asymmetric ([1.0, 0.0] or [0.0, 1.0]), and grounded ([1.0, 1.0]) states.
+6. Landing Reward Spikes: Large positive rewards are triggered by actions that transition the lander from an airborne state to a contact state (including asymmetric contact).
+7. Contact Instability Penalty: Significant negative rewards are associated with being in an asymmetric or grounded state while maintaining non-negligible vertical velocity ($y\_vel$) or angular velocity ($\omega$).
+8. Reward Regime Transition: The environment transitions from a descent-driven regime (characterized by small negative rewards for being airborne) to a stability-driven regime once ground contact is established.
+9. Terminal Outcome Extremes: A catastrophic -100.0 failure penalty is triggered upon episode termination in a failure state, frequently associated with high angular velocity ($\omega$) during the contact phase.
+10. Action Space: The action space is discrete and mutually exclusive (0=nothing, 1=left engine, 2=main engine, 3=right engine).
+
+---
+
+## 2026-07-09 01:03:17
+
+
+
+---
+
+## 2026-07-09 01:16:04
+
+1. Gravity acts on the lander continuously, causing a decrease in `y_vel` when no upward thrust is applied.
+2. The main engine (Action 2) provides upward thrust that increases `y_vel` and also influences `x_vel` based on the lander's current `angle`.
+3. The left engine (Action 1) generates a counter-clockwise torque, resulting in an increase in the `ang_vel` value.
+4. The right engine (Action 3) generates a clockwise torque, resulting in a decrease in the `ang_vel` value.
+5. The angular velocity (`ang_vel`) acts as the rate of change for the lander's orientation (`angle`) in subsequent steps.
+6. Side engines (1 and 3) have a dominant effect on `ang_vel` and `angle`, whereas the main engine (2) primarily affects linear velocities.
+7. The lander's horizontal position (`x_pos`) and horizontal velocity (`x_vel`) are affected by all engine types.
+8. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition to 1.0 upon impact with the ground.
+9. A crash, characterized by a large negative reward (e.g., -100.0), occurs if the lander hits the ground with excessive velocity or an unstable angle.
+10. When no action is taken (Action 0), `ang_vel` remains constant, and the lander's movement is governed by existing momentum and gravity.
+
+---
+
+## 2026-07-09 01:17:45
+
+1. Gravity acts on the lander continuously, causing a decrease in `y_vel` when no upward thrust is applied.
+2. The main engine (Action 2) provides upward thrust that increases `y_vel` and also influences `x_vel` based on the lander's current `angle`.
+3. The left engine (Action 1) generates a counter-clockwise torque, resulting in an increase in the `ang_vel` value.
+4. The right engine (Action 3) generates a clockwise torque, resulting in a decrease in the `ang_vel` value.
+5. The angular velocity (`ang_vel`) acts as the rate of change for the lander's orientation (`angle`) in subsequent steps.
+6. Side engines (1 and 3) have a dominant effect on angular dynamics (`ang_vel` and `angle`), whereas the main engine (2) primarily manages linear vertical velocity.
+7. All engine types (1, 2, and 3) influence the lander's horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+8. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition to 1.0 upon impact with the ground and can remain 1.0 for subsequent steps.
+9. Large negative rewards are triggered by instability, such as excessive angular velocity or vertical movement, which can occur during impact or while the lander is already in contact with the ground.
+10. A substantial positive reward (e.g., 100.0) is awarded for achieving a successful landing.
+
+---
+
+## 2026-07-09 01:20:07
+
+1. Gravity acts on the lander continuously, causing a decrease in `y_vel` when no upward thrust is applied.
+2. The main engine (Action 2) provides upward thrust that increases `y_vel` and also influences `x_vel` based on the lander's current `angle`.
+3. The left engine (Action 1) generates a counter-clockwise torque, resulting in an increase in the `ang_vel` value.
+4. The right engine (Action 3) generates a clockwise torque, resulting in a decrease in the `ang_vel` value.
+5. The angular velocity (`ang_vel`) acts as the rate of change for the lander's orientation (`angle`) in subsequent steps.
+6. Side engines (1 and 3) have a dominant effect on angular dynamics (`ang_vel` and `angle`), whereas the main engine (2) primarily manages linear vertical velocity.
+7. All engine types (1, 2, and 3) influence the lander's horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+8. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition to 1.0 upon impact with the ground, but can return to 0.0 if the lander bounces or is displaced.
+9. Large negative rewards are triggered by instability, such as excessive angular velocity or vertical velocity, and can occur even after leg contact has been established.
+10. A substantial positive reward (e.g., 100.0) is awarded for achieving a successful landing.
+
+---
+
+## 2026-07-09 01:25:48
+
+1. Gravity acts continuously on the lander, decreasing `y_vel` whenever upward thrust is insufficient to counteract it.
+2. The main engine (Action 2) provides upward thrust to manage `y_vel` and horizontal thrust to manage `x_vel`.
+3. The horizontal component of the main engine's thrust is directly influenced by the lander's current `angle`.
+4. The left engine (Action 1) generates counter-clockwise torque, resulting in an increase in `ang_vel`.
+5. The right engine (Action 3) generates clockwise torque, resulting in a decrease in `ang_vel`.
+6. Angular velocity (`ang_vel`) serves as the rate of change for the lander's orientation (`angle`) in subsequent steps.
+7. All engine actions (1, 2, and 3) influence both the horizontal position (`x_pos`) and the horizontal velocity (`x_vel`).
+8. Leg contact states (`left_leg_contact` and `right_leg_contact`) can transition from 1.0 back to 0.0 if the lander bounces or loses stability.
+9. Large negative rewards are triggered by instability, such as excessive `ang_vel` or `y_vel`, even after leg contact has been established.
+10. Stable, continuous contact with the ground results in the accrual of positive rewards throughout the landing phase.
+
+---
+
+## 2026-07-09 01:27:56
+
+1. Gravity acts continuously on the lander, decreasing `y_vel` whenever upward thrust is insufficient to counteract it.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque; the resulting change in `ang_vel` is dependent on the lander's `angle`, which can invert the effective direction of the torque.
+5. Angular velocity (`ang_vel`) serves as the rate of change for the lander's orientation (`angle`).
+6. All engine actions (1, 2, and 3) influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) can transition between 0.0 and 1.0, representing contact with the ground.
+8. A terminal crash or failure event is indicated by a very large negative reward (e.g., -100.0).
+9. Significant negative rewards are triggered by instability, such as excessive `ang_vel`, `x_vel`, or `y_vel`, even after leg contact has been established.
+10. Stable, continuous, and low-velocity contact with the ground results in the accrual of positive rewards.
+
+---
+
+## 2026-07-09 01:29:27
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. Angular velocity (`ang_vel`) serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 and can be established asynchronously for each leg.
+8. A terminal failure or crash event is indicated by a large negative reward (e.g., -100.0), which can occur even if leg contact is established.
+9. A terminal successful landing is indicated by a large positive reward (e.g., +100.0).
+10. Significant negative rewards are triggered by instability (excessive `ang_vel`, `x_vel`, or `y_vel`), while stable, low-velocity ground contact results in the accrual of positive rewards.
+
+---
+
+## 2026-07-09 01:30:15
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. Angular velocity (`ang_vel`) serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 and can be established asynchronously for each leg.
+8. A terminal failure or crash event (e.g., -100.0) can be triggered by high instability (such as excessive `ang_vel`) even after leg contact has been established.
+9. A terminal successful landing (e.g., +100.0) is achieved when the lander achieves stable, low-velocity contact with the ground, typically involving both legs.
+10. Significant negative rewards are triggered by instability (excessive `ang_vel`, `x_vel`, or `y_vel`), while maintaining a stable, low-velocity state during ground contact results in the accrual of positive rewards.
+
+---
+
+## 2026-07-09 01:32:56
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. Angular velocity (`ang_vel`) serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 and can be established asynchronously for each leg.
+8. A terminal failure or crash event (e.g., -100.0) can be triggered by high instability (such as excessive `ang_vel` or `y_vel`) regardless of whether one or both legs have made contact.
+9. A terminal successful landing (e.g., +100.0) is achieved when the lander achieves stable, low-velocity contact with the ground, typically involving both legs.
+10. Significant negative rewards are triggered by instability (excessive `ang_vel`, `x_vel`, or `y_vel`), while maintaining a stable, low-velocity state during ground contact results in the accrual of positive rewards.
+
+---
+
+## 2026-07-09 01:35:03
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. Angular velocity (`ang_vel`) serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 and can be established asynchronously for each leg.
+8. A terminal failure (-100.0) can be triggered by high instability (such as excessive `ang_vel` or `y_vel`) or by maintaining a significant `angle` deviation while in contact with the ground.
+9. A successful landing is achieved when the lander maintains low `y_vel`, `x_vel`, and a near-zero `angle` during ground contact.
+10. Significant negative rewards are triggered by instability (excessive `ang_vel`, `x_vel`, or `y_vel`), while maintaining a stable, low-velocity, near-zero-angle state during ground contact results in the accrual of positive rewards.
+
+---
+
+## 2026-07-09 01:41:59
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. Angular velocity (`ang_vel`) serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 and can be established asynchronously for each leg.
+8. A terminal failure (-100.0) can be triggered by high instability (such as excessive `ang_vel` or `y_vel`) or by maintaining a significant `angle` deviation while in contact with the ground.
+9. A successful landing is achieved when the lander maintains low `y_vel`, `x_vel`, and a near-zero `angle` during ground contact.
+10. Massive negative rewards are triggered by instability at ground level ($y\_pos \approx 0$), specifically when actions cause the lander to lose leg contact (bouncing/lifting off) or experience significant velocity spikes during contact.
+
+---
+
+## 2026-07-09 01:43:14
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`, serving as the primary tool for vertical descent stabilization.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`; improper use can rapidly increase angular instability.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 upon impact with the ground ($y\_pos \approx 0$).
+8. A terminal failure (-100.0) is triggered by high instability (such as excessive `ang_vel` or significant `angle` deviation) while the lander is in contact with the ground (legs = 1.0).
+9. The environment provides massive positive rewards for actions (including side engine actions) that effectively stabilize the lander's descent or orientation immediately prior to or during ground contact.
+10. Large negative rewards are triggered by actions that exacerbate angular instability (specifically side engines) or by inaction (Action 0) during critical velocity management phases.
+
+---
+
+## 2026-07-09 01:44:11
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides vertical thrust to manage `y_vel` and horizontal thrust to manage `x_vel`, serving as the primary tool for descent stabilization.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`; improper use can rapidly increase angular instability.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 upon impact with the ground ($y\_pos \approx 0$).
+8. A terminal failure (-100.0) is triggered by actions that induce excessive angular instability or significant `angle` deviation while one or both legs are in contact with the ground.
+9. Massive positive rewards are associated with the main engine (Action 2) when it effectively stabilizes the lander's descent or orientation near the ground.
+10. Large negative rewards are triggered by side engine actions (Action 1 and 3) that exacerbate angular instability or by inaction (Action 0) during critical velocity or orientation management phases.
+
+---
+
+## 2026-07-09 01:50:22
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides both vertical and horizontal thrust to manage `y_vel` and `x_vel`, serving as the primary tool for descent stabilization.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 upon impact with the ground ($y\_pos \approx 0$).
+8. A terminal failure (-100.0) is triggered by actions that induce excessive angular instability or significant `angle` deviation while one or both legs are in contact with the ground.
+9. Massive positive rewards are associated with the main engine (Action 2) when it effectively stabilizes the lander's descent or orientation near the ground.
+10. Large negative rewards are triggered by side engine actions (1, 3) that induce extreme instability or velocity, or by any action that causes the lander to bounce or lift off once leg contact has been established.
+
+---
+
+## 2026-07-09 01:52:38
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides both vertical and horizontal thrust to manage `y_vel` and `x_vel`, serving as the primary tool for descent stabilization.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 upon impact with the ground ($y\_pos \approx 0$).
+8. Massive positive rewards are associated with the main engine (Action 2) when it effectively stabilizes the lander's descent or orientation near the ground.
+9. Large negative rewards are triggered by actions that induce extreme instability or significant `angle` deviation while one or both legs are in contact with the ground.
+10. Once leg contact has been established, any action (0, 1, 2, or 3) that results in the lander bouncing, lifting off, or losing stability triggers significant negative rewards.
+
+---
+
+## 2026-07-09 01:54:52
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides both vertical and horizontal thrust, serving as the primary tool for managing `y_vel` and `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 upon impact with the ground ($y\_pos \approx 0$).
+8. Leg contact is not permanent; contact states can transition from 1.0 back to 0.0 if an action causes the lander to bounce or lift off the ground.
+9. Positive rewards are associated with stabilizing descent and managing orientation near the ground, which can be achieved via the main engine or corrective side engine actions.
+10. Massive negative rewards are triggered by actions that induce extreme angular instability or cause the lander to bounce/lift off after contact has been established.
+
+---
+
+## 2026-07-09 01:57:30
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides both vertical and horizontal thrust, serving as the primary tool for managing `y_vel` and `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 upon impact with the ground ($y\_pos \approx 0$).
+8. Leg contact is not permanent; contact states can transition from 1.0 back to 0.0 if an action causes the lander to bounce or lift off the ground.
+9. Positive rewards are strongly associated with maintaining leg contact and stabilizing orientation once the lander has reached the ground ($y\_pos \approx 0$).
+10. Massive negative rewards are triggered by actions that cause a transition from 1.0 to 0.0 in leg contact states, indicating that lifting off or bouncing after landing is a critical failure.
+
+---
+
+## 2026-07-09 01:59:38
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The main engine (Action 2) provides both vertical and horizontal thrust, serving as the primary tool for managing `y_vel` and `x_vel`.
+3. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+4. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Leg contact states (`left_leg_contact` and `right_leg_contact`) transition between 0.0 and 1.0 upon impact with the ground ($y\_pos \approx 0$).
+8. Leg contact is not permanent; contact states can transition from 1.0 to 0.0 if an action causes the lander to bounce or lift off the ground.
+9. Positive rewards are associated with maintaining leg contact and stabilizing orientation once the lander has reached the ground, including a large terminal reward for successful completion.
+10. Massive negative rewards (typically between -10 and -25) are triggered by actions that cause a transition from 1.0 to 0.0 in leg contact states, indicating that lifting off or bouncing after landing is a critical failure.
+
+---
+
+## 2026-07-09 02:03:46
+
+1. Gravity acts continuously, decreasing `y_vel` unless countered by sufficient upward thrust.
+2. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+4. `left_leg_contact` and `right_leg_contact` are independent binary states (0.0 or 1.0) and can be active separately or simultaneously.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Significant negative rewards (typically between -10 and -25) are triggered by any transition of a leg contact state from 1.0 to 0.0, indicating a bounce or lift-off.
+8. Positive rewards are associated with establishing and maintaining leg contact at $y\_pos \approx 0$, including large terminal rewards for successful stabilization.
+9. Engine thrust (including side engines) can be used to both cause lift-off (1.0 $\to$ 0.0) and re-establish contact (0.0 $\to$ 1.0) depending on the resulting thrust vector.
+10. Failed episodes, such as those characterized by uncontrolled bouncing or extreme instability, can result in massive terminal negative rewards (e.g., -100).
+
+---
+
+## 2026-07-09 02:05:11
+
+1. Gravity acts continuously on the lander, decreasing `y_vel` unless countered by sufficient vertical thrust.
+2. The direction and horizontal component of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. Side engines (Action 1 and 3) generate torque, where the resulting change in `ang_vel` is modulated by the lander's `angle`.
+4. `left_leg_contact` and `right_leg_contact` are independent binary states (0.0 or 1.0) that can be active separately or simultaneously.
+5. All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`).
+6. `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. Significant negative rewards are triggered by any transition of a leg contact state from 1.0 to 0.0, indicating a bounce or lift-off.
+8. Establishing leg contact (0.0 $\to$ 1.0) or maintaining contact at low $y\_pos$ generates positive rewards, with a large terminal reward (100.0) for successful stabilization where both legs maintain contact.
+9. The main engine (Action 2) is the primary tool for managing vertical velocity, while the side engines (Actions 1 and 3) are the primary tools for attitude control and managing `ang_vel`.
+10. Failed episodes, such as those characterized by uncontrolled bouncing or extreme instability, result in significant negative rewards and episode termination.
+
+---
+
+## 2026-07-09 02:06:57
+
+1. **Gravity**: A continuous gravitational force acts on the lander, reducing `y_vel` unless countered by sufficient upward thrust from engine actions.
+2. **Thrust Vectoring**: The direction and resultant horizontal and vertical components of thrust for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) generate torque that modifies `ang_vel`, with the magnitude of the resulting angular change being a function of the lander's current `angle`.
+4. **Binary Contact States**: `left_leg_contact` and `right_leg_contact` are independent binary states (0.0 or 1.0) that can be active individually or simultaneously.
+5. **Horizontal Dynamics**: All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`) due to the angle-dependent thrust vector.
+6. **Angular Kinematics**: `ang_vel` serves as the rate of change for the lander's orientation (`angle`).
+7. **Contact Loss Penalties**: Any transition of a leg contact state from 1.0 to 0.0 (indicating a bounce or lift-off) triggers significant negative rewards, often ranging from -15.0 to -20.0.
+8. **Contact Gain Rewards**: Establishing leg contact (transitioning from 0.0 to 1.0) generates significant positive rewards, which can be particularly large when both legs contact the ground.
+9. **Stabilization and Terminal Reward**: A large terminal reward of 100.0 is awarded for successful stabilization, characterized by both legs maintaining a contact state of 1.0.
+10. **Primary Control Roles**: The main engine (Action 2) is the primary mechanism for managing vertical velocity, while the side engines (Actions 1 and 3) are the primary tools for managing attitude and `ang_vel`.
+
+---
+
+## 2026-07-09 02:10:10
+
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and the resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque, which modifies `ang_vel` and the orientation (`angle`).
+4. **Vertical Control and Coupling**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the lander's `angle`, thereby influencing `x_vel` and `angle`.
+5. **Horizontal Dynamics**: All engine actions influence both the horizontal position (`x_pos`) and horizontal velocity (`x_vel`) due to the angle-dependent thrust vector.
+6. **Angular Kinematics**: The `ang_vel` parameter serves as the rate of change for the lander's orientation (`angle`).
+7. **Contact Gain Rewards**: Transitioning a leg contact state from 0.0 to 1.0 (establishing contact) generates significant positive rewards, typically in the range of +10.0 to +12.5.
+8. **Contact Loss Penalties**: Transitioning a leg contact state from 1.0 to 0.0 (indicating a bounce or lift-off) frequently triggers significant negative rewards.
+9. **Stabilization Reward**: High rewards are associated with the terminal state of successful stabilization, where both `left_leg_contact` and `right_leg_contact` are maintained at 1.0.
+10. **Idle State**: Action 0 provides no thrust, causing the lander's movement to be dictated solely by existing momentum and gravity.
+
+---
+
+## 2026-07-09 02:12:59
+
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained or poorly timed use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Horizontal Dynamics**: All engine actions influence both `x_pos` and `x_vel` due to the angle-dependent thrust vector.
+6. **Angular Kinematics**: The `ang_vel` parameter serves as the rate of change for the lander's orientation (`angle`).
+7. **Contact Gain Rewards**: Transitioning a leg contact state from 0.0 to 1.0 generates significant positive rewards, typically observed in the range of +6.0 to +13.0.
+8. **Contact Loss Penalties**: Transitioning a leg contact state from 1.0 to 0.0 (indicating a bounce or lift-off) frequently triggers significant negative rewards.
+9. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+10. **Post-Landing Attitude Maintenance**: Once leg contact is established, side engines (Actions 1 and 3) can be used to perform fine-grained attitude control to maintain stability and minimize angular velocity.
+
+---
+
+## 2026-07-09 02:15:03
+
+---
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained or poorly timed use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Horizontal Dynamics**: All engine actions influence both `x_pos` and `x_vel` due to the angle-dependent thrust vector.
+6. **Angular Kinematics**: The `ang_vel` parameter serves as the rate of change for the lander's orientation (`angle`).
+7. **Contact State Transitions**: Transitions in leg contact states (0.0 to 1.0 or 1.0 to 0.0) can generate significant positive rewards; simultaneous dual-leg contact (0.0 to 1.0) produces the highest reward spikes (e.g., +26.6).
+8. **Action-Specific Reward Tendencies**: The main engine (Action 2) is consistently associated with positive step rewards during descent, whereas Action 0 (Nothing) and side engines (Actions 1 and 3) frequently incur negative step rewards.
+9. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+10. **Landing Velocity Sensitivity**: High vertical or angular velocities at the moment of contact can lead to immediate contact loss or a terminal failure, even if contact is momentarily established.
+
+---
+
+## 2026-07-09 02:16:23
+
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained or poorly timed use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Horizontal Dynamics**: All engine actions influence both `x_pos` and `x_vel` due to the angle-dependent thrust vector.
+6. **Angular Kinematics**: The `ang_vel` parameter serves as the rate of change for the lander's orientation (`angle`).
+7. **Contact State Rewards**: Transitions in leg contact states (0.0 to 1.0) generate significant positive rewards. Single-leg contact transitions can yield substantial rewards (e.g., ~+12.0), while simultaneous dual-leg contact (0.0 to 1.0) produces the highest reward spikes.
+8. **Action-Specific Reward Tendencies**: The main engine (Action 2) is consistently associated with positive step rewards during descent, whereas Action 0 (Nothing) and side engines (Actions 1 and 3) frequently incur negative step rewards.
+9. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+10. **Landing Stability and Contact Retention**: High vertical or angular velocities at the moment of contact can cause immediate loss of contact or trigger a terminal failure, as high `ang_vel` can lead to rapid tumbling after initial impact.
+
+---
+
+## 2026-07-09 02:20:46
+
+---
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained or poorly timed use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Horizontal Dynamics**: All engine actions influence both `x_pos` and `x_vel` due to the angle-dependent thrust vector.
+6. **Angular Kinematics**: The `ang_vel` parameter serves as the rate of change for the lander's orientation (`angle`).
+7. **Contact State Transitions**: Transitions in leg contact states (0.0 $\leftrightarrow$ 1.0) generate significant reward spikes; establishing contact (0 to 1) typically yields large positive rewards, while losing contact (1 to 0) can yield large negative penalties.
+8. **Action-Specific Reward Tendencies**: The main engine (Action 2) is generally associated with positive step rewards during descent, though rewards can become negative if thrust is poorly aligned with the lander's orientation; side engines (Actions 1 and 3) and "nothing" (Action 0) frequently incur negative step rewards.
+9. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+10. **Contact Stability and Disruption**: Landing with high `ang_vel` or `y_vel` can cause immediate contact loss. Additionally, applying thrust (Actions 1, 2, or 3) while the lander is already in a contact state can cause contact "flickering" or total loss, triggering significant negative reward spikes (e.g., ~-20.0).
+
+---
+
+## 2026-07-09 02:22:15
+
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control Coupling**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Contact State Transitions**: Transitions in leg contact states (0.0 $\leftrightarrow$ 1.0) generate significant reward spikes; establishing contact (0 to 1) is a critical phase of the landing sequence.
+6. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+7. **Contact vs. Stabilization**: Establishing contact (leg contact = 1.0) is a necessary but insufficient condition for success; the lander must also satisfy stability requirements (likely involving low `ang_vel` and `y_vel`) to avoid a terminal failure.
+8. **Post-Contact Engine Utility**: While applying thrust (Actions 1, 2, or 3) while in a contact state can cause contact "flickering" or loss, it can also be used to modulate the lander's state to achieve the final stabilization required for a successful landing.
+9. **Action-Specific Reward Tendencies**: During descent, Action 2 is generally associated with positive step rewards, while Actions 1, 3, and 0 frequently incur negative rewards; however, side engines (1, 3) can yield high positive rewards if they effectively stabilize the lander after contact.
+10. **Angular Velocity and Stability**: High `ang_vel` at the moment of contact or during the post-contact phase is a primary driver of instability and is strongly associated with terminal failure.
+
+---
+
+## 2026-07-09 02:26:46
+
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control Coupling**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Contact State Disruption**: Applying thrust (particularly the main engine, Action 2) while in a contact state can trigger a transition from contact (1.0) to non-contact (0.0), leading to significant penalties.
+6. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+7. **Contact vs. Stabilization**: Establishing contact (leg contact = 1.0) is a necessary but insufficient condition for success; the lander must also satisfy stability requirements (low `ang_vel` and `y_vel`) to avoid terminal failure.
+8. **High-Variance Post-Contact Control**: During the post-contact stabilization phase, side engines (Actions 1 and 3) can generate extremely large positive rewards if they effectively dampen movement, but they also carry the risk of extreme negative rewards if they induce attitude oscillation or instability.
+9. **Descent Reward Tendencies**: During descent, Action 2 is the most consistent source of positive step rewards; Actions 1, 3, and 0 are frequently associated with negative rewards or high volatility.
+10. **Angular Velocity and Stability**: High `ang_vel` at the moment of contact or during the post-contact phase is a primary driver of instability and is strongly associated with terminal failure.
+
+---
+
+## 2026-07-09 02:29:37
+
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control Coupling**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Post-Contact Main Engine Penalty**: Applying the main engine (Action 2) while in a contact state is strongly associated with negative step rewards and attitude instability, even if the contact state (leg contact = 1.0) is maintained.
+6. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+7. **Contact vs. Stabilization**: Establishing contact (leg contact = 1.0) is a necessary but insufficient condition for success; the lander must also satisfy stability requirements (low `ang_vel` and `y_vel`) to avoid terminal failure.
+8. **Post-Contact Side-Engine Reward Bifurcation**: During the post-contact stabilization phase, side engines (Actions 1 and 3) exhibit extreme reward variance, providing massive positive rewards for effectively damping angular velocity or massive negative penalties for inducing attitude oscillation.
+9. **Descent Control Dynamics**: During the descent phase, while Action 2 is a primary mechanism for managing `y_vel`, side engines (Actions 1 and 3) are also critical for managing attitude-dependent descent trajectories and can be significant sources of positive rewards.
+10. **Angular Velocity and Stability**: High `ang_vel` at the moment of contact or during the post-contact phase is a primary driver of instability and is strongly associated with terminal failure.
+
+---
+
+## 2026-07-09 02:32:03
+
+---
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control Coupling**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Post-Contact Main Engine Penalty**: Applying the main engine (Action 2) while in a contact state is strongly associated with negative step rewards and attitude instability, even if the contact state (leg contact = 1.0) is maintained.
+6. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+7. **Contact vs. Stabilization**: Establishing contact (leg contact = 1.0) is a necessary but insufficient condition for success; the lander must also satisfy stability requirements (low `ang_vel` and `y_vel`) to avoid terminal failure.
+8. **Post-Contact Side-Engine Reward Bifurcation**: During the post-contact stabilization phase, side engines (Actions 1 and 3) exhibit extreme reward variance, providing massive positive rewards for effectively damping angular velocity or massive negative penalties for inducing attitude oscillation.
+9. **Descent-Phase Side-Engine Penalty**: During the descent phase (pre-contact), the use of side engines (Actions 1 and 3) is frequently associated with consistent negative step rewards, suggesting that attitude corrections via side engines are more heavily penalized during descent than during the post-contact phase.
+10. **Angular Velocity and Stability**: High `ang_vel` at the moment of contact or during the post-contact phase is a primary driver of instability and is strongly associated with terminal failure.
+
+---
+
+## 2026-07-09 02:37:35
+
+1. **Gravity**: A continuous gravitational force acts on the lander, causing `y_vel` to decrease unless countered by upward thrust.
+2. **Thrust Vectoring**: The direction and resulting horizontal and vertical thrust components for all engine actions (1, 2, and 3) are modulated by the lander's current `angle`.
+3. **Torque and Attitude**: Side engines (Actions 1 and 3) are the primary mechanism for generating torque; sustained use can lead to rapid, large increases in `ang_vel`.
+4. **Vertical and Horizontal Control Coupling**: While the main engine (Action 2) is the primary mechanism for managing `y_vel`, its thrust is coupled to the `angle`, thereby influencing `x_vel` and `angle`.
+5. **Post-Contact Main Engine Penalty**: Applying the main engine (Action 2) while in a contact state is strongly associated with negative step rewards and attitude instability, even if the contact state is maintained.
+6. **Terminal Reward Structure**: The simulation provides a large terminal reward of +100.0 for successful stabilization and a large terminal penalty of -100.0 for failure.
+7. **Contact vs. Stabilization**: Establishing contact (leg contact = 1.0) is a necessary but insufficient condition for success; the lander must also satisfy stability requirements (low `ang_vel` and `y_vel`) to avoid terminal failure.
+8. **Post-Contact Side-Engine Reward Bifurcation**: During the post-contact stabilization phase, side engines (Actions 1 and 3) exhibit extreme reward variance, providing massive positive rewards for effectively damping angular velocity or massive negative penalties for inducing attitude oscillation.
+9. **Descent-Phase Reward Sensitivity**: During the descent phase, rewards for all engine actions are highly sensitive to the resulting change in the lander's velocity; successful damping of `y_vel` or `ang_vel` results in positive rewards, whereas ineffective or destabilizing actions yield negative step rewards.
+10. **Leg Contact State and Stability**: The simulation tracks `left_leg_contact` and `right_leg_contact` independently; maintaining dual-leg contact `[1.0, 1.0]` is critical for stability, while single-leg contact states (e.g., `[1.0, 0.0]`) are associated with extreme reward volatility and serve as a precursor to terminal failure.
+
+---
+
+## 2026-07-09 02:38:54
+
+1. **Gravitational Influence**: A continuous force acts on the lander, necessitating managed vertical thrust (Action 2) to prevent `y_vel` from reaching critical descent speeds.
+2. **Angle-Modulated Thrust Coupling**: All engine actions are modulated by the current `angle`, which couples vertical thrust (Action 2) with horizontal velocity (`x_vel`) and attitude control.
+3. **Torque Dynamics**: Side engines (Actions 1 and 3) are the primary drivers of torque; they are essential for attitude control but can cause rapid, uncontrolled increases in `ang_vel` if used excessively.
+4. **Post-Contact Side-Engine Volatility**: During the contact/stabilization phase, Actions 1 and 3 exhibit extreme reward variance, providing massive positive rewards for successful angular damping (e.g., Episode 1, step 377) or massive negative penalties for failing to control oscillations (e.g., Episode 2, step 473).
+5. **Dual-Contact Insufficiency**: Achieving dual-leg contact `[1.0, 1.0]` is necessary but insufficient for success; terminal failure occurs if the lander's attitude (`angle`) or `ang_vel` is not sufficiently minimized at the time of contact (as demonstrated in Episode 2).
+6. **Terminal Reward Logic**: The simulation concludes with a +100.0 reward for successful stabilization and a -100.0 penalty for terminal failure, which can be triggered by high-velocity impact or uncontrolled attitude.
+7. **Descent-Phase Reward Sensitivity**: Step rewards during the descent phase are highly sensitive to the instantaneous changes in `y_vel` and `ang_vel` resulting from engine thrust.
+8. **Leg Contact State Transitions**: The transition from zero contact to single-leg contact `[1.0, 0.0]` or `[0.0, 1.0]` is characterized by high reward volatility and serves as a critical window for final attitude stabilization.
+9. **Main Engine Post-Contact Utility**: While the main engine (Action 2) is the primary tool for managing `y_vel` during descent, its application during the post-contact phase is less effective for stabilization and can contribute to attitude instability.
+10. **Attitude-Driven Failure Modes**: Extreme values in `angle` or `ang_vel` are primary drivers of the terminal failure penalty, capable of overriding the stability normally provided by established leg contact.
+
+---
+
+## 2026-07-09 02:43:31
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the essential mechanism for counteracting gravity and regulating `y_vel` during the descent phase to prevent high-velocity impact.
+2. **Angular-Thrust Coupling**: All engine thrust is modulated by the current `angle`, creating a coupling where vertical thrust (Action 2) also influences horizontal velocity (`x_vel`) and attitude.
+3. **Torque Dynamics and Side-Engine Volatility**: Actions 1 and 3 are the primary drivers of torque; while necessary for attitude control, they can cause rapid, uncontrolled increases in `ang_vel` if applied excessively.
+4. **Contact Transition Reward Spikes**: The transition to dual-leg contact `[1.0, 1.0]` is a high-magnitude reward event, often triggering substantial instantaneous positive bonuses upon successful landing.
+5. **Success Criteria (Contact and Stability)**: Achieving dual-leg contact is a prerequisite for success, but the terminal +100.0 reward is contingent upon maintaining `angle` and `ang_vel` at near-zero values.
+6. **Action 0 (Null Action) Penalty**: Executing Action 0 (nothing) during flight or descent typically incurs a consistent negative step reward (approximately -2.0), serving as a cost for time and lack of control.
+7. **Main Engine Post-Contact Utility**: While critical for descent, the application of Action 2 once `y_pos` is near zero is less effective for fine stabilization and can introduce attitude instability.
+8. **State-Dependent Contact Outcomes**: The magnitude and sign of rewards during the contact window are highly sensitive to the lander's instantaneous `y_vel` and `ang_vel` at the moment of impact.
+9. **Attitude-Driven Failure Modes**: Extreme values in `angle` or `ang_vel` are the primary drivers of terminal failure penalties, capable of overriding the stability normally provided by established leg contact.
+10. **Continuous Post-Contact Stabilization**: The environment requires sustained attitude management even after dual-leg contact is established; failure to damp residual oscillations through Actions 1, 3, or 0 can lead to episode termination.
+
+---
+
+## 2026-07-09 02:46:15
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for regulating `y_vel` and counteracting gravity during the descent phase.
+2. **Angular-Thrust Coupling**: All engine thrust is modulated by the current `angle`, meaning the main engine (Action 2) also influences horizontal velocity (`x_vel`) and attitude.
+3. **Post-Contact Side-Engine Volatility**: Applying side engines (Actions 1 and 3) after dual-leg contact `[1.0, 1.0]` is established is extremely high-risk, frequently triggering massive negative rewards (often between -10.0 and -20.0).
+4. **Landing Phase Reward Spikes**: The environment provides large, positive instantaneous reward spikes (reaching +20.0 or higher) during the low `y_pos` phase, likely rewarding specific descent profiles or velocity targets.
+5. **Success Criteria (Contact and Stability)**: Achieving dual-leg contact is a prerequisite for the terminal +100.0 reward, which is contingent upon maintaining `angle` and `ang_vel` at near-zero values.
+6. **Escalating Null Action Penalty**: The penalty for Action 0 (nothing) is not a fixed cost; its magnitude increases significantly when applied during the contact phase if residual `y_vel` or `ang_vel` is present.
+7. **Main Engine Post-Contact Utility**: While essential for descent, the application of Action 2 when `y_pos` is near zero becomes less effective for fine stabilization and can introduce attitude instability.
+8. **State-Dependent Contact Outcomes**: The sign and magnitude of rewards during the landing window are highly sensitive to the lander's instantaneous `y_vel` and `ang_vel` at the moment of contact.
+9. **Attitude-Driven Failure Modes**: Extreme values in `angle` or `ang_vel` remain the primary drivers of terminal failure penalties, which can override the stability provided by leg contact.
+10. **Post-Contact Stabilization Conflict**: The environment creates a tension in the terminal phase where the lander must manage residual oscillations, yet the actions required for stabilization (specifically side engines) carry high risks of severe negative rewards.
+
+---
+
+## 2026-07-09 02:49:47
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for regulating `y_vel` during the descent phase, generally providing positive rewards when used to counteract gravity.
+2. **Angular-Thrust Coupling**: All engine thrust is modulated by the current `angle`, meaning the main engine (Action 2) simultaneously influences horizontal velocity (`x_vel`) and attitude.
+3. **Side-Engine Penalties during Descent**: During the descent phase (pre-contact), applying side engines (Actions 1 and 3) frequently results in negative rewards, likely due to the introduction of undesirable horizontal velocity or attitude perturbations.
+4. **High-Stakes Side-Engine Utility in Contact**: Once leg contact is established, side engines (Actions 1 and 3) become extremely high-stakes; they can trigger massive positive rewards (reaching +10.0 to +20.0) if used correctly for orientation, or massive negative rewards (reaching -10.0 to -20.0) if they destabilize the lander.
+5. **Landing Phase Reward Spikes**: The environment provides large, positive instantaneous reward spikes during the low `y_pos` phase, rewarding specific descent and attitude profiles.
+6. **Null Action (Action 0) Volatility**: In the terminal/contact phase, Action 0 is highly state-dependent; it can yield significant negative penalties (e.g., -17.0) if the lander requires stabilization, or substantial positive rewards (e.g., +12.0) if the lander is already stable.
+7. **Main Engine Risk Post-Contact**: While essential for descent, applying Action 2 after leg contact has been established is high-risk and can result in significant negative rewards, likely due to disrupting the established landing stability.
+8. **State-Dependent Contact Outcomes**: The sign and magnitude of rewards during the landing window are extremely sensitive to the lander's instantaneous `y_vel`, `ang_vel`, and `angle` at the moment of contact or engine application.
+9. **Attitude-Driven Failure Modes**: Extreme values in `angle` or `ang_vel` remain the primary drivers of terminal failure penalties, which can override the stability provided by leg contact.
+10. **Post-Contact Stabilization Tension**: The environment creates a tension in the terminal phase where the lander must manage residual oscillations; the actions required for fine stabilization (specifically side engines) carry extreme risk-reward profiles.
+
+---
+
+## 2026-07-09 02:51:28
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for regulating `y_vel` during descent, providing significant positive rewards when used to counteract gravity.
+2. **Angular-Thrust Coupling**: All engine thrusts are modulated by the current `angle`, meaning any engine application (Actions 1, 2, or 3) simultaneously influences both linear velocity (`x_vel`, `y_vel`) and attitude (`angle`, `ang_vel`).
+3. **Side-Engine Penalties during Descent**: During the pre-contact descent phase, applying side engines (Actions 1 and 3) frequently incurs negative rewards, likely due to the introduction of undesirable horizontal drift or angular perturbations.
+4. **Post-Contact Side-Engine Utility**: Once leg contact is established, side engines (Actions 1 and 3) become critical for orientation stabilization; they carry extreme risk-reward profiles, capable of triggering massive positive rewards (e.g., +12.0) if used to correct attitude, or massive negative rewards if they destabilize the lander.
+5. **Landing Phase Reward Spikes**: The environment provides large, instantaneous positive reward spikes during the low `y_pos` phase (near contact), rewarding specific descent and attitude profiles.
+6. **Null Action (Action 0) Volatility**: In the terminal or contact phase, Action 0 is highly state-dependent, yielding significant negative penalties if the lander requires immediate stabilization or substantial positive rewards if the lander is already stable.
+7. **Main Engine Risk Post-Contact**: While essential for descent, applying Action 2 after leg contact has been established is high-risk and can lead to catastrophic instability or crashes.
+8. **Catastrophic Terminal Penalty**: A complete failure in the landing or stabilization phase triggers a massive terminal penalty (e.g., -100.0), distinguishing a "FAILURE" outcome from a "PARTIAL" outcome.
+9. **Attitude-Driven Failure Modes**: Extreme values in `angle` or `ang_vel` are the primary drivers of terminal failure, often overriding any stability provided by leg contact.
+10. **Asymmetric Contact Outcomes**: The environment allows for "PARTIAL" outcomes, where the lander may achieve a stable state with only one leg in contact (e.g., `[0.0, 1.0]` or `[1.0, 0.0]`), which can still yield significant rewards.
+
+---
+
+## 2026-07-09 02:56:55
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for regulating `y_vel` during descent, providing positive rewards when used to counteract gravity.
+2. **Angular-Thrust Coupling**: All engine applications (Actions 1, 2, or 3) simultaneously influence both linear velocity (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`).
+3. **Side-Engine Penalties during Descent**: In the pre-contact phase, applying side engines (Actions 1 and 3) frequently incurs negative rewards, likely due to the introduction of undesirable horizontal drift.
+4. **High-Stakes Post-Contact Stabilization**: Once leg contact is established, side engines (Actions 1 and 3) are critical for attitude correction; they carry extreme reward-risk profiles, capable of triggering massive positive rewards (e.g., +22.0) or massive negative penalties (e.g., -20.0) depending on the success of the stabilization.
+5. **Main Engine Instability Post-Contact**: Applying Action 2 after leg contact has been established is highly destabilizing and can lead to significant negative rewards (e.g., -10.9).
+6. **Null Action (Action 0) Volatility Post-Contact**: In the contact phase, Action 0 is highly state-dependent; it can trigger massive negative penalties (e.g., -18.9) if the lander requires immediate stabilization or corrective thrust.
+7. **Bimodal Reward Spikes**: Large reward spikes are observed at two distinct stages: the initial landing/contact phase and during successful attitude stabilization post-contact.
+8. **Attitude-Driven Failure Modes**: Extreme values in `angle` or `ang_vel`, particularly during the post-contact stabilization phase, are the primary drivers of massive reward penalties.
+9. **Asymmetric Contact Outcomes**: The environment allows for "PARTIAL" outcomes, where the lander may achieve stability with only one leg in contact, which can still yield significant rewards.
+10. **Catastrophic Terminal Penalty**: A complete failure in the landing or stabilization phase triggers a massive terminal penalty, distinguishing a "FAILURE" outcome from a "PARTIAL" outcome.
+
+---
+
+## 2026-07-09 02:59:25
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for regulating `y_vel` during descent, providing positive rewards when used to counteract gravity.
+2. **Angular-Thrust Coupling**: All engine applications (Actions 1, 2, or 3) simultaneously influence both linear velocity (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`).
+3. **Side-Engine Penalties during Descent**: In the pre-contact phase, applying side engines (Actions 1 and 3) frequently incurs negative rewards, likely due to the introduction of undesirable horizontal drift.
+4. **High-Stakes Post-Contact Stabilization**: Once leg contact is established, side engines (Actions 1 and 3) are critical for attitude correction; they carry extreme reward-risk profiles, capable of triggering massive positive rewards or massive negative penalties depending on the success of the stabilization.
+5. **Main Engine Instability Post-Contact**: Applying Action 2 after leg contact has been established is highly destabilizing and can lead to significant negative rewards (e.g., -17.8 or lower).
+6. **Null Action Volatility Post-Contact**: In the contact phase, Action 0 is highly state-dependent; it can trigger massive negative penalties if immediate stabilization is required, but can also yield significant positive rewards if it facilitates stabilization.
+7. **Thrust-Induced Contact Transitions**: Actions taken during the contact phase (particularly side engines) can cause the lander to lose or gain leg contact (e.g., transitioning from `1.0` to `0.0`), which fundamentally shifts the reward and stability dynamics.
+8. **Bimodal Reward Spikes**: Large reward spikes are observed at two distinct stages: the initial landing/contact phase and during successful attitude stabilization post-contact.
+9. **Attitude-Driven Failure Modes**: Extreme values in `angle` or `ang_vel`, particularly during the post-contact stabilization phase, are the primary drivers of massive reward penalties.
+10. **Catastrophic Terminal Penalty**: A complete failure in the landing or stabilization phase triggers a massive terminal penalty, distinguishing a "FAILURE" outcome from a "PARTIAL" outcome.
+
+---
+
+## 2026-07-09 03:00:55
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for regulating `y_vel` during descent, providing positive rewards when used to counteract gravity.
+2. **Angular-Thrust Coupling**: All engine applications (Actions 1, 2, or 3) simultaneously influence both linear velocity (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`).
+3. **Side-Engine Utility in Descent**: Side engines (Actions 1 and 3) can provide significant positive rewards during the descent phase if they are used to successfully manage attitude, though they still pose a risk of inducing undesirable horizontal drift.
+4. **High-Stakes Post-Contact Stabilization**: Once leg contact is established, side engines are critical for attitude correction; they carry extreme reward-risk profiles, capable of triggering massive positive rewards or massive negative penalties depending on the success of the stabilization.
+5. **Main Engine Instability Post-Contact**: Applying Action 2 after leg contact has been established is highly destabilizing and can lead to significant negative rewards, particularly when the lander possesses existing angular momentum.
+6. **Null Action Volatility Post-Contact**: In the contact phase, Action 0 is highly state-dependent; it can trigger massive negative penalties if immediate stabilization is required, but can also yield significant positive rewards if it facilitates stabilization.
+7. **Thrust-Induced Contact Transitions**: Actions taken during the contact phase (particularly side engines) can cause the lander to lose or gain leg contact (e.g., transitioning from `1.0` to `0.0`), which fundamentally shifts the reward and stability dynamics.
+8. **Bimodal Reward Spikes**: Large reward spikes are observed at two distinct stages: the initial landing/contact phase and during successful attitude stabilization post-contact.
+9. **Angular Velocity Death-Spirals**: There exists a critical threshold for `ang_vel` during the post-contact phase; if exceeded, corrective actions (including side engines) may fail to arrest the rotation, leading to rapidly compounding angular instability and massive penalties.
+10. **Catastrophic Terminal Penalty**: A complete failure in the landing or stabilization phase, often driven by unrecoverable angular momentum, triggers a massive terminal penalty, distinguishing a "FAILURE" outcome from a "PARTIAL" outcome.
+
+---
+
+## 2026-07-09 03:04:08
+
+---
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during the descent phase, though its utility is severely limited and highly destabilizing once leg contact is established.
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), necessitating complex multi-axis control.
+3. **Side Engine Criticality in Contact**: Side engines (Actions 1 and 3) are the primary tools for attitude correction during the contact phase; they are responsible for both the highest positive reward spikes (e.g., >20) and significant negative penalties.
+4. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent management to rapid attitude stabilization.
+5. **Main Engine Instability Post-Contact**: Applying Action 2 after leg contact is established is extremely high-risk and frequently results in massive negative rewards, particularly when it interferes with required angular stabilization.
+6. **Null Action Risk**: In the contact phase, Action 0 is highly volatile; while it can facilitate stability, it can also trigger heavy penalties if the lander's angular momentum requires immediate active thrust to prevent a crash.
+7. **Extreme Reward Volatility**: The post-contact phase is characterized by extreme reward fluctuations, where successful attitude arrest can trigger massive positive rewards, while incorrect thrust or inaction can lead to massive penalties.
+8. **Angular Velocity Sensitivity**: The reward function is hyper-sensitive to `ang_vel` during contact; actions that successfully arrest rotation trigger high positive rewards, while actions that exacerbate rotation trigger massive penalties.
+9. **Side Engine/Rotation Interaction**: During contact, side engines can either successfully counteract high `ang_vel` (leading to massive reward spikes) or inadvertently drive the lander into an unrecoverable angular death-spiral (leading to massive penalties).
+10. **Landing Objective Convergence**: Successful outcomes require the simultaneous and precise minimization of `y_vel` (to prevent impact damage) and `ang_vel` (to prevent tipping) at the moment of leg contact.
+
+---
+
+## 2026-07-09 03:08:18
+
+---
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during the descent phase; while essential for countering high downward velocities, its application post-contact is highly destabilizing and frequently triggers massive negative rewards.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring complex, coordinated multi-axis control to prevent unintended drift or rotation.
+
+3. **Side Engine High-Stakes Correction**: Side engines (Actions 1 and 3) are responsible for the environment's most extreme reward fluctuations; they can trigger massive positive rewards (e.g., >20) through successful attitude arrest or massive negative penalties (e.g., <-15) if they exacerbate rotation or cause a loss of contact.
+
+4. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent/velocity management to rapid attitude stabilization and contact maintenance.
+
+5. **Main Engine Instability Post-Contact**: Applying Action 2 after leg contact is established is extremely high-risk. It often interferes with the fine-tuned angular stabilization required to maintain contact, frequently resulting in massive negative penalties.
+
+6. **Null Action Volatility**: In the contact phase, Action 0 is highly volatile; while it can facilitate stability in a near-static state, it can also trigger heavy penalties if the lander's existing angular momentum requires immediate active thrust to prevent a crash or a loss of contact.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing can result in a divergence of dozens of reward points in a single step.
+
+8. **Angular Velocity Sensitivity**: The reward function is hyper-sensitive to `ang_vel` during the contact phase; actions that successfully arrest rotation trigger high positive rewards, while actions that inadvertently increase angular momentum trigger the environment's largest negative penalties.
+
+9. **Contact State Transience**: Leg contact is not a guaranteed terminal state; high-magnitude thrust or excessive angular momentum can cause the lander to "bounce" or lose contact (transitioning from 1.0 back to 0.0), which resets the physics regime and the reward landscape.
+
+10. **Landing Objective Convergence**: Successful outcomes require the simultaneous and precise minimization of `y_vel` (to prevent impact damage or bouncing) and `ang_vel` (to prevent tipping or loss of contact) at the moment of leg contact.
+
+---
+
+## 2026-07-09 03:15:25
+
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; while essential for countering high downward velocities, its application post-contact is highly destabilizing and frequently triggers significant negative rewards.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring complex, coordinated multi-axis control to prevent unintended drift or rotation.
+
+3. **Side Engine High-Stakes Correction**: Side engines (Actions 1 and 3) are responsible for the environment's most extreme reward fluctuations; they can trigger massive positive rewards (e.g., >20) through successful attitude arrest or massive negative penalties (e.g., <-15) if they cause a loss of leg contact.
+
+4. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent/velocity management to rapid attitude stabilization and contact maintenance.
+
+5. **Main Engine Instability Post-Contact**: Applying Action 2 after leg contact is established is extremely high-risk. It frequently interferes with the fine-tuned angular stabilization required to maintain contact, often resulting in significant negative penalties (e.g., -4.0 at step 472).
+
+6. **Null Action Volatility**: In the contact phase, Action 0 is highly volatile; while it can facilitate stability in a near-static state, it can also trigger heavy penalties if the lander's existing angular momentum requires immediate active thrust to prevent a crash or a loss of contact.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing can result in a divergence of dozens of reward points in a single step.
+
+8. **Angular Velocity Sensitivity**: The reward function is hyper-sensitive to `ang_vel` during the contact phase; actions that successfully arrest rotation trigger high positive rewards, while actions that inadvertently increase angular momentum trigger the environment's largest negative penalties.
+
+9. **Contact State Fragility and Re-establishment**: Leg contact is highly transient; side engines (Actions 1 and 3) are capable of inducing "bounces" that transition contact from 1.0 to 0.0, but they are also the primary mechanism for re-establishing contact through rapid attitude correction.
+
+10. **Landing Objective Convergence**: Successful outcomes require the simultaneous and precise minimization of `y_vel` (to prevent impact damage or bouncing) and `ang_vel` (to prevent tipping or loss of contact) at the moment of leg contact.
+
+---
+
+## 2026-07-09 03:20:40
+
+---
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; while essential for countering high downward velocities, its application post-contact is highly destabilizing and frequently triggers significant negative rewards.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring complex, coordinated multi-axis control to prevent unintended drift or rotation.
+
+3. **Side Engine Contact Transitions**: Actions 1 and 3 are the primary drivers of contact state changes; they can induce contact loss (transitioning from 1.0 to 0.0) resulting in large penalties (e.g., -17.26) or facilitate rapid contact re-establishment (transitioning from 0.0 to 1.0) through high-torque attitude corrections that yield massive positive rewards (e.g., >12).
+
+4. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent/velocity management to rapid attitude stabilization and contact maintenance.
+
+5. **Main Engine Pre-Contact Optimization**: While Action 2 is high-risk post-contact, it is extremely effective for final-approach velocity arrest; if applied with precise timing just before the initial leg contact, it can trigger massive positive rewards (e.g., 14.415).
+
+6. **Null Action Volatility**: In the contact phase, Action 0 is highly volatile; while it can facilitate stability in a near-static state, it can also trigger heavy penalties if the lander's existing angular momentum requires immediate active thrust to prevent a crash or a loss of contact.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing can result in a divergence of dozens of reward points in a single step.
+
+8. **Angular Momentum Arrest Rewards**: The environment is hyper-sensitive to `ang_vel` during the contact phase; actions that successfully arrest high angular velocity (e.g., step 331 in Episode 1) trigger high positive rewards, whereas failure to arrest rotation triggers the environment's largest negative penalties.
+
+9. **Contact State Fragility**: Leg contact is highly transient and prone to "bounces"; the ability of side engines to rapidly transition the lander between contact and non-contact states makes contact maintenance the most unstable and high-stakes phase of the simulation.
+
+10. **Landing Objective Convergence**: Successful outcomes require the simultaneous and precise minimization of `y_vel` (to prevent impact damage or bouncing) and `ang_vel` (to prevent tipping or loss of contact) at the moment of leg contact.
+
+---
+
+## 2026-07-09 03:24:32
+
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for velocity arrest immediately preceding the initial leg contact.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated multi-axis control to prevent unintended drift or rotation.
+
+3. **Contact Transition Rewards**: The transition of leg contact from `0.0` to `1.0` is frequently accompanied by massive instantaneous positive rewards (e.g., >12), marking the successful transition from descent to a landing state.
+
+4. **Contact Phase Regime Shift**: The transition of leg contact represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent/velocity management to rapid attitude stabilization and contact maintenance.
+
+5. **Main Engine Pre-Contact Optimization**: Action 2 is highly effective for final-approach velocity arrest; if applied with precise timing just before the initial leg contact, it can trigger significant positive rewards.
+
+6. **Null Action Utility**: In the contact phase, Action 0 is useful for maintaining stability in near-static states, but it is insufficient for arresting significant angular momentum.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing results in a massive divergence between high positive rewards and the terminal penalty.
+
+8. **Terminal Angular Failure**: While the lander can occasionally sustain high `ang_vel` for several steps post-contact, failure to arrest rotation triggers the environment's largest negative penalty (e.g., -100.0), signaling a catastrophic crash or tip-over.
+
+9. **Contact State Fragility**: Leg contact is highly transient and prone to "bounces"; the ability of side engines to rapidly transition the lander between contact and non-contact makes contact maintenance the most unstable and high-stakes phase of the simulation.
+
+10. **Landing Objective Convergence**: Successful outcomes require the simultaneous and precise minimization of `y_vel` (to prevent impact damage) and `ang_vel` (to prevent tipping) at the moment of leg contact.
+
+---
+
+## 2026-07-09 03:26:17
+
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting vertical velocity immediately preceding leg contact to prevent high-impact damage.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to manage the resulting multi-axis drift and rotation.
+
+3. **Contact Transition Rewards**: The transition of leg contact from `0.0` to `1.0` is marked by significant instantaneous positive rewards, signaling the successful transition from a descent regime to a landing regime.
+
+4. **Contact Phase Regime Shift**: The transition of leg contact represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent/velocity management to rapid attitude stabilization and contact maintenance.
+
+5. **Main Engine Pre-Contact Optimization**: Action 2 is highly effective for final-approach velocity arrest; precise timing of the main engine application just before initial leg contact is required to maximize landing rewards and minimize impact velocity.
+
+6. **Post-Contact Angular Sensitivity**: Once leg contact is established, the system becomes hyper-sensitive to `ang_vel`; small residual angular velocities can escalate rapidly, necessitating immediate and precise counter-thrust from side engines to prevent terminal instability.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing results in a massive divergence between high positive rewards and the terminal penalty.
+
+8. **Terminal State Triggers**: The environment's largest negative penalty (e.g., -100.0) is triggered when the lander fails to arrest angular momentum or exceeds critical tilt thresholds during or immediately after the contact phase.
+
+9. **Dual-Mode Contact Loss**: The leg contact states are vulnerable to two distinct physical failure modes: "bouncing" (where excessive positive `y_vel` post-impact causes separation) and "tipping" (where high `ang_vel` causes the lander to rotate out of a stable contact state).
+
+10. **Landing Objective Convergence**: Successful outcomes require the simultaneous and precise minimization of `y_vel` (to prevent impact damage) and `ang_vel` (to prevent tipping) at the moment of leg contact and throughout the subsequent stabilization phase.
+
+---
+
+## 2026-07-09 03:28:43
+
+---
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting vertical velocity immediately preceding leg contact to prevent high-impact damage.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to manage the resulting multi-axis drift and rotation.
+
+3. **Contact Transition Rewards**: The transition of leg contact from `0.0` to `1.0` is marked by significant instantaneous positive rewards, signaling the successful transition from a descent regime to a landing regime.
+
+4. **Contact Phase Regime Shift**: The transition of leg contact represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent/velocity management to rapid attitude stabilization and contact maintenance.
+
+5. **Main Engine Pre-Contact Optimization**: Action 2 is highly effective for final-approach velocity arrest; precise timing of the main engine application just before initial leg contact is required to maximize landing rewards and minimize impact velocity.
+
+6. **Post-Contact Angular Sensitivity**: Once leg contact is established, the system becomes hyper-sensitive to `ang_vel`; small residual angular velocities can escalate rapidly, necessitating immediate and precise counter-thrust from side engines to prevent terminal instability.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing results in a massive divergence between high positive rewards and the terminal penalty.
+
+8. **Terminal State Triggers**: The environment's largest negative penalty is triggered when the lander fails to arrest angular momentum or exceeds critical tilt thresholds during or immediately after the contact phase.
+
+9. **Recurrent Contact Instability**: Leg contact is not a permanent state; "bouncing" (excessive positive `y_vel` post-impact) and "tipping" (high `ang_vel`) can cause the lander to oscillate between contact and non-contact states, or lose contact entirely even after an initial successful landing.
+
+10. **Single-Leg Contact Instability**: States where only one leg maintains contact (`[1.0, 0.0]` or `[0.0, 1.0]`) constitute highly unstable, transient regimes that frequently serve as immediate precursors to either a full contact recovery or total contact loss.
+
+---
+
+## 2026-07-09 03:33:27
+
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting vertical velocity immediately preceding leg contact to prevent high-impact damage.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to manage the resulting multi-axis drift and rotation.
+
+3. **Contact Transition Rewards**: The transition of leg contact from `0.0` to `1.0` is marked by significant instantaneous positive rewards, signaling the successful transition from a descent regime to a landing regime.
+
+4. **Contact Phase Regime Shift**: The transition of leg contact represents a fundamental shift in the environment's reward landscape, moving the primary objective from descent/velocity management to rapid attitude stabilization and contact maintenance.
+
+5. **Main Engine Pre-Contact Optimization**: Action 2 is highly effective for final-approach velocity arrest; precise timing of the main engine application just before initial leg contact is required to maximize landing rewards and minimize impact velocity.
+
+6. **Post-Contact Angular Sensitivity**: Once leg contact is established, the system becomes hyper-sensitive to `ang_vel`; small residual angular velocities can escalate rapidly, necessitating immediate and precise counter-thrust from side engines to prevent terminal instability.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing results in a massive divergence between high positive rewards and the terminal penalty.
+
+8. **Terminal Failure via Momentum**: The environment's largest negative penalty is triggered by exceeding critical thresholds in angular momentum or tilt; this terminal state can be triggered even if both legs have successfully achieved contact (`[1.0, 1.0]`).
+
+9. **Sustained Contact Stability**: Once dual-leg contact (`[1.0, 1.0]`) is successfully established and stabilized, the environment allows for prolonged reward accumulation provided that both `y_vel` and `ang_vel` are maintained near zero.
+
+10. **Single-Leg Contact Instability**: States where only one leg maintains contact (`[1.0, 0.0]` or `[0.0, 1.0]`) constitute highly unstable, transient regimes that frequently serve as immediate precursors to either a full contact recovery or total contact loss.
+
+---
+
+## 2026-07-09 03:38:38
+
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting vertical velocity immediately preceding leg contact to prevent high-impact damage.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to manage resulting multi-axis drift and rotation.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's objective, moving from descent/velocity management to ground-stabilization and attitude maintenance.
+
+4. **Post-Contact Lateral Drift**: Once contact is established, the lander is subject to residual lateral drift in `x_pos` and `x_vel`; the environment does not provide immediate absolute immobilization of horizontal momentum upon landing.
+
+5. **Post-Contact Angular Sensitivity**: Once leg contact is established, the system becomes hyper-sensitive to `ang_vel`; small residual angular velocities can escalate rapidly, necessitating immediate and precise counter-thrust from side engines to prevent terminal instability.
+
+6. **Stability via Minimal Intervention**: During the post-contact stabilization phase, the frequent use of Action 0 (nothing) suggests that over-correction via engine thrust can induce oscillations in `angle` or `ang_vel` that are difficult to damp.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing results in a massive divergence between high positive rewards and the terminal penalty.
+
+8. **Terminal Failure via Momentum**: The environment's largest negative penalty is triggered by exceeding critical thresholds in angular momentum or tilt; this terminal state can be triggered even if dual-leg contact (`[1.0, 1.0]`) has been successfully achieved.
+
+9. **Sustained Contact Stability**: Once dual-leg contact is established and stabilized, the environment allows for prolonged reward accumulation provided that `y_vel`, `x_vel`, and `ang_vel` are all maintained near zero.
+
+10. **Single-Leg Contact Instability**: States where only one leg maintains contact (`[1.0, 0.0]` or `[0.0, 1.0]`) constitute highly unstable, transient regimes that frequently serve as immediate precursors to either a full contact recovery or total contact loss.
+
+---
+
+## 2026-07-09 03:41:35
+
+---
+1. **Vertical Velocity Regulation**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting vertical velocity immediately preceding leg contact to prevent high-impact damage.
+
+2. **Multi-Axis Thrust Coupling**: All engine applications (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to manage resulting multi-axis drift and rotation.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's objective, moving from descent/velocity management to ground-stabilization and attitude maintenance.
+
+4. **Post-Contact Lateral Drift**: Once contact is established, the lander is subject to residual lateral drift in `x_pos` and `x_vel`; the environment does not provide immediate absolute immobilization of horizontal momentum upon landing.
+
+5. **Post-Contact Angular Sensitivity**: Once leg contact is established, the system becomes hyper-sensitive to `ang_vel`; small residual angular velocities can escalate rapidly, necessitating immediate and precise counter-thrust from side engines to prevent terminal instability.
+
+6. **Single-Leg Contact Persistence**: States where only one leg maintains contact (`[1.0, 0.0]` or `[0.0, 1.0]`) can persist for extended durations; while inherently less stable than dual-leg contact, they do not necessarily serve as immediate precursors to terminal failure.
+
+7. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility, where the difference between successful attitude arrest and incorrect thrust timing or high-momentum impact results in a massive divergence between high positive rewards and the terminal penalty.
+
+8. **Terminal Failure via Momentum**: The environment's largest negative penalties are triggered by exceeding critical thresholds in angular momentum or tilt; this terminal state can be triggered even if dual-leg contact (`[1.0, 1.0]`) has been successfully achieved.
+
+9. **Sustained Contact Stability**: Once dual-leg contact is established and stabilized, the environment allows for prolonged reward accumulation provided that `y_vel`, `x_vel`, and `ang_vel` are all maintained near zero.
+
+10. **Contact-Velocity Penalty**: During the transition to or throughout the contact phase, any significant non-zero velocity (`y_vel` or `ang_vel`) can trigger disproportionately large negative rewards, emphasizing the requirement for near-zero momentum to maintain a stable contact state.
+
+---
+
+## 2026-07-09 03:46:41
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to ensure low-impact landing.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to prevent unintended drift or rotation.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's objective, moving from descent/velocity management to ground-stabilization and attitude maintenance.
+
+4. **Ground-Thrust Instability**: Applying engine thrust (Actions 1, 2, or 3) while in a dual-leg contact state (`[1.0, 1.0]`) can trigger catastrophic instability, causing the lander to tip or lose contact, which results in massive negative rewards.
+
+5. **Single-Leg Transition State**: The environment allows for an intermediate phase where only one leg maintains contact (`[1.0, 0.0]` or `[0.0, 1.0]`); this state can persist for a duration before full dual-leg stabilization is achieved.
+
+6. **Post-Contact Angular Sensitivity**: Once grounded, the system is hyper-sensitive to `ang_vel`; small residual angular velocities can escalate rapidly, necessitating immediate and precise counter-thrust to prevent terminal tipping.
+
+7. **Lateral Momentum Persistence**: Upon establishing contact, the lander remains subject to residual lateral movement; the environment does not provide immediate immobilization of `x_pos` and `x_vel` upon landing.
+
+8. **Multi-Modal Terminal Failure**: Terminal failure can be triggered via two distinct pathways: high-momentum impact during the descent phase, or exceeding critical angular/tilt thresholds during the post-contact stabilization phase.
+
+9. **Extreme Reward Divergence**: The post-contact phase is characterized by extreme reward volatility; successful attitude arrest during ground contact yields high positive rewards, whereas incorrect thrust timing or tipping results in massive negative penalties.
+
+10. **Contact-Velocity Penalty**: During the transition to or throughout the contact phase, any significant non-zero velocity (`y_vel` or `ang_vel`) triggers disproportionately large negative rewards, emphasizing the necessity of near-zero momentum for stability.
+
+---
+
+## 2026-07-09 03:48:54
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to ensure low-impact landing.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to prevent unintended drift or rotation.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's objective, moving from descent/velocity management to ground-stabilization and attitude maintenance.
+
+4. **Dual-Contact Fragility**: The state of dual-leg contact (`[1.0, 1.0]`) is highly unstable; applying engine thrust (Actions 1, 2, or 3) or even certain "nothing" (Action 0) transitions can trigger a loss of one leg, reverting the lander to a single-leg contact state.
+
+5. **Single-Leg Persistence Regime**: Once a leg is lost, the environment allows for extended single-leg contact phases (`[1.0, 0.0]` or `[0.0, 1.0]`), which can persist for hundreds of steps without a total crash, though they represent a failure to achieve full stabilization.
+
+6. **Post-Contact Angular/Lateral Sensitivity**: Once grounded, the system is hyper-sensitive to residual `ang_vel` and `x_vel`; small angular velocities can escalate rapidly, causing the lander to tip or lose its remaining leg contact.
+
+7. **Contact-Velocity Penalty**: During the transition to or throughout the contact phase, any significant non-zero velocity (`y_vel` or `ang_vel`) triggers disproportionately large negative rewards, emphasizing the necessity of near-zero momentum for stability.
+
+8. **Terminal Outcome Bifurcation**: The environment distinguishes between "PARTIAL" outcomes (where landing/contact is achieved but dual-leg stability is lost) and terminal failures (where the lander tips or exceeds critical thresholds).
+
+9. **Grounded Momentum Floor**: Successful stabilization requires the lander to maintain near-zero `y_vel` and `ang_vel` continuously; even minute residual velocities can trigger significant reward penalties or state transitions.
+
+10. **Extreme Reward Volatility**: The post-contact phase is characterized by extreme reward divergence; successful attitude arrest during ground contact yields positive rewards, whereas incorrect thrust timing or tipping results in massive negative penalties.
+
+---
+
+## 2026-07-09 03:55:04
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to ensure a controlled landing.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (Actions 1, 2, or 3) exert simultaneous influence on linear velocities (`x_vel`, `y_vel`) and angular attitude (`angle`, `ang_vel`), requiring coordinated control to prevent unintended drift or rotation.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental shift in the environment's objective, moving from descent/velocity management to ground-stabilization and attitude maintenance.
+
+4. **Single-Leg to Dual-Leg Recovery**: The environment allows for transitions from single-leg contact `[1.0, 0.0]` back to dual-leg contact `[1.0, 1.0]` through specific engine applications, meaning a single-leg state is not necessarily a terminal failure.
+
+5. **Dual-Contact Fragility**: The state of dual-leg contact (`[1.0, 1.0]`) is highly unstable; applying engine thrust (Actions 1, 2, or 3) or failing to arrest angular momentum can easily trigger a loss of one leg, reverting the lander to a single-leg contact state.
+
+6. **Post-Contact Momentum Sensitivity**: Once grounded, the system is hyper-sensitive to residual `ang_vel` and `x_vel`; small angular velocities can escalate rapidly, causing the lander to tip or lose its remaining leg contact.
+
+7. **Grounded Thrust-Velocity Penalty**: Applying engine thrust (Actions 1, 2, or 3) while in a contact state frequently induces the very `y_vel` or `ang_vel` that triggers massive negative rewards, violating the grounded momentum floor.
+
+8. **Terminal Outcome Bifurcation**: The environment distinguishes between "PARTIAL" outcomes (where landing/contact is achieved but dual-leg stability is lost) and terminal failures (where the lander tips or exceeds critical thresholds).
+
+9. **Grounded Momentum Floor**: Successful stabilization requires the lander to maintain near-zero `y_vel` and `ang_vel` continuously; even minute residual velocities can trigger significant reward penalties or state transitions.
+
+10. **Extreme Reward Volatility**: The post-contact phase is characterized by extreme reward divergence; successful attitude arrest during ground contact yields positive rewards, whereas incorrect thrust timing or inducing momentum during contact results in massive negative penalties.
+
+---
+
+## 2026-07-09 03:59:33
+
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` during descent; its application is essential for arresting downward velocity to facilitate a transition to the contact phase.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation during descent or landing.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental change in environmental physics, moving the objective from descent/velocity management to ground-stabilization.
+
+4. **Single-Leg to Dual-Leg Recovery**: The environment allows for a transition from single-leg contact `[1.0, 0.0]` to dual-leg contact `[1.0, 1.0]`, meaning a single-leg contact state is a recoverable phase rather than an immediate terminal failure.
+
+5. **Thrust-Induced Contact Loss**: Applying engine thrust (Actions 1, 2, or 3) while in a dual-leg contact state `[1.0, 1.0]` can trigger a catastrophic loss of all ground contact `[0.0, 0.0]`, representing the lander tipping or bouncing.
+
+6. **Post-Contact Momentum Sensitivity**: Once grounded, the system is hyper-sensitive to residual `ang_vel` and `x_vel`; minute angular velocities can rapidly escalate, leading to the loss of leg contact.
+
+7. **Contact-Reward Divergence**: The reward function is tightly coupled to contact transitions; successful transitions into contact yield massive positive rewards, while thrusting that causes contact loss or instability yields massive negative penalties (e.g., -10 to -20).
+
+8. **Terminal Outcome Bifurcation**: The environment distinguishes between "PARTIAL" outcomes (where ground contact is achieved and maintained) and terminal failures (where the lander tips or exceeds critical thresholds).
+
+9. **Grounded Momentum Floor**: Successful stabilization requires the lander to maintain near-zero `y_vel` and `ang_vel` continuously; even small deviations can trigger high-magnitude negative rewards and state instability.
+
+10. **Asymmetric Thrust Destabilization**: While the main engine (Action 2) is used for vertical control, asymmetrical thrust (Actions 1 or 3) applied during the grounded phase is a primary driver of the angular momentum that induces tipping and contact loss.
+
+---
+
+## 2026-07-09 04:10:06
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` during descent; its application is essential for arresting downward velocity to facilitate a transition to the contact phase.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental change in environmental physics, moving the objective from descent/velocity management to ground-stabilization.
+
+4. **Leg Contact Recoverability**: The environment allows for a transition from single-leg contact `[1.0, 0.0]` or `[0.0, 1.0]` to dual-leg contact `[1.0, 1.0]`, meaning a single-leg contact state is a recoverable phase rather than an immediate terminal failure.
+
+5. **Thrust-Induced Contact Loss**: Applying engine thrust (Actions 1, 2, or 3) while in a grounded state can trigger a catastrophic loss of all ground contact `[0.0, 0.0]`, representing the lander tipping or bouncing.
+
+6. **Post-Contact Momentum Sensitivity**: Once grounded, the system is hyper-sensitive to residual `ang_vel` and `x_vel`; minute angular velocities can rapidly escalate, leading to the loss of leg contact.
+
+7. **Contact-Reward Divergence**: The reward function is tightly coupled to contact transitions; successful transitions into contact yield positive rewards, while thrusting that causes contact loss or instability during the grounded phase yields massive negative penalties.
+
+8. **Terminal Outcome Bifurcation**: The environment distinguishes between "PARTIAL" outcomes (where some ground contact is achieved and maintained) and terminal failures (where the lander loses all contact or exceeds critical thresholds).
+
+9. **Asymmetric Ground Destabilization**: While the main engine (Action 2) is used for vertical control, asymmetrical thrust (Actions 1 or 3) applied during the grounded phase is the primary driver of the angular momentum that induces tipping and contact loss.
+
+10. **Momentum-Driven Contact Oscillations**: The interaction between residual momentum and corrective asymmetrical thrust can induce high-frequency oscillations between dual-leg, single-leg, and zero-leg contact states during the grounded phase.
+
+---
+
+## 2026-07-09 04:14:15
+
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` during descent; its application is essential for arresting downward velocity to facilitate a transition to the contact phase.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental change in environmental physics, moving the objective from descent/velocity management to ground-stabilization.
+
+4. **Leg Contact Recoverability**: The environment allows for a transition from single-leg contact `[1.0, 0.0]` or `[0.0, 1.0]` to dual-leg contact `[1.0, 1.0]`, meaning a single-leg contact state is a recoverable phase rather than an immediate terminal failure.
+
+5. **Thrust-Induced Contact Loss**: Applying engine thrust (Actions 1, 2, or 3) while in a grounded state can trigger a catastrophic loss of all ground contact `[0.0, 0.0]`, representing the lander tipping or bouncing.
+
+6. **Post-Contact Momentum Sensitivity**: Once grounded, the system is hyper-sensitive to residual `ang_vel` and `x_vel`; minute angular velocities can rapidly escalate, leading to the loss of leg contact.
+
+7. **Contact-Reward Divergence**: The reward function is tightly coupled to contact transitions; successful transitions into contact yield positive rewards, while thrusting that causes contact loss or instability during the grounded phase yields massive negative penalties.
+
+8. **Velocity-Triggered Terminal Failure**: The environment distinguishes between "PARTIAL" outcomes (where some ground contact is achieved and maintained) and terminal "FAILURE" outcomes, which are triggered when kinetic energy (specifically high `y_vel` or `x_vel`) exceeds critical thresholds upon or near contact.
+
+9. **Asymmetric Ground Destabilization**: While the main engine (Action 2) is used for vertical control, asymmetrical thrust (Actions 1 or 3) applied during the grounded phase is the primary driver of the angular momentum that induces tipping and contact loss.
+
+10. **Horizontal Velocity-Induced Volatility**: High magnitude `x_vel` introduces significant lateral momentum that complicates attitude control and increases the probability of terminal failure by making the transition to a stable, grounded state significantly more volatile.
+
+---
+
+## 2026-07-09 04:16:01
+
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` during descent; its application is essential for arresting downward velocity to facilitate a transition to the contact phase.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation across all axes.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `0.0` to `1.0` represents a fundamental change in environmental physics, moving the objective from descent/velocity management to ground-stabilization.
+
+4. **Leg Contact Recoverability**: The environment allows for a transition from single-leg contact `[1.0, 0.0]` or `[0.0, 1.0]` to dual-leg contact `[1.0, 1.0]`, meaning a single-leg contact state is a recoverable phase rather than an immediate failure.
+
+5. **Thrust-Induced Contact Loss**: Applying engine thrust (Actions 1, 2, or 3) while in a grounded state can trigger a catastrophic loss of ground contact (e.g., `[0.0, 0.0]`), representing the lander tipping or bouncing.
+
+6. **Post-Contact Angular Sensitivity**: Once grounded, the system is hyper-sensitive to `ang_vel`; even minute angular velocities can rapidly escalate, leading to the loss of leg contact.
+
+7. **Dual-to-Single Contact Terminality**: While single-leg contact is a recoverable state, the transition from dual-leg contact `[1.0, 1.0]` back to a single-leg contact state `[1.0, 0.0]` or `[0.0, 1.0]` during the grounded phase triggers a terminal "FAILURE" outcome and massive penalties.
+
+8. **Contact-Reward Divergence**: The reward function is tightly coupled to contact transitions; successful transitions into contact yield high positive rewards, while thrusting that causes contact loss or instability during the grounded phase yields massive negative penalties.
+
+9. **Asymmetric Engine Duality**: While asymmetrical thrust (Actions 1 or 3) is necessary for attitude correction, its application during the grounded phase is the primary driver of the angular momentum that induces tipping and terminal contact loss.
+
+10. **Kinetic Energy-Triggered Failure**: Terminal failure is triggered when kinetic energy—specifically high `y_vel`, `x_vel`, or `ang_vel`—exceeds critical thresholds upon or near the contact phase, or when post-contact stability is lost.
+
+---
+
+## 2026-07-09 04:21:37
+
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` during descent; its application is essential for arresting downward velocity to facilitate the transition from flight to the contact phase.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation across all axes.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `[0.0, 0.0]` to `[1.0, 1.0]` represents a fundamental change in environmental physics, moving the objective from descent/velocity management to ground-stabilization and skid management.
+
+4. **Leg Contact Recoverability**: The environment allows for a transition from dual-leg contact `[1.0, 1.0]` to single-leg contact `[1.0, 0.0]` or `[0.0, 1.0]` and back to `[1.0, 1.0]`, meaning loss of contact during the grounded phase is a recoverable state rather than an immediate terminal failure.
+
+5. **Thrust-Induced Ground Instability**: Applying asymmetrical engine thrust (Actions 1 or 3) while in a grounded state can trigger a loss of ground contact (e.g., `[1.0, 0.0]`), representing the lander tipping or bouncing.
+
+6. **Post-Contact Kinetic Drift**: Once grounded, the lander can maintain non-zero `x_vel`, `y_vel`, and `ang_vel` (skidding or sliding); maintaining stability requires managing this residual kinetic energy to prevent further contact loss.
+
+7. **Ground-State Penalty Sensitivity**: While single-leg contact is recoverable, the transition from dual-leg contact `[1.0, 1.0]` back to a single-leg contact state during the grounded phase is associated with massive negative penalties.
+
+8. **Contact-Reward Coupling**: The reward function is tightly coupled to contact transitions; successful transitions into dual-leg contact yield high positive rewards, while actions that induce contact loss or high-velocity instability during the grounded phase yield massive negative penalties.
+
+9. **Asymmetric Engine Duality**: While asymmetrical thrust (Actions 1 or 3) is necessary for attitude correction during descent, its application during the grounded phase is the primary driver of the angular and linear momentum that induces tipping or skidding.
+
+10. **Kinetic Energy-Triggered Instability**: Terminal failure or extreme penalties are triggered when kinetic energy—specifically high `y_vel`, `x_vel`, or `ang_vel`—is present during the contact transition or when post-contact stability is lost due to excessive motion.
+
+---
+
+## 2026-07-09 04:24:11
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is essential for arresting downward velocity to facilitate the transition from flight to the contact phase.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation across all axes.
+
+3. **Contact Phase Regime Shift**: The transition of leg contact from `[0.0, 0.0]` to `[1.0, 1.0]` represents a fundamental change in environmental physics, moving the objective from descent/velocity management to ground-stabilization and skid management.
+
+4. **Leg Contact Recoverability**: The environment allows for a transition from dual-leg contact `[1.0, 1.0]` to single-leg contact `[1.0, 0.0]` or `[0.0, 1.0]` and back to `[1.0, 1.0]`, meaning loss of contact during the grounded phase is a recoverable state rather than an immediate terminal failure.
+
+5. **Thrust-Induced Ground Instability**: Applying engine thrust (Actions 1, 2, or 3) while in a grounded state can trigger a loss of ground contact (e.g., `[1.0, 0.0]` or `[0.0, 0.0]`), representing the lander tipping, bouncing, or being lifted.
+
+6. **Post-Contact Kinetic Drift**: Once grounded, the lander can maintain significant non-zero `x_vel`, `y_vel`, and `ang_vel` (skidding or sliding); stability requires managing this residual kinetic energy to prevent further contact loss.
+
+7. **Ground-State Penalty Magnitude**: Transitions from a stable dual-leg contact `[1.0, 1.0]` to any non-contact state (`[1.0, 0.0]`, `[0.0, 1.0]`, or `[0.0, 0.0]`) during the grounded phase are associated with massive negative penalties that can offset cumulative descent rewards.
+
+8. **Contact-Recovery Reward Incentive**: Transitioning into dual-leg contact `[1.0, 1.0]` from a state of lost contact yields significant positive reward spikes, which can be as large as, or larger than, the initial landing reward.
+
+9. **Asymmetric Engine Duality**: While asymmetrical thrust (Actions 1 or 3) is necessary for attitude correction during descent, its application during the grounded phase is the primary driver of the angular and linear momentum that induces tipping or bouncing.
+
+10. **Kinetic Energy-Triggered Instability**: Terminal-level penalties and contact loss are primarily triggered by excessive kinetic energy—specifically high `y_vel` during the landing transition or high `x_vel`/`ang_vel` while attempting to stabilize during the grounded phase.
+
+---
+
+## 2026-07-09 04:29:42
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is essential for arresting downward velocity to facilitate a smooth transition to the contact phase.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Intermediate Contact States**: The environment recognizes and rewards non-binary contact states; transitions into single-leg contact (`[1,0]` or `[0,1]`) during the landing process trigger significant positive rewards, similar to full dual-leg contact.
+
+4. **Contact Phase Recoverability**: The transition from dual-leg contact `[1,1]` to a no-contact state `[0,0]` is not a terminal failure; the lander can regain contact and continue to accumulate rewards.
+
+5. **Thrust-Induced Ground Instability**: Applying engine thrust (Actions 1, 2, or 3) while in a grounded state can trigger a loss of ground contact, representing the lander tipping, bouncing, or being lifted.
+
+6. **Post-Contact Kinetic Drift**: Once grounded, the lander can maintain significant non-zero `x_vel`, `y_vel`, and `ang_vel` (skidding or sliding); stability requires managing this residual kinetic energy.
+
+7. **Severe Contact-Loss Penalties**: Transitions from a stable dual-leg contact `[1,1]` to a no-contact state `[0,0]` (often caused by sudden upward vertical velocity) are associated with massive negative penalties.
+
+8. **Contact-Recovery Reward Spikes**: Transitioning from a no-contact state `[0,0]` back into any contact state (`[1,0]`, `[0,1]`, or `[1,1]`) yields significant positive reward spikes that can offset previous penalties.
+
+9. **Asymmetric Engine Duality**: While asymmetrical thrust (Actions 1 or 3) is necessary for attitude correction during descent, its application during the grounded phase is a primary driver of the angular momentum that induces tipping or bouncing.
+
+10. **Bounce-Cycle Volatility**: The environment exhibits high reward volatility during "bounce" cycles, where the lander undergoes rapid successions of `[1,1]` $\rightarrow$ `[0,0]` (massive penalty) followed by `[0,0]` $\rightarrow$ `[1,x]` (massive reward).
+
+---
+
+## 2026-07-09 04:32:59
+
+---
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition into a contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to maintain stability.
+
+3. **Intermediate Contact State Rewards**: The environment provides significant positive rewards for transitions into single-leg contact states (`[1,0]` or `[0,1]`), which serve as critical milestones during the landing process.
+
+4. **Contact Phase Recoverability**: The transition from a contact state (`[1,x]` or `[x,1]`) to a no-contact state (`[0,0]`) is not necessarily terminal; the lander can recover from lift-offs or bounces to regain contact and accumulate further rewards.
+
+5. **Thrust-Induced Ground Instability**: Activating any engine (Actions 1, 2, or 3) while in any grounded state (`[1,0]`, `[0,1]`, or `[1,1]`) can trigger a lift-off or bounce, transitioning the lander back to a no-contact state (`[0,0]`).
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding or sliding across the landing surface.
+
+7. **Severe Contact-Loss Penalties**: Transitions from any contact state to a no-contact state (`[0,0]`) are associated with massive negative penalties, particularly when triggered by engine use while grounded.
+
+8. **Contact-Recovery Reward Spikes**: Transitioning from a no-contact state back into any contact state yields significant positive reward spikes, which can heavily offset the penalties incurred during a bounce or lift-off.
+
+9. **Asymmetric Engine Duality**: While asymmetric thrust (Actions 1 or 3) is necessary for attitude correction during descent, it is a primary driver of the angular momentum that induces tipping or lift-off when applied during the grounded phase.
+
+10. **Bounce-Cycle Reward Volatility**: The environment exhibits extreme reward volatility during "bounce" or "lift-off" cycles, characterized by rapid successions of massive negative contact-loss penalties followed by massive positive contact-recovery rewards.
+
+---
+
+## 2026-07-09 04:35:33
+
+1. **Vertical Velocity Management**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition into a stable contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to maintain stability.
+
+3. **Asymmetric Contact Transitions**: Engine-induced instability can cause transitions from a stable `[1,1]` state to a single-leg contact state (e.g., `[1,0]` or `[0,1]`), which is a distinct intermediate state between landing and total lift-off.
+
+4. **Contact-Recovery Reward Spikes**: Transitions from a no-contact state back into any contact state yield massive positive reward spikes (e.g., >20.0), which can heavily offset the penalties incurred during a previous lift-off or bounce.
+
+5. **Thrust-Induced Ground Instability**: Activating any engine (Actions 1, 2, or 3) while in any grounded state (`[1,x]` or `[x,1]`) can trigger either a total lift-off (`[0,0]`) or a tipping event that results in asymmetric contact.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding or sliding across the landing surface.
+
+7. **Severe Contact-Loss Penalties**: Transitions from any contact state to a no-contact state (`[0,0]`) are associated with massive negative penalties, frequently exceeding -15.0.
+
+8. **Asymmetric Engine Duality**: While asymmetric thrust (Actions 1 or 3) is necessary for attitude correction during descent, it is the primary driver of the angular momentum that induces tipping or asymmetric contact-loss when applied during the grounded phase.
+
+9. **Bounce-Cycle Reward Volatility**: The environment exhibits extreme reward volatility during "bounce" or "lift-off" cycles, characterized by rapid successions of massive negative contact-loss penalties followed by massive positive contact-recovery rewards.
+
+10. **Kinetic Energy Landing Sensitivity**: The stability of the contact state is highly sensitive to the lander's residual kinetic energy (`x_vel`, `y_vel`, and `ang_vel`) at the moment of impact, where higher velocities increase the likelihood of transitioning to a no-contact or single-leg state.
+
+---
+
+## 2026-07-09 04:40:17
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition from a no-contact state into a stable contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to maintain stability.
+
+3. **Asymmetric Contact Transitions**: Landing is rarely an instantaneous transition to `[1,1]`; it typically involves intermediate asymmetric states (e.g., `[1,0]` or `[0,1]`) where only one leg maintains contact before full stability is achieved.
+
+4. **Contact-Recovery Reward Spikes**: Transitions from a no-contact state (`[0,0]`) back into any contact state (`[1,x]` or `[x,1]`) yield massive positive reward spikes (often >10.0), which are a primary driver of total episode reward.
+
+5. **Ground-State Destabilization**: Transitions from a grounded state (`[1,x]` or `[x,1]`) to a no-contact state (`[0,0]`) can be triggered by engine activation (Actions 1, 2, or 3) or by inaction (Action 0) if the lander's residual kinetic energy/drift is sufficient to overcome gravity.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding or sliding across the landing surface even in a stable `[1,1]` state.
+
+7. **Severe Contact-Loss Penalties**: Transitions from any contact state to a no-contact state (`[0,0]`) are associated with massive negative penalties (frequently < -15.0), which can instantly negate the gains of a successful landing.
+
+8. **Asymmetric Engine Duality**: While asymmetric thrust (Actions 1 or 3) is the primary driver of the angular momentum that induces tipping, it is also a critical mechanism for transitioning from a no-contact state (`[0,0]`) back into a partial, single-leg contact state.
+
+9. **Bounce-Cycle Reward Volatility**: The environment exhibits extreme reward volatility during "bounce" or "lift-off" cycles, characterized by rapid successions of massive negative contact-loss penalties followed by massive positive contact-recovery rewards.
+
+10. **Kinetic Energy Landing Sensitivity**: The stability of the contact state is highly sensitive to the lander's residual kinetic energy (`x_vel`, `y_vel`, and `ang_vel`) at the moment of impact; higher velocities increase the likelihood of transitioning into a no-contact or asymmetric contact state.
+
+---
+
+## 2026-07-09 04:41:41
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition from a no-contact state into a stable contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to maintain stability.
+
+3. **Asymmetric Contact Transitions**: Landing is rarely an instantaneous transition to `[1,1]`; it typically involves intermediate asymmetric states (e.g., `[1,0]` or `[0,1]`) where only one leg maintains contact before full stability is achieved.
+
+4. **Single-Leg Contact Rewards**: Transitions from a no-contact state (`[0,0]`) to a single-leg contact state (`[1,0]` or `[0,1]`) yield massive positive reward spikes (often >10.0), making partial contact a significant driver of total episode reward.
+
+5. **Ground-State Destabilization**: Transitions from a grounded state to a no-contact state can be triggered by engine activation (Actions 1, 2, or 3), particularly when the lander has residual angular momentum or is in an asymmetric contact state.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding or sliding across the landing surface even in a stable `[1,1]` state.
+
+7. **Extreme Contact-Loss Penalties**: Transitions from any contact state to a no-contact state are associated with massive negative penalties; the magnitude can be extremely severe (e.g., -100.0) if the action causes significant instability or tipping.
+
+8. **Asymmetric Engine Duality**: While asymmetric thrust (Actions 1 or 3) is the primary driver of the angular momentum that induces tipping, it is also a critical mechanism for transitioning from a no-contact state (`[0,0]`) back into a partial, single-leg contact state.
+
+9. **Bounce-Cycle Reward Volatility**: The environment exhibits extreme reward volatility during "bounce" or "lift-off" cycles, characterized by rapid successions of massive negative contact-loss penalties followed by massive positive contact-recovery rewards.
+
+10. **Angular Momentum Stability Threshold**: The stability of the contact state is highly sensitive to the lander's residual angular velocity (`ang_vel`); high `ang_vel` significantly increases the likelihood that an engine action will induce a catastrophic loss of contact.
+
+---
+
+## 2026-07-09 04:45:26
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Asymmetric Contact Transitions**: Landing typically involves intermediate asymmetric states (e.g., `[1,0]` or `[0,1]`) where only one leg maintains contact before full stability is achieved.
+
+4. **Contact Transition Reward Spikes**: Transitions from a no-contact state (`[0,0]`) to a partial contact state (`[1,0]` or `[0,1]`), as well as transitions from partial to full contact (`[1,1]`), yield significant positive reward spikes.
+
+5. **Grounded State Destabilization**: While in a stable grounded state (`[1,1]`), the application of asymmetric thrust (Actions 1 or 3) can induce rapid angular velocity spikes, leading to immediate contact loss and high-magnitude negative penalties.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding, sliding, or high-frequency jittering across the landing surface even in a `[1,1]` state.
+
+7. **Extreme Contact-Loss Penalties**: Transitions from any contact state to a no-contact state are associated with severe negative penalties; terminal tipping events or catastrophic instability can trigger the maximum penalty (e.g., -100.0).
+
+8. **Asymmetric Engine Duality**: Asymmetric thrust (Actions 1 and 3) serves a dual role: it is the primary mechanism for correcting angular momentum/attitude, but it is also the primary driver of tipping and contact loss.
+
+9. **Bounce-Cycle Reward Volatility**: The environment exhibits extreme reward volatility during "bounce" or "lift-off" cycles, characterized by rapid successions of massive negative contact-loss penalties followed by massive positive contact-recovery rewards.
+
+10. **Angular Momentum Stability Threshold**: The stability of contact states is highly sensitive to `ang_vel`; even small asymmetric engine pulses can cause `ang_vel` to exceed a threshold that triggers a catastrophic loss of contact.
+
+---
+
+## 2026-07-09 04:47:29
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Asymmetric Contact Transitions**: Landing typically involves intermediate asymmetric states (e.g., `[1,0]` or `[0,1]`) where only one leg maintains contact before full stability is achieved.
+
+4. **Contact Transition Reward Spikes**: Transitions from a no-contact state (`[0,0]`) to a partial contact state (`[1,0]` or `[0,1]`), as well as transitions from partial to full contact (`[1,1]`), yield significant positive reward spikes.
+
+5. **Grounded State Destabilization**: While in a stable grounded state (`[1,1]`), the application of asymmetric thrust (Actions 1 or 3) can induce rapid angular velocity spikes, leading to immediate contact loss and high-magnitude negative penalties.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding, sliding, or high-frequency jittering across the landing surface even in a `[1,1]` state.
+
+7. **Extreme Contact-Loss Penalties**: Transitions from any contact state to a no-contact state are associated with severe negative penalties, frequently observed in the range of -15.0 to -20.0.
+
+8. **Asymmetric Engine Duality**: Asymmetric thrust (Actions 1 and 3) serves a dual role: it is the primary mechanism for correcting angular momentum/attitude, but it is also the primary driver of tipping and contact loss.
+
+9. **High-Magnitude Bounce-Recovery Cycles**: The environment exhibits high-volatility "bounce" cycles where a massive contact-loss penalty is immediately followed by a massive contact-recovery reward; in many cases, the recovery reward (e.g., >20.0) can exceed the magnitude of the preceding penalty.
+
+10. **Angular Momentum Stability Threshold**: The stability of contact states is highly sensitive to `ang_vel`; even small asymmetric engine pulses can cause `ang_vel` to exceed a threshold that triggers a catastrophic loss of contact.
+
+---
+
+## 2026-07-09 04:50:12
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Asymmetric Contact Transitions**: Landing typically involves intermediate asymmetric states (e.g., `[1,0]` or `[0,1]`) where only one leg maintains contact before full stability is achieved.
+
+4. **Contact Transition Reward Spikes**: Transitions from a no-contact state (`[0,0]`) to a partial contact state (`[1,0]` or `[0,1]`), as well as transitions from partial to full contact (`[1,1]`), yield significant positive reward spikes.
+
+5. **Grounded State Destabilization**: While in a stable grounded state (`[1,1]`), the application of asymmetric thrust (Actions 1 or 3) can induce rapid angular velocity spikes, leading to immediate contact loss and high-magnitude negative penalties.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding, sliding, or high-frequency jittering across the landing surface even in a `[1,1]` state.
+
+7. **Terminal Instability Penalties**: Beyond standard contact-loss penalties, extreme angular velocity or uncontrolled rotation while in a contact state (`[1,0]` or `[1,1]`) triggers a massive terminal penalty (e.g., -100.0), signifying a catastrophic crash.
+
+8. **Asymmetric Engine Duality**: Asymmetric thrust (Actions 1 and 3) serves a dual role: it is the primary mechanism for correcting angular momentum/attitude, but it is also the primary driver of tipping and contact loss.
+
+9. **High-Magnitude Bounce-Recovery Cycles**: The environment exhibits high-volatility "bounce" cycles where a massive contact-loss penalty is immediately followed by a massive contact-recovery reward.
+
+10. **Angular Momentum Stability Threshold**: The stability of contact states is highly sensitive to `ang_vel`; even small asymmetric engine pulses can cause `ang_vel` to exceed a threshold that triggers either a catastrophic loss of contact or terminal instability.
+
+---
+
+## 2026-07-09 04:51:51
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Asymmetric Contact Transitions**: Landing typically involves intermediate asymmetric states (e.g., `[1,0]` or `[0,1]`) where only one leg maintains contact before full stability is achieved.
+
+4. **Contact Transition Reward Spikes**: Transitions from a no-contact state (`[0,0]`) to a partial contact state (`[1,0]` or `[0,1]`), as well as transitions from no-contact directly to full contact (`[1,1]`), yield significant positive reward spikes.
+
+5. **Thrust-Induced Destabilization**: While in a grounded state (`[1,1]`), the application of asymmetric thrust (Actions 1 or 3) or poorly timed main thrust (Action 2) can induce rapid angular velocity spikes, leading to immediate contact loss and high-magnitude negative penalties.
+
+6. **Post-Contact Kinetic Drift & Jitter**: Once contact is established, the lander often maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding, sliding, or high-frequency jittering across the landing surface, which requires constant micro-adjustments to stabilize.
+
+7. **Inertial Contact Loss (Action 0 Risk)**: In a grounded state (`[1,1]`), selecting Action 0 (nothing) can lead to catastrophic contact loss if the lander's residual kinetic drift or tilt is not actively countered by corrective thrust.
+
+8. **High-Magnitude Bounce-Recovery Cycles**: The environment exhibits high-volatility "bounce" cycles where a massive contact-loss penalty can be immediately offset by a massive contact-recovery reward if the lander successfully re-establishes contact.
+
+9. **Asymmetric Engine Duality**: Asymmetric thrust (Actions 1 and 3) serves a dual role: it is the primary mechanism for correcting angular momentum/attitude, but it is also the primary driver of tipping and leg-contact loss.
+
+10. **Terminal Stability Reward**: Reaching the end of a trajectory while maintaining a stable, full-contact state (`[1,1]`) yields a massive terminal reward (e.g., 100.0), distinguishing a successful landing from a partial or unstable touchdown.
+
+---
+
+## 2026-07-09 04:54:00
+
+1. **Vertical Velocity Management**: Action 2 (main engine) is the primary mechanism for managing `y_vel` during descent; its application is critical for arresting downward velocity to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Thrust Coupling**: All engine actions (1, 2, or 3) exert simultaneous influence on both linear velocities and angular attitude, requiring precise coordination to prevent unintended rotation.
+
+3. **Asymmetric Contact Transitions**: Landing and stabilization often involve intermediate asymmetric states (e.g., `[1,0]` or `[0,1]`) where only one leg maintains contact before full stability is achieved.
+
+4. **Contact Transition Reward Spikes**: Significant positive rewards are yielded during transitions from a no-contact state (`[0,0]`) to full contact (`[1,1]`), as well as during recovery transitions from a partial contact state (`[0,1]`) to full contact (`[1,1]`).
+
+5. **Thrust-Induced Destabilization**: In a grounded state (`[1,1]`), the application of asymmetric thrust (Actions 1 or 3) can induce rapid angular velocity spikes, leading to immediate contact loss and high-magnitude negative penalties (e.g., -100.0).
+
+6. **Post-Contact Kinetic Drift & Jitter**: Once contact is established, the lander typically maintains residual non-zero `x_vel`, `y_vel`, and `ang_vel`, resulting in skidding, sliding, or high-frequency jittering across the landing surface.
+
+7. **Inertial Contact Loss (Action 0 Risk)**: In a grounded state (`[1,1]`), selecting Action 0 (nothing) can lead to catastrophic contact loss if the lander's residual kinetic drift or tilt is not actively countered by corrective thrust.
+
+8. **High-Magnitude Bounce-Recovery Cycles**: The environment exhibits high-volatility "bounce" cycles where a massive contact-loss penalty can be immediately offset by a massive contact-recovery reward if the lander successfully re-establishes contact.
+
+9. **Asymmetric Engine Duality**: Asymmetric thrust (Actions 1 and 3) serves a dual role: it is the primary mechanism for correcting angular momentum/attitude, but it is also the primary driver of tipping and leg-contact loss.
+
+10. **Contact State Fragility**: The grounded state (`[1,1]`) is highly sensitive to torque; even low angular velocities can trigger nearly instantaneous transitions back to a no-contact or partial-contact state when asymmetric thrust is applied.
+
+---
+
+## 2026-07-09 04:57:48
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination to prevent unintended rotation during descent and stabilization.
+
+3. **Contact Transition Reward Volatility**: Transitions between no-contact (`[0,0]`), partial-contact (`[0,1]` or `[1,0]`), and full-contact (`[1,1]`) states generate significant, rapid reward spikes.
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum/attitude but are also the primary drivers of torque-induced tipping when the lander is in a grounded state.
+
+5. **Torque-Induced Contact Loss**: In a grounded state (`[1,1]`), asymmetric thrust application can trigger rapid `ang_vel` spikes, causing immediate contact loss and massive negative penalties (e.g., -100.0).
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander typically maintains residual `x_vel`, `y_vel`, and `ang_vel`, resulting in continuous skidding, sliding, or high-frequency jittering across the surface.
+
+7. **Bounce-Recovery Compensation**: The environment exhibits high-volatility "bounce" cycles where massive contact-loss penalties can be immediately offset by significant positive rewards if the lander successfully re-establishes `[1,1]` contact.
+
+8. **Angular Velocity Dominance in Failure**: Unmanaged `ang_vel` is the most frequent precursor to catastrophic failure; high angular momentum frequently overrides successful `y_vel` management and causes contact loss.
+
+9. **Contact State Fragility**: The grounded state (`[1,1]`) is highly sensitive to torque; even low-magnitude angular velocities can trigger nearly instantaneous transitions back to a no-contact or partial-contact state.
+
+10. **Inertial Drift Management**: While selecting Action 0 (nothing) avoids adding new torque, it does not arrest existing kinetic drift, meaning the lander remains vulnerable to tipping if current `ang_vel` or tilt is not actively countered by corrective thrust.
+
+---
+
+## 2026-07-09 04:59:35
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination to prevent unintended rotation during descent.
+
+3. **Contact Transition Reward Volatility**: Transitions between no-contact (`[0,0]`), partial-contact (`[0,1]` or `[1,0]`), and full-contact (`[1,1]`) states generate significant, rapid reward spikes.
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum but are the primary drivers of torque-induced tipping when the lander is in a grounded state.
+
+5. **Catastrophic Grounded-State Failure**: In a grounded state (`[1,1]`), applying asymmetric thrust (1 or 3) can trigger an immediate catastrophic failure penalty (e.g., -100.0), often occurring even before the state flags reflect a loss of contact.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander typically maintains residual `x_vel`, `y_vel`, and `ang_vel`, resulting in continuous skidding, sliding, or jittering across the surface.
+
+7. **Ground-Level Interaction**: Contact is established when `y_pos` reaches approximately 0; however, the lander can sustain a grounded state (`[1,1]`) even when `y_pos` becomes slightly negative.
+
+8. **Angular Velocity Dominance in Failure**: Unmanaged `ang_vel` is the most frequent precursor to failure; high angular momentum frequently overrides successful `y_vel` management and causes contact loss or tipping.
+
+9. **Contact State Fragility**: The grounded state (`[1,1]`) is highly sensitive to torque; even low-magnitude angular velocities or slight tilts can trigger nearly instantaneous transitions back to no-contact or catastrophic failure.
+
+10. **Inertial Drift Management**: Selecting Action 0 (nothing) avoids adding new torque, but does not arrest existing kinetic drift, meaning the lander remains vulnerable to tipping if current `ang_vel` or tilt is not actively countered.
+
+---
+
+## 2026-07-09 05:03:00
+
+1. **Vertical Velocity Control**: Action 2 (main engine) remains the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination to prevent unintended rotation during descent.
+
+3. **Contact Transition Reward Scaling**: Significant positive reward spikes occur during contact transitions. Data indicates that the transition to partial contact (`[1,0]` or `[0,1]`) often generates a higher instantaneous reward than the subsequent transition to full contact (`[1,1]`).
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum but serve as the primary drivers of torque-induced tipping, especially during the high-stakes transition to a grounded state.
+
+5. **Catastrophic Grounded-State Failure**: In a grounded state (`[1,1]`), applying any thrust action (1, 2, or 3) while the lander possesses non-zero angular velocity or significant tilt (`angle`) can trigger an immediate catastrophic failure penalty (-100.0).
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander typically maintains residual `x_vel`, `y_vel`, and `ang_vel`, resulting in continuous skidding, sliding, or jittering across the surface.
+
+7. **Ground-Level Interaction**: Contact is established when `y_pos` reaches approximately 0; the lander can sustain a grounded state (`[1,1]`) even when `y_pos` becomes slightly negative.
+
+8. **Angular Velocity/Tilt Sensitivity**: In the grounded state, the lander is extremely sensitive to its orientation; even moderate angular velocities (e.g., $|ang\_vel| > 0.1$) or tilts (e.g., $|angle| > 0.05$) act as precursors to immediate failure upon any further engine activation.
+
+9. **Contact State Fragility**: The grounded state (`[1,1]`) is highly volatile; small torque-induced oscillations or unmanaged kinetic energy can cause nearly instantaneous transitions back to no-contact or catastrophic failure.
+
+10. **Inertial Drift Management**: Selecting Action 0 (nothing) avoids adding new torque, but does not arrest existing kinetic drift, meaning the lander remains vulnerable to tipping if current `ang_vel` or tilt is not actively countered prior to contact.
+
+---
+
+## 2026-07-09 05:06:07
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination to prevent unintended rotation during descent.
+
+3. **Contact Transition Reward Scaling**: Significant positive reward spikes occur during contact transitions. Data indicates that the transition to partial contact (`[1,0]` or `[0,1]`) often generates a higher instantaneous reward than the subsequent transition to full contact (`[1,1]`).
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum but serve as the primary drivers of torque-induced tipping, especially during the high-stakes transition to a grounded state.
+
+5. **Bimodal Grounded-State Penalty**: In a grounded state (`[1,1]`), the environment applies two distinct penalty tiers: a moderate instability penalty (typically between -10 and -20) for disturbances such as non-zero `y_vel` or `ang_vel`, and a catastrophic failure penalty (-100.0) when `angle` or `ang_vel` reaches critical thresholds.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander typically maintains residual `x_vel`, `y_vel`, and `ang_vel`, resulting in continuous skidding, sliding, or jittering across the surface.
+
+7. **Ground-Level Interaction**: Contact is established when `y_pos` reaches approximately 0; the lander can sustain a grounded state (`[1,1]`) even when `y_pos` becomes slightly negative.
+
+8. **Angular and Vertical Sensitivity**: The stability of the grounded state is extremely sensitive to orientation; even minor non-zero velocities (`y_vel`, `ang_vel`) or tilt (`angle`) act as precursors to instability penalties, while larger deviations trigger immediate catastrophic failure.
+
+9. **Contact State Fragility**: The grounded state (`[1,1]`) is highly volatile; small torque-induced oscillations or unmanaged kinetic energy can cause nearly instantaneous transitions back to no-contact or catastrophic failure.
+
+10. **Inertial Drift Management**: Selecting Action 0 (nothing) avoids adding new torque, but it does not arrest existing kinetic drift, meaning the lander remains vulnerable to instability penalties if current `x_vel`, `y_vel`, or `ang_vel` are non-zero.
+
+---
+
+## 2026-07-09 05:08:41
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination to prevent unintended rotation during descent.
+
+3. **Contact Transition Reward Spikes**: Significant positive reward spikes occur during contact transitions. Data indicates that the transition to partial contact (`[1,0]` or `[0,1]`) often generates a higher instantaneous reward than the subsequent transition to full contact (`[1,1]`), and the terminal success reward can be triggered even in a partial contact state.
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum but serve as the primary drivers of torque-induced tipping, especially during the high-stakes transition to a grounded state.
+
+5. **Bimodal Grounded-State Penalty**: In a grounded state, the environment applies two distinct penalty tiers: a moderate instability penalty (frequently around -10) for kinetic or angular disturbances, and a catastrophic failure penalty (-100.0) when `angle` or `ang_vel` reaches critical thresholds.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander typically maintains residual `x_vel`, `y_vel`, and `ang_vel`, resulting in continuous skidding, sliding, or jittering across the surface.
+
+7. **Ground-Level Interaction**: Contact is established when `y_pos` reaches approximately 0; the lander can sustain a grounded state even when `y_pos` becomes slightly negative.
+
+8. **Angular and Vertical Sensitivity**: The stability of the grounded state is extremely sensitive to orientation; even minor non-zero velocities (`y_vel`, `ang_vel`) or tilt (`angle`) act as precursors to instability penalties, while larger deviations trigger immediate catastrophic failure.
+
+9. **Contact State Chattering**: The grounded state is highly volatile; "chattering"—the rapid, unstable oscillation between partial contact (`[1,0]`/`[0,1]`) and full contact (`[1,1]`)—is a major driver of repeated moderate instability penalties.
+
+10. **Inertial Drift Management**: Selecting Action 0 (nothing) avoids adding new torque, but it does not arrest existing kinetic drift, meaning the lander remains vulnerable to instability penalties if current `x_vel`, `y_vel`, or `ang_vel` are non-zero.
+
+---
+
+## 2026-07-09 05:12:22
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination to prevent unintended rotation during descent.
+
+3. **Contact Transition Reward Spikes**: Significant positive rewards are triggered during transitions between contact states. Data indicates that rapid switching between asymmetric partial contact states (e.g., transitioning from `[1,0]` to `[0,1]`) can generate high instantaneous rewards.
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum but serve as the primary drivers of torque-induced rotation, which can lead to rapid increases in `ang_vel`.
+
+5. **Bimodal Grounded-State Penalty**: In a grounded state, the environment applies two distinct penalty tiers: moderate instability penalties (observed between -10 and -20) for kinetic or angular disturbances, and a catastrophic failure penalty (-100.0) when `angle` or `ang_vel` reaches critical thresholds.
+
+6. **Post-Contact Kinetic Drift**: Once contact is established, the lander typically maintains residual `x_vel`, `y_vel`, and `ang_vel`, resulting in continuous skidding, sliding, or jittering across the surface.
+
+7. **Contact State Autonomy**: Contact is not strictly governed by `y_pos` being $\le 0$; the lander can maintain or trigger contact states (including full contact `[1,1]`) even while `y_pos` is slightly positive.
+
+8. **Angular and Vertical Sensitivity**: The stability of the grounded state is extremely sensitive to orientation; minor non-zero velocities or tilt act as precursors to instability penalties, while larger deviations trigger immediate catastrophic failure.
+
+9. **Contact State Chattering**: The grounded state is highly volatile; "chattering"—the rapid, unstable oscillation between partial contact (`[1,0]`/`[0,1]`) and full contact (`[1,1]`)—is a major driver of repeated moderate instability penalties.
+
+10. **Inertial Drift Management**: Selecting Action 0 (nothing) avoids adding new torque or thrust, but it does not arrest existing kinetic drift, meaning the lander remains vulnerable to instability penalties if current `x_vel`, `y_vel`, or `ang_vel` are non-zero.
+
+---
+
+## 2026-07-09 05:15:57
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination to prevent unintended rotation during descent.
+
+3. **High-Magnitude Contact Transitions**: Transitions into contact states, particularly the transition to full contact `[1,1]`, can trigger massive positive reward spikes (e.g., >15.0), which are significantly higher than standard step rewards.
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum but serve as the primary drivers of torque-induced rotation, which can lead to rapid increases in `ang_vel`.
+
+5. **Bimodal Grounded-State Penalty**: In a grounded state, the environment applies two distinct penalty tiers: moderate instability penalties for kinetic or angular disturbances, and a catastrophic failure penalty (-100.0) when `angle` or `ang_vel` reaches critical thresholds.
+
+6. **Asynchronous Leg Contact**: Contact can be established or lost sequentially (e.g., `[0,0]` $\rightarrow$ `[1,0]` $\rightarrow$ `[1,1]` or `[1,1]` $\rightarrow$ `[0,1]`), allowing for various partial contact configurations during the landing process.
+
+7. **Post-Contact Kinetic Instability**: Establishing contact does not guarantee stability; corrective thrust (Actions 1, 2, or 3) can generate extreme `ang_vel` even while grounded, which can trigger an immediate catastrophic failure penalty (-100.0).
+
+8. **Contact State Autonomy**: Contact is not strictly governed by `y_pos` being $\le 0$; the lander can maintain or trigger contact states, including full contact `[1,1]`, even while `y_pos` is slightly positive.
+
+9. **Angular and Vertical Sensitivity**: The stability of the grounded state is extremely sensitive to orientation; minor non-zero velocities or tilt act as precursors to instability penalties, while larger deviations trigger immediate catastrophic failure.
+
+10. **Inertial Drift Management**: Selecting Action 0 (nothing) avoids adding new torque or thrust, but it does not arrest existing kinetic drift, meaning the lander remains vulnerable to instability penalties if current `x_vel`, `y_vel`, or `ang_vel` are non-zero.
+
+---
+
+## 2026-07-09 05:17:36
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring precise coordination of thrust to manage both linear velocities ($x\_vel, y\_vel$) and `ang_vel`.
+
+3. **High-Magnitude Contact Transitions**: Transitions into contact states, particularly the transition to full contact `[1,1]`, can trigger massive positive reward spikes (e.g., >15.0), which are significantly higher than standard step rewards.
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are required for correcting angular momentum but serve as the primary drivers of torque-induced rotation, which can lead to rapid increases in `ang_vel`.
+
+5. **Critical Orientation Thresholds**: A catastrophic failure penalty (-100.0) is triggered when the absolute value of `angle` reaches a critical threshold (observed at $\approx 1.2$ radians), regardless of current velocity or contact state.
+
+6. **Asynchronous Leg Contact**: Contact can be established or lost sequentially (e.g., `[0,0] \rightarrow [1,0] \rightarrow [1,1]` or `[1,1] \rightarrow [0,1]`), allowing for various partial contact configurations during the landing and post-landing process.
+
+7. **Contact State Volatility**: Establishing contact does not guarantee a permanent grounded state; improper thrusting or excessive kinetic energy can cause the lander to lose contact (e.g., transitioning from `[1,1]` back to `[0,1]`) even at low `y_pos`.
+
+8. **Position-Contact Decoupling**: Contact is not strictly governed by `y_pos` being $\le 0$; the lander can maintain or trigger contact states, including full contact `[1,1]`, even while `y_pos` is slightly negative.
+
+9. **Cumulative Angular Drift**: Failure can result from the slow, continuous accumulation of `angle` deviations; even if `ang_vel` is low, a persistent tilt will eventually breach the critical orientation threshold and trigger catastrophic failure.
+
+10. **Grounded Kinetic Instability**: In a grounded state, applying corrective thrust (Actions 1, 2, or 3) can generate extreme `ang_vel` or cause a sudden loss of contact, which can lead to immediate instability penalties or catastrophic failure.
+
+---
+
+## 2026-07-09 05:22:59
+
+1. **Vertical Velocity Control**: Action 2 (main engine) is the primary mechanism for managing `y_vel` and is essential for arresting descent to transition from a no-contact state into a contact state.
+
+2. **Multi-Axis Coupling**: All thrust actions (1, 2, 3) exert simultaneous linear and angular influence, requiring coordination to manage both linear velocities ($x\_vel, y\_vel$) and `ang_vel`.
+
+3. **High-Magnitude Contact/Re-contact Rewards**: Entering or re-establishing contact states (e.g., transitioning to `[1,0]`, `[0,1]`, or `[1,1]`) triggers significant positive reward spikes, often much larger than standard step rewards.
+
+4. **Asymmetric Engine Duality**: Actions 1 and 3 are the primary drivers for correcting angular momentum, though they also serve as the main sources of torque-induced rotation.
+
+5. **Critical Orientation Thresholds**: A catastrophic failure penalty is triggered when the absolute value of `angle` reaches a critical threshold (observed at $\approx 1.2$ radians).
+
+6. **Asynchronous Leg Contact**: Contact can be established or lost sequentially (e.g., `[0,0] \rightarrow [1,0] \rightarrow [1,1]`), allowing for various partial contact configurations.
+
+7. **Contact State Volatility**: Establishing contact does not guarantee a permanent grounded state; improper thrusting (particularly Actions 1 or 2) can cause the lander to abruptly lose contact and transition from `[1,1]` back to `[0,0]` or `[0,1]`.
+
+8. **Position-Contact Decoupling**: Contact is not strictly governed by `y_pos \le 0`; the lander can maintain or trigger contact states even while `y_pos` is slightly positive or negative.
+
+9. **Cumulative Angular Drift**: Failure can result from the slow, continuous accumulation of `angle` deviations; even with low `ang_vel`, a persistent tilt will eventually breach the critical orientation threshold.
+
+10. **Grounded Stabilization Dynamics**: In grounded states with high `ang_vel`, inaction (Action 0) can be heavily penalized, whereas applying corrective torque (specifically Action 3) can stabilize the lander and yield significant positive rewards.
+
+---
+
+## 2026-07-09 05:26:41
+
+---
+
+
+---
+
+## 2026-07-09 05:27:45
+
+1. The main engine (Action 2) provides upward thrust, increasing the vertical velocity (`y_vel`).
+2. The right engine (Action 3) generates torque that decreases the angular velocity (`ang_vel`).
+3. The left engine (Action 1) generates torque that increases the angular velocity (`ang_vel`).
+4. Gravity acts as a constant downward force, reducing the vertical velocity (`y_vel`) when no upward thrust is applied.
+5. Side engine actions (1 and 3) are the primary mechanisms for controlling the lander's orientation (`angle`) and rotation speed (`ang_vel`).
+6. A terminal crash penalty (-100 reward) is applied if the lander fails to land safely, which can occur even if leg contact flags are active.
+7. The vertical position (`y_pos`) changes over time as a direct consequence of the current vertical velocity (`y_vel`).
+8. Horizontal displacement (`x_pos`) and horizontal velocity (`x_vel`) are influenced by the lander's tilt (`angle`) and the resulting directional component of thrust.
+9. The `left_leg_contact` and `right_leg_contact` flags indicate whether the lander's legs are in contact with the landing surface.
+10. Angular velocity (`ang_vel`) is highly sensitive to the application of side engine actions, allowing for rapid adjustments to the lander's attitude.
+
+---
+
+## 2026-07-09 05:29:25
+
+1. The main engine (Action 2) provides upward thrust, primarily increasing the vertical velocity (`y_vel`).
+2. The right engine (Action 3) generates torque that decreases the angular velocity (`ang_vel`).
+3. The left engine (Action 1) generates torque that increases the angular velocity (`ang_vel`).
+4. Gravity acts as a constant downward force, reducing the vertical velocity (`y_vel`) when upward thrust is insufficient or absent.
+5. Side engine actions (1 and 3) are the primary mechanisms for controlling the lander's orientation (`angle`) and rotation speed (`ang_vel`).
+6. A terminal crash penalty (-100 reward) is applied if the lander fails to land safely, which can occur even if the leg contact flags are active.
+7. The lander's tilt (`angle`) redirects the thrust vector; therefore, applying the main engine (Action 2) while tilted results in horizontal displacement (`x_pos`) and horizontal velocity (`x_vel`).
+8. The vertical position (`y_pos`) changes over time as a direct consequence of the current vertical velocity (`y_vel`).
+9. The `left_leg_contact` and `right_leg_contact` flags indicate whether the lander's legs are in contact with the landing surface; achieving contact is strongly associated with significant positive reward increments.
+10. Angular velocity (`ang_vel`) is highly sensitive to the application of side engine actions, allowing for rapid adjustments to the lander's attitude.
+
+---
+
+## 2026-07-09 05:39:01
+
+1. The main engine (Action 2) provides upward thrust, primarily increasing the vertical velocity (`y_vel`).
+2. The right engine (Action 3) generates torque that decreases the angular velocity (`ang_vel`).
+3. The left engine (Action 1) generates torque that increases the angular velocity (`ang_vel`).
+4. Gravity acts as a constant downward force, reducing the vertical velocity (`y_vel`) when upward thrust is insufficient or absent.
+5. Side engine actions (1 and 3) are the primary mechanisms for controlling the lander's orientation (`angle`) and rotation speed (`ang_vel`).
+6. A terminal crash penalty (-100 reward) is applied if the lander fails to land safely, which can occur even if the leg contact flags are active.
+7. The lander's tilt (`angle`) redirects the thrust vector; applying the main engine (Action 2) while tilted results in horizontal displacement (`x_pos`) and horizontal velocity (`x_vel`).
+8. Achieving leg contact (`left_leg_contact` and `right_leg_contact`) is strongly associated with significant positive reward increments.
+9. Large negative rewards (observed between -10 and -20) are triggered when the lander's vertical position (`y_pos`) becomes negative, indicating the lander has penetrated the landing surface.
+10. Maintaining stability is critical during and after contact; high angular velocity (`ang_vel`) or significant tilt (`angle`) while the legs are in contact with the ground can lead to large negative rewards due to tipping or instability.
+
+---
+
+## 2026-07-09 05:42:37
+
+1. The main engine (Action 2) provides upward thrust, primarily increasing the vertical velocity (`y_vel`).
+2. The right engine (Action 3) generates torque that decreases the angular velocity (`ang_vel`).
+3. The left engine (Action 1) generates torque that increases the angular velocity (`ang_vel`).
+4. Gravity acts as a constant downward force, reducing the vertical velocity (`y_vel`) when upward thrust is insufficient or absent.
+5. Side engine actions (1 and 3) are the primary mechanisms for controlling the lander's orientation (`angle`) and rotation speed (`ang_vel`).
+6. Achieving leg contact (the transition of `left_leg_contact` or `right_leg_contact` from 0 to 1) is associated with significant positive reward increments.
+7. Large negative rewards (observed between -10 and -20) are triggered while the lander is in contact (`left_leg_contact` or `right_leg_contact` is 1), likely due to instability, excessive velocity, or "bouncing" during the landing phase.
+8. A terminal crash penalty (-100 reward) is applied if the lander fails to land safely.
+9. The lander's tilt (`angle`) redirects the thrust vector; applying the main engine (Action 2) while tilted results in horizontal displacement (`x_pos`) and horizontal velocity (`x_vel`).
+10. Maintaining stability in orientation (`angle`) and angular velocity (`ang_vel`) is critical once leg contact is established; high angular velocity or significant tilt while in contact can lead to large negative rewards.
+
+---
+
+## 2026-07-09 05:44:54
+
+---
+1. The main engine (Action 2) provides upward thrust, primarily increasing the vertical velocity (`y_vel`).
+2. The right engine (Action 3) provides negative torque, reducing positive angular velocity (`ang_vel`) and increasing the magnitude of negative angular velocity.
+3. The left engine (Action 1) provides positive torque, increasing positive angular velocity (`ang_vel`) and reducing the magnitude of negative angular velocity.
+4. Gravity acts as a constant downward force, reducing the vertical velocity (`y_vel`) when upward thrust is insufficient or absent.
+5. Side engine actions (1 and 3) are the primary mechanisms for controlling the lander's orientation (`angle`) and rotation speed (`ang_vel`).
+6. Achieving leg contact (the transition of `left_leg_contact` or `right_leg_contact` from 0 to 1) is associated with immediate, significant positive reward spikes (e.g., +16 to +18).
+7. A successful terminal landing provides a large positive reward (e.g., +100).
+8. Large negative rewards (e.g., between -10 and -20) are triggered while the lander is in contact if it is unstable, characterized by high angular velocity (`ang_vel`), high vertical velocity (`y_vel`), or significant tilt (`angle`).
+9. Applying the main engine (Action 2) while tilted (`angle` $\neq$ 0) redirects the thrust vector, resulting in horizontal displacement (`x_pos`) and horizontal velocity (`x_vel`).
+10. Maintaining stability with minimal `angle` and `ang_vel` is critical once leg contact is established to avoid large instability penalties and ensure a successful landing.
+
+---
+
+## 2026-07-09 05:48:25
+
+---
+1. The main engine (Action 2) provides upward thrust, primarily increasing the vertical velocity (`y_vel`).
+2. The right engine (Action 3) provides negative torque, reducing positive angular velocity (`ang_vel`) and increasing the magnitude of negative `ang_vel`.
+3. The left engine (Action 1) provides positive torque, increasing positive angular velocity (`ang_vel`) and reducing the magnitude of negative `ang_vel`.
+4. Gravity acts as a constant downward force, reducing the vertical velocity (`y_vel`) when upward thrust is insufficient or absent.
+5. Achieving leg contact (the transition of `left_leg_contact` or `right_leg_contact` from 0 to 1) is associated with immediate, significant positive reward spikes.
+6. Leg contact can occur sequentially, where one leg makes contact before the second leg.
+7. Large negative instability penalties (e.g., between -10 and -20) are triggered if the lander is in contact and exhibits non-zero vertical velocity (`y_vel`), significant tilt (`angle`), or high angular velocity (`ang_vel`).
+8. Applying the main engine (Action 2) while tilted (`angle` $\neq$ 0) redirects the thrust vector, resulting in horizontal displacement (`x_pos`) and horizontal velocity (`x_vel`).
+9. Side engine actions (1 and 3) are the primary mechanisms for controlling the lander's orientation (`angle`) and rotation speed (`ang_vel`).
+10. Maintaining stability with minimal `angle`, `ang_vel`, and `y_vel` is critical once any leg contact is established to avoid large instability penalties and ensure a successful landing.
+
+---
+
+## 2026-07-09 05:50:50
+
+---
+1. The main engine (Action 2) provides upward thrust, primarily increasing vertical velocity (`y_vel`).
+2. The right engine (Action 3) provides negative torque, reducing positive angular velocity (`ang_vel`) and increasing the magnitude of negative `ang_vel`.
+3. The left engine (Action 1) provides positive torque, increasing positive angular velocity (`ang_vel`) and reducing the magnitude of negative `ang_vel`.
+4. Gravity acts as a constant downward force, reducing the vertical velocity (`y_vel`) when upward thrust is insufficient or absent.
+5. Transitions in leg contact (the movement of `left_leg_contact` or `right_leg_contact` from 0 to 1) are associated with immediate, significant positive reward spikes.
+6. Achieving simultaneous contact of both legs can trigger much higher reward peaks (e.g., >20) compared to single-leg contact.
+7. Once any leg contact is established, even minimal non-zero vertical velocity (`y_vel`) can trigger extreme instability penalties (e.g., between -10 and -20).
+8. Applying the main engine (Action 2) while the lander is tilted (`angle` $\neq$ 0) redirects the thrust vector, resulting in horizontal displacement (`x_pos`) and horizontal velocity (`x_vel`).
+9. Side engine actions (1 and 3) are the primary mechanisms for controlling the lander's orientation (`angle`) and rotation speed (`ang_vel`).
+10. Significant tilt (`angle`) or high angular velocity (`ang_vel`) while in contact with the ground triggers large negative instability penalties.
+
+---
+
+## 2026-07-09 05:55:49
+
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but redirects this force to cause horizontal displacement (`x_pos`, `x_vel`) if the lander's `angle` is non-zero.
+2. The left engine (Action 1) provides positive torque, increasing positive `ang_vel` and reducing the magnitude of negative `ang_vel`.
+3. The right engine (Action 3) provides negative torque, increasing negative `ang_vel` and reducing positive `ang_vel`.
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Transitions in leg contact from 0 to 1 for either the `left_leg_contact` or `right_leg_contact` trigger immediate positive reward spikes.
+6. Achieving simultaneous contact of both legs (both contact variables = 1) triggers much higher reward peaks compared to single-leg contact.
+7. Once any leg contact is established, any significant non-zero horizontal (`x_vel`), vertical (`y_vel`), or angular (`ang_vel`) velocity triggers severe negative instability penalties.
+8. Large negative rewards are triggered by high angular velocity (`ang_vel`) or significant tilt (`angle`) while the lander is in contact with the ground.
+9. The loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is associated with significant negative rewards.
+10. Side engine actions (Actions 1 and 3) are the primary mechanisms for managing the lander's orientation and rotation speed to achieve a stable, zero-velocity landing.
+
+---
+
+## 2026-07-09 05:58:25
+
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but redirects this force to cause horizontal displacement (`x_pos`, `x_vel`) if the lander's `angle` is non-zero.
+2. The left engine (Action 1) provides positive torque, increasing positive `ang_vel` and reducing the magnitude of negative `ang_vel`.
+3. The right engine (Action 3) provides negative torque, increasing negative `ang_vel` and reducing positive `ang_vel`.
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Transitions in leg contact from 0 to 1 for either the `left_leg_contact` or `right_leg_contact` trigger immediate positive reward spikes.
+6. Achieving simultaneous contact of both legs (both contact variables = 1) triggers much higher reward peaks compared to single-leg contact.
+7. Loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is associated with extreme negative rewards, which can reach as high as -100.
+8. Once any leg contact is established, applying engine thrust (Actions 1, 2, or 3) can trigger severe negative instability penalties if it results in significant non-zero `x_vel`, `y_vel`, or `ang_vel`.
+9. High angular velocity (`ang_vel`) or significant tilt (`angle`) can trigger negative rewards both during the flight phase and while the lander is in contact with the ground.
+10. Side engine actions (Actions 1 and 3) are the primary mechanisms for managing the lander's orientation and rotation speed to achieve a stable, zero-velocity landing.
+
+---
+
+## 2026-07-09 06:01:23
+
+---
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but generates horizontal displacement (`x_pos`, `x_vel`) whenever the lander's `angle` is non-zero.
+2. The main engine (Action 2) induces a destabilizing torque that acts in the same direction as the current `angle`, increasing the magnitude of the angular velocity (`ang_vel`).
+3. The left engine (Action 1) provides positive torque, increasing positive `ang_vel` and reducing the magnitude of negative `ang_vel`.
+4. The right engine (Action 3) provides negative torque, increasing negative `ang_vel` and reducing positive `ang_vel`.
+5. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+6. Transitions in leg contact from 0 to 1 trigger positive reward spikes, with achieving simultaneous contact of both legs (both = 1) triggering much higher reward peaks.
+7. Loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is associated with extreme negative rewards.
+8. Applying any engine thrust (Actions 1, 2, or 3) while the lander is in a landed state (at least one leg contact = 1) triggers severe negative instability penalties.
+9. High angular velocity (`ang_vel`) or significant tilt (`angle`) triggers negative rewards during both the flight phase and while the lander is in contact with the ground.
+10. Side engines (Actions 1 and 3) are the primary mechanisms for managing orientation and countering the destabilizing torque of the main engine to achieve a stable landing.
+
+---
+
+## 2026-07-09 06:02:52
+
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but generates horizontal displacement (`x_pos`, `x_vel`) whenever the lander's `angle` is non-zero.
+2. The main engine (Action 2) induces a destabilizing torque that acts in the same direction as the current `angle`, increasing the magnitude of the angular velocity (`ang_vel`).
+3. Side engines provide corrective torque: the left engine (Action 1) increases `ang_vel` (positive torque) and the right engine (Action 3) decreases it (negative torque).
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Leg contact transitions from 0 to 1 trigger positive rewards, with achieving simultaneous contact of both legs (both = 1) triggering significantly higher reward peaks.
+6. Applying any engine thrust (Actions 1, 2, or 3) while the lander is in a landed state (at least one leg contact = 1) triggers severe negative instability penalties.
+7. High angular velocity (`ang_vel`) or significant tilt (`angle`) triggers negative rewards during both the flight phase and while the lander is in contact with the ground.
+8. A crash, characterized by high tilt and angular velocity at the point of impact, results in an extremely large terminal negative reward.
+9. Loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is associated with extreme negative rewards.
+10. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+
+---
+
+## 2026-07-09 06:05:08
+
+---
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but generates horizontal displacement (`x_pos`, `x_vel`) whenever the lander's `angle` is non-zero.
+2. The main engine (Action 2) induces a destabilizing torque that acts in the same direction as the current `angle`, increasing the magnitude of the angular velocity (`ang_vel`).
+3. Side engines provide corrective torque: the left engine (Action 1) increases `ang_vel` (positive torque) and the right engine (Action 3) decreases it (negative torque).
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Leg contact transitions from 0 to 1 trigger positive rewards, with achieving simultaneous contact of both legs (both = 1) triggering significantly higher reward peaks.
+6. In a landed state (at least one leg contact = 1), the lander receives negative rewards if it possesses non-zero vertical velocity (`y_vel`), angular velocity (`ang_vel`), or tilt (`angle`).
+7. While in a landed state, applying engine thrust (Actions 1, 2, or 3) to actively stabilize the lander by driving `y_vel`, `ang_vel`, and `angle` toward zero can trigger large positive rewards.
+8. A crash, characterized by high tilt and angular velocity at the point of impact, results in an extremely large terminal negative reward.
+9. Loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is associated with extreme negative rewards.
+10. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+
+---
+
+## 2026-07-09 06:09:13
+
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but generates horizontal displacement (`x_pos`, `x_vel`) whenever the lander's `angle` is non-zero.
+2. The main engine (Action 2) induces a destabilizing torque that acts in the same direction as the current `angle`, increasing the magnitude of the angular velocity (`ang_vel`).
+3. Side engines provide corrective torque: the left engine (Action 1) increases `ang_vel` (positive torque) and the right engine (Action 3) decreases it (negative torque).
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Achieving simultaneous contact of both legs (both `left_leg_contact` and `right_leg_contact` = 1) triggers a massive, immediate positive reward spike.
+6. In a landed state, possessing non-zero vertical velocity (`y_vel`), angular velocity (`ang_vel`), or tilt (`angle`) incurs significant negative rewards.
+7. Applying engine thrust (Actions 1, 2, or 3) while landed can be used to stabilize the lander by driving `y_vel`, `ang_vel`, and `angle` toward zero.
+8. A crash, often characterized by high tilt or angular velocity during or immediately after a loss of contact, results in an extremely large terminal negative reward (e.g., -100).
+9. Loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is a heavily penalized event that typically leads to rapid instability.
+10. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+
+---
+
+## 2026-07-09 06:10:12
+
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but generates horizontal displacement (`x_pos`, `x_vel`) whenever the lander's `angle` is non-zero.
+2. The main engine (Action 2) induces a destabilizing torque that acts in the same direction as the current `angle`, increasing the magnitude of the angular velocity (`ang_vel`).
+3. Side engines provide corrective torque: the left engine (Action 1) increases `ang_vel` (positive torque) and the right engine (Action 3) decreases it (negative torque).
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Achieving simultaneous contact of both legs (both `left_leg_contact` and `right_leg_contact` = 1) triggers a massive, immediate positive reward spike.
+6. In a landed state, possessing non-zero vertical velocity (`y_vel`), angular velocity (`ang_vel`), or tilt (`angle`) incurs significant negative rewards.
+7. Applying engine thrust (Actions 1, 2, or 3) while landed can be used to stabilize the lander by driving `y_vel`, `ang_vel`, and `angle` toward zero.
+8. A crash, often characterized by high tilt or angular velocity during or immediately after a loss of contact, results in an extremely large terminal negative reward (e.g., -100).
+9. Loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is a heavily penalized event that typically leads to rapid instability.
+10. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+
+---
+
+## 2026-07-09 06:13:25
+
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but generates horizontal displacement (`x_pos`, `x_vel`) whenever the `angle` is non-zero.
+2. The main engine (Action 2) induces a destabilizing torque that acts in the same direction as the current `angle`, increasing the magnitude of the angular velocity (`ang_vel`).
+3. Side engines provide corrective torque: the left engine (Action 1) increases `ang_vel` and the right engine (Action 3) decreases it.
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Achieving leg contact (either single or simultaneous) is associated with significant positive reward spikes.
+6. A crash, characterized by high vertical velocity (`y_vel`) or angular velocity (`ang_vel`) during or immediately after leg contact, results in an extremely large terminal negative reward (e.g., -100).
+7. Applying engine thrust (Actions 1, 2, or 3) can be used to stabilize the lander by driving `y_vel`, `ang_vel`, and `angle` toward zero.
+8. In a landed state, possessing non-zero vertical velocity (`y_vel`), angular velocity (`ang_vel`), or tilt (`angle`) incurs significant negative rewards and can lead to a terminal crash.
+9. Loss of contact (a transition of a leg contact variable from 1 to 0) while in a landed state is a heavily penalized event that typically leads to rapid instability.
+10. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+
+---
+
+## 2026-07-09 06:15:15
+
+1. The main engine (Action 2) provides upward thrust to increase `y_vel`, but generates horizontal displacement (`x_pos`, `x_vel`) whenever the `angle` is non-zero.
+2. The main engine (Action 2) induces a destabilizing torque that acts in the same direction as the current `angle`, increasing the magnitude of the angular velocity (`ang_vel`).
+3. Side engines provide corrective torque: the left engine (Action 1) increases `ang_vel` and the right engine (Action 3) decreases it.
+4. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is absent or insufficient.
+5. Achieving leg contact (either single or simultaneous) is associated with significant positive reward spikes.
+6. A crash, characterized by high vertical velocity (`y_vel`) or angular velocity (`ang_vel`) during or immediately after leg contact, results in an extremely large terminal negative reward (e.g., -100).
+7. Applying engine thrust (Actions 1, 2, or 3) can be used to stabilize the lander by driving `y_vel`, `ang_vel`, and `angle` toward zero.
+8. In a landed state, even small non-zero values for `y_vel`, `ang_vel`, or `angle` can incur negative rewards, and high angular velocity while in contact can trigger large immediate penalties (e.g., ~ -17).
+9. Transitioning from a landed state (leg contact = 1) to a non-contact state (leg contact = 0) is a highly volatile event that triggers massive negative reward spikes, even when the lander's velocities are near zero.
+10. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+
+---
+
+## 2026-07-09 06:17:29
+
+1. Main engine (Action 2) increases `y_vel` but generates horizontal displacement (`x_pos`, `x_vel`) and destabilizing torque (increasing `ang_vel`) whenever the `angle` is non-zero.
+2. Side engines (Actions 1 and 3) provide corrective torque to manage `ang_vel`, but also contribute to horizontal displacement.
+3. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is insufficient.
+4. Achieving leg contact (either single or simultaneous) is associated with significant positive reward spikes.
+5. A terminal crash, characterized by high vertical velocity (`y_vel`) or angular velocity (`ang_vel`) during or immediately after contact, results in an extremely large terminal negative reward (e.g., -100).
+6. High velocities during leg contact (non-terminal) trigger significant immediate negative penalties (e.g., ranging from ~-9 to ~-18).
+7. Transitioning from a landed state (leg contact = 1) to a non-contact state (leg contact = 0), or losing a second leg of contact (e.g., 1,1 to 1,0), triggers massive negative reward spikes.
+8. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+9. In a landed state, even small non-zero values for `y_vel`, `ang_vel`, or `angle` can incur continuous negative rewards.
+10. Successful landing requires the simultaneous minimization of `y_vel`, `ang_vel`, and `angle` to prevent the coupled physics from triggering instability or high-velocity penalties during contact.
+
+---
+
+## 2026-07-09 06:19:54
+
+1. Main engine (Action 2) increases `y_vel` but generates horizontal displacement (`x_pos`, `x_vel`) and destabilizing torque (increasing `ang_vel`) whenever the `angle` is non-zero.
+2. Side engines (Actions 1 and 3) provide corrective torque to manage `ang_vel`, but also contribute to horizontal displacement.
+3. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is insufficient.
+4. Achieving initial leg contact (single leg) triggers a significant positive reward spike.
+5. A terminal crash (reward -100) can be triggered by high angular velocity (`ang_vel`) or extreme `angle` during or immediately after contact, even if vertical velocity (`y_vel`) is relatively low.
+6. High velocities during leg contact (non-terminal) trigger significant immediate negative penalties.
+7. Transitioning from a landed state (both legs contact = 1, 1) to a non-contact or single-leg contact state triggers massive negative reward spikes.
+8. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+9. In a landed state, even small non-zero values for `y_vel`, `ang_vel`, or `angle` incur continuous negative rewards.
+10. Successful landing requires the simultaneous minimization of `y_vel`, `ang_vel`, and `angle` to stabilize the lander and prevent rotation-induced terminal crashes upon contact.
+
+---
+
+## 2026-07-09 06:21:48
+
+---
+1. Main engine (Action 2) increases `y_vel` but generates horizontal displacement (`x_pos`, `x_vel`) and destabilizing torque (increasing `ang_vel`) whenever the `angle` is non-zero.
+2. Side engines (Actions 1 and 3) provide corrective torque to manage `ang_vel`, but also contribute to horizontal displacement.
+3. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is insufficient.
+4. Achieving leg contact (single or dual) triggers significant positive reward spikes at the moment of impact.
+5. A terminal crash (reward -100) can be triggered by high angular velocity (`ang_vel`) or extreme `angle` during or immediately after contact, even if vertical velocity (`y_vel`) is near zero.
+6. High velocities during leg contact (non-terminal) trigger significant immediate negative penalties.
+7. Transitioning from a landed state (both legs contact = 1, 1) to a non-contact or single-leg contact state triggers massive negative reward spikes.
+8. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+9. High angular velocity (`ang_vel`) or significant `angle` can trigger severe non-terminal penalties or terminal crashes, even when vertical descent has nearly ceased.
+10. Successful landing requires the simultaneous minimization of `y_vel`, `ang_vel`, and `angle` to stabilize the lander and prevent rotation-induced terminal crashes upon contact.
+
+---
+
+## 2026-07-09 06:23:49
+
+1. Main engine (Action 2) increases `y_vel` but generates horizontal displacement (`x_pos`, `x_vel`) and destabilizing torque (increasing `ang_vel`) whenever the `angle` is non-zero.
+2. Side engines (Actions 1 and 3) provide corrective torque to manage `ang_vel`, but also contribute to horizontal displacement.
+3. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is insufficient.
+4. Achieving leg contact (single or dual) triggers significant positive reward spikes at the moment of impact.
+5. A terminal crash (reward -100) is triggered by high `ang_vel` or extreme `angle` during or immediately after contact, even if vertical velocity (`y_vel`) is near zero.
+6. High velocities (both linear and angular) during leg contact trigger significant immediate negative penalties.
+7. Single-leg contact (e.g., [1, 0] or [0, 1]) is a high-instability state that can rapidly escalate into a terminal crash if angular velocity is not immediately countered.
+8. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+9. Post-contact stabilization requires the active use of side engines to mitigate the torque and angular velocity spikes that occur during the transition from single-leg to dual-leg contact.
+10. Successful landing requires the simultaneous minimization of `y_vel`, `ang_vel`, and `angle` to stabilize the lander and ensure the dual-leg contact [1, 1] state is reached without rotation-induced failure.
+
+---
+
+## 2026-07-09 06:25:22
+
+1. Main engine (Action 2) increases `y_vel` but generates horizontal displacement (`x_pos`, `x_vel`) and destabilizing torque (increasing `ang_vel`) whenever the `angle` is non-zero.
+2. Side engines (Actions 1 and 3) provide corrective torque to manage `ang_vel`, but also contribute to horizontal displacement.
+3. Gravity acts as a constant downward force, reducing vertical velocity (`y_vel`) when upward thrust is insufficient.
+4. Achieving leg contact (single or dual) triggers significant positive reward spikes at the moment of impact, with dual-leg contact [1, 1] providing the highest reward.
+5. A successful landing requires not only reaching the [1, 1] contact state but also maintaining stability (minimizing `y_vel`, `ang_vel`, and `angle`) to prevent subsequent contact loss.
+6. High linear or angular velocities during contact, or extreme `angle` during or immediately after contact, trigger significant immediate negative penalties or terminal crashes.
+7. Ground contact is a dynamic state; applying upward thrust (Action 2) or excessive corrective thrust (Actions 1 or 3) while in contact can cause the lander to "bounce," transitioning the state from [1, 1] to [1, 0], [0, 1], or [0, 0].
+8. The lander's dynamics are highly coupled: engine thrust applied at a non-zero `angle` simultaneously affects vertical velocity, horizontal position, and angular stability.
+9. Single-leg contact (e.g., [1, 0] or [0, 1]) is a high-instability state that can rapidly escalate into a total loss of contact or a terminal crash if angular velocity is not immediately countered.
+10. Successful stabilization requires continuous thrust modulation to manage the torque and angular velocity spikes that occur during the transition from flight to single-leg and finally to dual-leg contact.
+
+---
+
+## 2026-07-09 06:26:08
+
+---
+
+
+---
+
+## 2026-07-09 06:28:48
+
+1. **Vertical Thrust:** Action 2 (main engine) provides upward thrust that directly counters gravity, reducing negative `y_vel` and slowing descent.
+2. **Lateral and Rotational Control:** Actions 1 (left engine) and 3 (right engine) provide both lateral acceleration (`x_vel`) and torque, affecting the lander's `angle` and `ang_vel`.
+3. **Gravity and Descent:** The environment exerts a constant downward force, causing `y_vel` to become increasingly negative in the absence of upward thrust.
+4. **Leg Contact Mechanics:** Leg contact is registered as 1.0 when the lander's legs touch the ground; the left and right legs can be in contact independently or simultaneously.
+5. **Grounded Torque and Instability:** Once a leg is in contact with the ground (contact = 1.0), using engines can induce significant angular velocity (`ang_vel`), which may lead to tipping.
+6. **Crash/Tip-over Penalties:** High-magnitude negative rewards (e.g., ranging from -15 to -25) occur when engines are fired while the lander is grounded, suggesting a crash or tip-over event.
+7. **Stability-Based Reward Volatility:** While grounded, the reward signal is highly sensitive to stability; actions that successfully correct orientation can yield very large positive rewards, while unstable actions yield large negative penalties.
+8. **Angular Momentum Management:** Maintaining a near-zero `angle` during descent and landing requires precise, frequent adjustments to `ang_vel` using the side engines.
+9. **Lateral Drift:** Continuous or unbalanced use of side engines (1 or 3) results in persistent changes in `x_vel` and a corresponding drift in `x_pos`.
+10. **Landing Transition Dynamics:** The transition from flight to contact is highly dependent on managing the trade-off between descent velocity (`y_vel`) and angular stability to prevent tipping upon touchdown.
+
+---
+
+## 2026-07-09 06:32:04
+
+1. **Vertical Thrust:** Action 2 (main engine) provides upward thrust that directly counters gravity, reducing negative `y_vel` and slowing descent.
+2. **Lateral and Rotational Control:** Actions 1 (left engine) and 3 (right engine) provide both lateral acceleration (`x_vel`) and torque, affecting the lander's `angle` and `ang_vel`.
+3. **Gravity and Descent:** The environment exerts a constant downward force, causing `y_vel` to become increasingly negative in the absence of upward thrust.
+4. **Leg Contact Mechanics:** Leg contact is registered as 1.0 when the lander's legs touch the ground; the left and right legs can be in contact independently or simultaneously.
+5. **Grounded Side-Engine Risk:** Using side engines (Actions 1 or 3) while in contact with the ground is a high-risk behavior that frequently triggers large negative rewards (often between -10 and -20).
+6. **Unstable State Penalties:** Large negative rewards can be incurred even when no action is taken (Action 0) if the lander is in an unrecoverable angular state while grounded.
+7. **Crash/Tip-over Penalty Scale:** Significant negative rewards (often in the -10 to -25 range) are characteristic of tipping events, crashes, or high-magnitude instability during the landing phase.
+8. **Stability-Based Reward Volatility:** While grounded, the reward signal is extremely sensitive to orientation and angular velocity; actions that correct orientation yield high rewards, while unstable states yield large penalties.
+9. **Angular Momentum Management:** Maintaining near-zero `angle` and `ang_vel` is critical to prevent uncontrollable rotation and subsequent tipping upon touchdown.
+10. **Landing Success Reward:** A successful, stable landing sequence can result in a large positive terminal reward (e.g., +100.0).
+
+---
+
+## 2026-07-09 06:33:16
+
+1. **Vertical Thrust:** Action 2 (main engine) provides upward thrust that directly counters gravity, reducing negative `y_vel` and slowing descent.
+2. **Lateral and Rotational Control:** Actions 1 (left engine) and 3 (right engine) provide both lateral acceleration (`x_vel`) and torque, affecting the lander's `angle` and `ang_vel`.
+3. **Side-Engine Descent Penalty:** Utilizing side engines (Actions 1 or 3) during the descent phase frequently incurs immediate negative rewards (typically in the -1.0 to -3.0 range), suggesting a cost for lateral/rotational maneuvers.
+4. **Leg Contact Mechanics:** Leg contact is registered as 1.0 when the lander's legs touch the ground; the left and right legs can be in contact independently or simultaneously.
+5. **Grounded Side-Engine Risk:** Using side engines (Actions 1 or 3) while in contact with the ground is high-risk and can lead to significant instability or crashes.
+6. **Unstable State Penalties:** Large negative rewards can be incurred even with no action taken (Action 0) if the lander's orientation or angular velocity enters an unrecoverable or highly unstable state.
+7. **Crash/Terminal Penalty Scale:** A catastrophic failure, such as a tip-over or uncontrolled landing, results in a massive terminal penalty (e.g., -100.0).
+8. **Stability-Based Reward Volatility:** During the landing and grounded phases, the reward signal is extremely sensitive to orientation and angular velocity; stable states yield high positive rewards, while increasing instability triggers rapid reward decay.
+9. **Angular Momentum Management:** Maintaining near-zero `angle` and `ang_vel` is critical; excessive angular velocity during or immediately after leg contact is a primary precursor to terminal crash penalties.
+10. **Landing Success Reward:** A successful, stable landing sequence (low `y_vel`, low `ang_vel`, and near-zero `angle` upon contact) results in substantial positive rewards.
+
+---
+
+## 2026-07-09 06:36:48
+
+1. **Vertical Thrust:** Action 2 (main engine) provides upward thrust that directly counters gravity, reducing negative `y_vel` and slowing descent.
+2. **Lateral and Rotational Control:** Actions 1 (left engine) and 3 (right engine) provide both lateral acceleration (`x_vel`) and torque, affecting the lander's `angle` and `ang_vel`.
+3. **Side-Engine Maneuver Cost:** Utilizing side engines (Actions 1 or 3) during the descent phase frequently incurs a cost, manifesting as negative rewards (typically in the -1.0 to -3.0 range).
+4. **Leg Contact Mechanics:** Leg contact is registered as 1.0 when the lander's legs touch the ground; the left and right legs can be in contact independently or simultaneously.
+5. **Grounded Maneuver Volatility:** Using side engines (Actions 1 or 3) while in contact with the ground is highly volatile; while it often triggers instability and negative rewards, it can also be used to trigger high positive rewards if it facilitates a necessary state transition.
+6. **Grounded Velocity Penalty:** Significant negative rewards (frequently in the -10.0 to -25.0 range) are incurred if the lander possesses non-zero lateral (`x_vel`) or vertical (`y_vel`) velocity while in contact with the ground.
+7. **Crash/Terminal Penalty Scale:** A catastrophic failure, such as a tip-over or uncontrolled landing, results in a massive terminal penalty (e.g., -100.0).
+8. **Stability-Based Reward Volatility:** During the landing and grounded phases, the reward signal is extremely sensitive to orientation, angular velocity, and the specific state of leg contact.
+9. **Angular Momentum Management:** Maintaining near-zero `angle` and `ang_vel` is critical; excessive angular velocity during or immediately after leg contact is a primary precursor to large negative rewards and terminal crash penalties.
+10. **Contact State Rewards:** Significant positive rewards can be triggered by rapid transitions in leg contact states or by successfully stabilizing the lander's velocity during or immediately following ground contact.
+
+---
+
+## 2026-07-09 06:42:24
+
+---
+1. **Vertical Thrust:** Action 2 (main engine) provides upward thrust that directly counters gravity, reducing negative `y_vel` and slowing descent.
+2. **Lateral and Rotational Control:** Actions 1 (left engine) and 3 (right engine) provide both lateral acceleration (`x_vel`) and torque, affecting the lander's `angle` and `ang_vel`.
+3. **Side-Engine Maneuver Cost:** Utilizing side engines (Actions 1 or 3) during the descent phase frequently incurs a cost, manifesting as negative rewards (typically in the -1.0 to -3.0 range).
+4. **Leg Contact Mechanics:** Leg contact is registered as 1.0 when the lander's legs touch the ground; the left and right legs can be in contact independently or simultaneously.
+5. **Grounded Maneuver Volatility:** Using side engines (Actions 1 or 3) while in contact with the ground is highly volatile; while it often triggers instability and negative rewards, it can also be used to trigger high positive rewards if it facilitates a necessary state transition.
+6. **Grounded Velocity Penalty:** Significant negative rewards (frequently in the -7.0 to -20.0 range) are incurred if the lander possesses non-zero lateral (`x_vel`) or vertical (`y_vel`) velocity while in contact with the ground, even if no engine action is taken (Action 0).
+7. **Crash/Terminal Penalty Scale:** A catastrophic failure, such as a tip-over or uncontrolled landing, results in a massive terminal penalty (e.g., -100.0).
+8. **Stability-Based Reward Volatility:** During the landing and grounded phases, the reward signal is extremely sensitive to orientation, angular velocity, and the specific state of leg contact.
+9. **Angular Momentum Management:** Maintaining near-zero `angle` and `ang_vel` is critical; excessive angular velocity during or immediately after leg contact is a primary precursor to large negative rewards and terminal crash penalties.
+10. **Contact State Rewards:** Significant positive rewards (often in the +8.0 to +15.0 range) can be triggered by rapid transitions in leg contact states or by successfully stabilizing the lander's velocity during or immediately following ground contact.
+
+---
+
+## 2026-07-09 06:43:46
+
+---
+1. **Vertical Thrust:** Action 2 (main engine) provides upward thrust that directly counters gravity, reducing negative `y_vel` and slowing descent.
+2. **Lateral and Rotational Control:** Actions 1 (left engine) and 3 (right engine) provide both lateral acceleration (`x_vel`) and torque, affecting the lander's `angle` and `ang_vel`.
+3. **Side-Engine Maneuver Cost:** Utilizing side engines (Actions 1 or 3) during the descent phase frequently incurs a cost, manifesting as negative rewards (typically in the -1.0 to -3.0 range).
+4. **Leg Contact Mechanics:** Leg contact is registered as 1.0 when the lander's legs touch the ground; the left and right legs can be in contact independently or simultaneously.
+5. **Grounded Engine Volatility:** Using side engines (Actions 1 or 3) or the main engine (Action 2) while in contact with the ground is highly volatile; this often triggers significant negative rewards (frequently in the -7.0 to -25.0 range) due to induced instability.
+6. **Grounded Velocity Penalty:** Large negative rewards (e.g., -10.0 to -20.0) are incurred if the lander possesses non-zero lateral (`x_vel`) or vertical (`y_vel`) velocity while in contact with the ground, even if no engine action is taken (Action 0).
+7. **Crash/Terminal Penalty Scale:** A catastrophic failure, such as a tip-over or uncontrolled landing, results in a massive terminal penalty of -100.0.
+8. **Stability-Based Reward Volatility:** During the landing and grounded phases, the reward signal is extremely sensitive to orientation, angular velocity, and the specific state of leg contact.
+9. **Angular Momentum Management:** Maintaining near-zero `angle` and `ang_vel` is critical; excessive angular velocity during or immediately after leg contact is a primary precursor to large negative rewards and terminal crash penalties.
+10. **Contact State Rewards:** Significant positive rewards (often in the +10.0 to +20.0 range) can be triggered by successful transitions in leg contact states or by stabilizing the lander's velocity during or immediately following ground contact.
+
+---
+
+## 2026-07-09 06:46:32
+
+---
+1. **Main Engine (Action 2) Dynamics:** Provides vertical thrust to counter gravity; however, application while grounded can induce significant instability or cause a sudden loss of leg contact.
+2. **Lateral/Rotational Control (Actions 1 & 3):** Side engines provide lateral acceleration and torque; their reward impact is state-dependent, serving as necessary corrections or incurring penalties if they exacerbate existing instability.
+3. **Landing Contact Rewards:** Significant positive reward spikes (+10.0 to +13.0) are triggered during the transition from a zero-contact state to a leg contact state (1.0).
+4. **Grounded Engine Instability:** Activating any engine (Actions 1, 2, or 3) while in contact with the ground frequently results in high negative rewards (-7.0 to -25.0) due to induced oscillations, bouncing, or tip-over precursors.
+5. **Grounded State Penalty:** Large negative rewards (-10.0 to -20.0) can be incurred even with no engine action (Action 0) if the lander maintains high angular velocity or non-zero lateral/vertical velocity while in contact.
+6. **Leg Contact Mechanics:** Leg contact is binary (0.0 or 1.0) for each leg; the lander can be in a state of single-leg contact, dual-leg contact, or no contact.
+7. **Angular Momentum Management:** Maintaining near-zero `angle` and `ang_vel` is critical; excessive angular motion during or immediately after contact is a primary driver of reward degradation and terminal failure.
+8. **Contact Loss Dynamics:** Transitions from a grounded state (contact 1.0) to a non-contact state (contact 0.0) are often preceded by high instability and significant negative reward fluctuations.
+9. **Descent-to-Landing Coupling:** The reward signal is extremely sensitive to the interplay between `y_vel`, `angle`, and the specific leg contact configuration during the touchdown phase.
+10. **Reward Volatility:** During the landing and grounded phases, the reward signal is highly volatile, where minimal changes in orientation or angular velocity can cause large swings in the reward value.
+
+---
+
+## 2026-07-09 06:48:26
+
+1. **Main Engine (Action 2) Vertical Control:** Action 2 is the primary mechanism for managing `y_vel` (vertical velocity); successful application during descent typically yields positive rewards by controlling the rate of descent.
+2. **Side Engine (Actions 1 & 3) Rotational Trade-off:** Side engines provide necessary lateral control but incur high risk; they frequently induce rapid changes in `angle` and `ang_vel`, often resulting in immediate negative reward sequences.
+3. **Landing Contact Reward Spikes:** Significant positive reward spikes (ranging from approximately +7.0 to +17.0) are triggered when the lander transitions from a zero-contact state to a leg contact state (1.0).
+4. **Terminal Failure Penalty:** A massive negative terminal reward of -100.0 is triggered when the lander fails to stabilize after landing, typically characterized by excessive tilt or high angular velocity.
+5. **Post-Contact Stability Requirements:** Achieving leg contact (1.0, 1.0) does not guarantee success; if the lander maintains high angular velocity (e.g., `ang_vel` < -0.4) or increasing `angle` immediately after touchdown, it triggers the terminal failure state.
+6. **Leg Contact Mechanics:** Leg contact is a discrete binary state (0.0 or 1.0) for each leg; stable landing requires the transition to dual-leg contact (1.0, 1.0) while maintaining low angular momentum.
+7. **Angular Momentum Management:** Maintaining near-zero `ang_vel` is critical throughout the entire trajectory; excessive angular motion during the descent or the post-contact phase is a primary driver of reward degradation and terminal failure.
+8. **Side Engine Instability Patterns:** Action 3 (right engine) in many observed descent states appears highly prone to inducing unwanted rotation, frequently resulting in sequences of negative rewards.
+9. **Descent-to-Landing Coupling:** The reward signal is extremely sensitive to the interplay between `y_vel`, `angle`, and the specific leg contact configuration during the transition from flight to grounded states.
+10. **Reward Volatility:** The reward signal is highly volatile, particularly during the landing phase, where minimal shifts in orientation or angular velocity can cause large, rapid swings in the reward value.
+
+---
+
+## 2026-07-09 06:51:59
+
+1. **Main Engine (Action 2) Vertical Control:** Action 2 is the primary mechanism for managing `y_vel`; its application is essential for regulating the rate of descent.
+2. **Side Engine (Actions 1 & 3) Rotational Control:** Side engines provide necessary lateral and angular adjustments but are prone to inducing high `ang_vel`, which can destabilize the lander.
+3. **Leg Contact Reward Spikes:** Significant positive reward spikes are triggered by transitions from a 0.0 to a 1.0 state in either leg, occurring during both single-leg and dual-leg contact arrivals.
+4. **Leg Contact Loss Penalty:** Transitioning from a 1.0 to a 0.0 state (losing contact with the ground) incurs substantial negative rewards, frequently exceeding -15.0.
+5. **Terminal Success Reward:** A terminal reward of +100.0 is awarded at the conclusion of a successful, stabilized landing episode.
+6. **Binary Leg Contact Mechanics:** Leg contact is a discrete binary state (0.0 or 1.0); the reward signal is highly sensitive to the specific transition between these states.
+7. **Angular Momentum Management:** Maintaining near-zero `ang_vel` is critical throughout the landing phase; high angular velocity during or immediately after contact is a primary driver of reward degradation and contact loss.
+8. **Action 3 Destabilization Patterns:** Action 3 (right engine) is frequently associated with rapid rotational shifts and the subsequent loss of leg contact, often leading to heavy penalties.
+9. **Reward Volatility:** The reward signal is extremely volatile during the descent-to-landing transition, where minimal shifts in orientation or contact status cause large, rapid swings in value.
+10. **Landing Configuration Coupling:** The reward magnitude is tightly coupled to the resulting leg contact configuration (e.g., (1,0), (0,1), or (1,1)) immediately following an engine action.
+
+---
+
+## 2026-07-09 06:54:18
+
+1. **Main Engine (Action 2) Vertical Control:** Action 2 is the primary mechanism for managing `y_vel`; its application is essential for regulating the rate of descent and controlling vertical momentum.
+2. **Side Engine (Actions 1 & 3) Rotational Control:** Side engines provide necessary lateral and angular adjustments; while they can induce destabilizing `ang_vel`, they are also critical tools for rotational recovery.
+3. **Leg Contact Reward Spikes:** Significant positive reward spikes are triggered by transitions from a 0.0 to a 1.0 state in either leg, most notably during the transition to a dual-leg contact state (e.g., (0,0) $\rightarrow$ (1,1) or (0,1) $\rightarrow$ (1,1)).
+4. **Leg Contact Loss Penalty:** Transitioning from a 1.0 to a 0.0 state in either leg (e.g., (1,1) $\rightarrow$ (0,1) or (1,1) $\rightarrow$ (0,0)) incurs substantial negative rewards, often ranging from -10.0 to -25.0.
+5. **Terminal Success Reward:** A terminal reward of +100.0 is awarded at the conclusion of a successful, stabilized landing episode.
+6. **Binary Leg Contact Mechanics:** Leg contact is a discrete binary state (0.0 or 1.0); the reward signal is highly sensitive to the specific transition between these states.
+7. **Angular Momentum Management:** Maintaining near-zero `ang_vel` is critical; high angular velocity during or immediately after contact is a primary driver of contact loss and heavy penalties.
+8. **Physics-Driven Contact Transitions:** Leg contact states can change even when Action 0 (nothing) is selected, indicating that gravity and momentum drive "bouncing" or "sliding" mechanics.
+9. **Reward Volatility:** The reward signal is extremely volatile during the descent-to-landing and post-contact phases, where minimal shifts in orientation or contact status cause large, rapid swings in value.
+10. **Landing Configuration Coupling:** The reward magnitude is tightly coupled to the resulting leg contact configuration (e.g., (1,0), (0,1), or (1,1)) immediately following an engine action or physics event.
+
+---
+
+## 2026-07-09 06:55:09
+
+1. **Main Engine (Action 2) Vertical Control:** Action 2 remains the primary mechanism for regulating `y_vel`, essential for managing the descent rate and controlling vertical momentum.
+2. **Side Engine (Actions 1 & 3) Rotational Control:** Side engines provide necessary torque for adjusting `angle` and `ang_vel`; they are critical for both stabilizing the descent and performing rapid attitude corrections.
+3. **Leg Contact Reward Spikes:** Transitions from 0.0 to 1.0 in either leg (e.g., (0,0) $\rightarrow$ (1,0) or (0,1) $\rightarrow$ (1,1)) trigger significant positive reward spikes, which can occasionally exceed +12.0 during recovery maneuvers.
+4. **Leg Contact Loss Penalty:** Transitioning from 1.0 to 0.0 in either leg (e.g., (1,1) $\rightarrow$ (0,1)) incurs substantial negative rewards, typically ranging from -7.0 to -13.0, often exacerbated by high angular velocity.
+5. **Terminal Success Reward:** A terminal reward of +100.0 is awarded upon reaching a successful, stabilized landing state.
+6. **Contact Recovery Dynamics:** The reward structure incentivizes contact recovery; a significant penalty from losing contact can be mitigated by re-establishing contact (0.0 $\rightarrow$ 1.0) if the lander's orientation is controlled.
+7. **Angular Velocity and Bouncing:** High `ang_vel` is a primary driver of "bouncing" mechanics, where the lander undergoes rapid, volatile transitions between contact states (1.0 $\leftrightarrow$ 0.0) and experiences large reward swings.
+8. **Physics-Driven Contact Transitions:** Leg contact states are highly dynamic and can fluctuate due to gravity and momentum even when no engine action is applied (Action 0).
+9. **Reward Volatility during Landing:** The reward signal is extremely volatile during the transition from flight to contact, as minimal shifts in orientation or vertical velocity cause rapid, large-scale changes in contact status.
+10. **Landing Configuration Coupling:** The reward landscape is tightly coupled to the specific leg contact configuration—(0,0), (1,0), (0,1), or (1,1)—immediately following physics events or engine applications.
+
+---
+
+## 2026-07-09 06:56:26
+
+1. **Main Engine (Action 2) Vertical Control:** Action 2 remains the primary mechanism for regulating `y_vel`, essential for managing the descent rate and controlling vertical momentum.
+2. **Side Engine (Actions 1 & 3) Rotational Control:** Side engines provide necessary torque for adjusting `angle` and `ang_vel`; they are critical for both stabilizing the descent and performing rapid attitude corrections to prevent crashes.
+3. **Leg Contact Reward Spikes:** Transitions from 0.0 to 1.0 in either leg (e.g., (0,0) $\rightarrow$ (1,0)) trigger significant positive reward spikes, with observed values reaching up to approximately +14.8.
+4. **Leg Contact Loss Penalty:** Transitioning from 1.0 to 0.0 in either leg (e.g., (1,1) $\rightarrow$ (0,1)) incurs substantial negative rewards, with recent trajectories showing penalties as high as -18.9.
+5. **Terminal Reward/Penalty:** A terminal reward of +100.0 is awarded for a successful landing, while a terminal penalty of -100.0 is incurred upon a crash (failure).
+6. **Post-Contact Volatility (Micro-Bouncing):** Once contact is established, the lander frequently undergoes rapid, high-frequency oscillations between contact (1.0) and non-contact (0.0) states, causing continuous reward fluctuations even when the lander is nearly stationary.
+7. **Angular Velocity and Stability:** High `ang_vel` is a primary driver of instability; excessive rotation during the landing phase can lead to rapid, volatile transitions between contact states and ultimately result in a terminal crash.
+8. **Contact Recovery Dynamics:** The reward structure incentivizes contact recovery; the heavy penalties incurred from losing contact can be mitigated by successfully re-establishing contact (0.0 $\rightarrow$ 1.0) if the orientation is stabilized.
+9. **Physics-Driven Contact Transitions:** Leg contact states are highly dynamic and can fluctuate due to gravity and momentum; these transitions can occur frequently even when minimal engine action (Action 0) is applied.
+10. **Landing Configuration Coupling:** The reward landscape is tightly coupled to the specific leg contact configuration—(0,0), (1,0), (0,1), or (1,1)—which dictates the immediate stability and the resulting reward signal following physics events.
+
+---
+
+## 2026-07-09 06:59:21
+
+1. **Main Engine (Action 2) Vertical Control:** Action 2 remains the primary mechanism for regulating `y_vel`, which is essential for managing the descent rate and controlling vertical momentum.
+2. **Side Engine (Actions 1 & 3) Rotational Control:** Side engines provide the necessary torque for adjusting `angle` and `ang_vel`; they are critical for both stabilizing the descent and performing attitude corrections to prevent crashes.
+3. **Leg Contact Reward Spikes:** Transitions to contact states (0.0 $\rightarrow$ 1.0) trigger significant positive rewards, with recent observations showing spikes reaching above +22.0.
+4. **Leg Contact Loss Penalty:** Transitioning from contact to non-contact states (1.0 $\rightarrow$ 0.0) incurs substantial negative rewards, with recent trajectories showing penalties exceeding -18.0.
+5. **Terminal Reward/Penalty:** A terminal reward of +100.0 is awarded for a successful landing, while a terminal penalty of -100.0 is incurred upon a crash.
+6. **Post-Contact Volatility (Micro-Bouncing):** Once contact is established, the lander frequently undergoes rapid, high-frequency oscillations between contact (1.0) and non-contact (0.0) states.
+7. **Angular Velocity and Crash Risk:** High `ang_vel` is a primary driver of instability; excessive rotation can lead to a terminal crash even after both legs have successfully established contact.
+8. **Contact Recovery Dynamics:** The reward structure heavily incentivizes contact recovery; re-establishing contact (0.0 $\rightarrow$ 1.0) following a loss can yield massive positive rewards that can mitigate previous loss penalties.
+9. **Physics-Driven Contact Transitions:** Leg contact states are highly dynamic and can fluctuate due to gravity and momentum; these transitions can occur frequently even when minimal engine action (Action 0) is applied.
+10. **Landing Configuration Coupling:** The reward landscape is tightly coupled to the specific leg contact configuration—(0,0), (1,0), (0,1), or (1,1)—which dictates the immediate stability and the resulting reward signal.
+
+---
+
+## 2026-07-09 07:02:43
+
+---
+1. **Main Engine (Action 2) Vertical Control:** Action 2 is the primary mechanism for regulating `y_vel`, but excessive application can induce upward vertical momentum that breaks established leg contact (1.0 $\rightarrow$ 0.0).
+2. **Side Engine (Actions 1 & 3) Rotational Control:** Side engines provide the necessary torque to adjust `angle` and `ang_vel`, which is essential for stabilizing attitude and preventing orientation-based crashes.
+3. **Leg Contact Reward Spikes:** Transitions into contact states (0.0 $\rightarrow$ 1.0) trigger significant positive rewards, particularly during successful recovery attempts following a loss of contact.
+4. **Leg Contact Loss Penalties:** Transitions from contact to non-contact states (1.0 $\rightarrow$ 0.0) incur heavy negative rewards, penalizing instability or insufficient downward pressure.
+5. **Terminal Reward/Penalty:** A terminal reward of +100.0 is awarded for a successful landing, while a terminal penalty of -100.0 is incurred upon a crash.
+6. **Post-Contact Volatility (Micro-Bouncing):** Once contact is established, the lander is prone to rapid, high-frequency oscillations between contact (1.0) and non-contact (0.0) states.
+7. **Angular Velocity and Crash Risk:** High `ang_vel` is a primary driver of instability; excessive rotation can lead to a terminal crash even after both legs have successfully established contact.
+8. **Contact Recovery Dynamics:** The reward structure heavily incentivizes re-establishing contact (0.0 $\rightarrow$ 1.0) following a loss, which can significantly mitigate previous contact-loss penalties.
+9. **Physics-Driven Contact Transitions:** Leg contact states are highly dynamic and can fluctuate due to gravity and momentum; these transitions can occur frequently even when minimal engine action (Action 0) is applied.
+10. **Action-Induced Contact Instability:** Both the main engine (Action 2) and the side engines (Actions 1 & 3) can inadvertently trigger contact loss (1.0 $\rightarrow$ 0.0) through sudden shifts in vertical or rotational momentum.
+
+---
+
+## 2026-07-09 07:05:10
+
+---
+1. **Main Engine (Action 2) Vertical Control:** Action 2 is the primary mechanism for regulating `y_vel`, but excessive application can induce upward vertical momentum that breaks established leg contact (1.0 $\rightarrow$ 0.0).
+2. **Side Engine (Actions 1 & 3) Rotational Control:** Side engines provide the necessary torque to adjust `angle` and `ang_vel`, which is essential for stabilizing attitude and preventing orientation-based crashes.
+3. **Contact-Initiation Rewards:** Transitions from a non-contact state to a contact state (0.0 $\rightarrow$ 1.0), whether for a single leg or both, trigger significant positive reward spikes.
+4. **Contact-Loss Penalties:** Transitions from a contact state to a non-contact state (1.0 $\rightarrow$ 0.0) incur heavy negative rewards, penalizing instability or insufficient downward pressure.
+5. **Ground-Level Instability Penalties:** Maintaining non-zero `y_vel` or `ang_vel` while in a contact state near the ground (`y_pos` $\approx$ 0) can incur massive negative rewards, even if leg contact is not lost.
+6. **Terminal Reward/Penalty:** A terminal reward of +100.0 is awarded for a successful landing, while a terminal penalty of -100.0 is incurred upon a crash.
+7. **Contact Recovery Dynamics:** The reward structure heavily incentivizes re-establishing contact (0.0 $\rightarrow$ 1.0) following a loss, which can significantly mitigate previous contact-loss penalties.
+8. **Angular Velocity and Crash Risk:** High `ang_vel` is a primary driver of instability; excessive rotation can lead to a terminal crash even after both legs have successfully established contact.
+9. **Post-Contact Volatility (Micro-Bouncing):** Once contact is established, the lander is prone to rapid, high-frequency oscillations between contact (1.0) and non-contact (0.0) states.
+10. **Action-Induced Contact Instability:** Both the main engine (Action 2) and the side engines (Actions 1 & 3) can inadvertently trigger contact loss (1.0 $\rightarrow$ 0.0) through sudden shifts in vertical or rotational momentum.
+
+---
+
+## 2026-07-09 07:09:16
+
+1. **Main Engine (Action 2) Vertical Regulation:** Action 2 is the primary mechanism for regulating `y_vel`, but excessive application induces upward vertical momentum that breaks established leg contact (1.0 $\rightarrow$ 0.0).
+2. **Side Engines (Actions 1 & 3) Rotational/Lateral Control:** Side engines provide necessary torque to adjust `angle` and `ang_vel`. However, they can trigger abrupt contact loss (1.0 $\rightarrow$ 0.0) through sudden shifts in rotational or lateral momentum.
+3. **High-Magnitude Contact Transition Rewards/Penalties:** Transitions in contact states (0.0 $\leftrightarrow$ 1.0) are associated with large reward magnitudes; losing contact can incur heavy penalties (e.g., ~ -21.0), while regaining contact provides significant positive spikes (e.g., ~ +21.9).
+4. **Contact-Initiation Incentives:** Transitions from a non-contact state to a contact state (0.0 $\rightarrow$ 1.0), for either or both legs, trigger significant positive reward spikes.
+5. **Contact-Loss Penalties:** Transitions from a contact state to a non-contact state (1.0 $\rightarrow$ 0.0) incur heavy negative rewards, penalizing instability, excessive upward force, or sudden rotational shifts.
+6. **Ground-Level Instability Penalties:** Maintaining non-zero `y_vel` or `ang_vel` while in a contact state near the ground (`y_pos` $\approx$ 0) can incur massive negative rewards, even if leg contact is not lost.
+7. **Terminal Reward/Penalty:** A terminal reward of +100.0 is awarded for a successful landing, while a terminal penalty of -100.0 is incurred upon a crash. Crashes can occur even after both legs have successfully established contact.
+8. **Contact Recovery Dynamics:** The reward structure heavily incentivizes re-establishing contact (0.0 $\rightarrow$ 1.0) following a loss, which can significantly mitigate previous contact-loss penalties.
+9. **Angular Velocity and Crash Risk:** High `ang_vel` is a primary driver of instability; excessive rotation can lead to a terminal crash even after the lander has reached a low `y_pos` or established leg contact.
+10. **Post-Contact Volatility (Micro-Bouncing):** Once contact is established, the lander is prone to rapid, high-frequency oscillations between contact (1.0) and non-contact (0.0) states.
+
+---
+
+## 2026-07-09 07:10:07
+
+---
+
+
+---
+
+## 2026-07-09 07:11:57
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): The primary source of vertical upward thrust, used to counteract gravity and manage descent velocity (`y_vel`).
+3. Side Engines (Actions 1 & 3): Used to manipulate the lander's orientation by providing torque to adjust `angle` and `ang_vel`.
+4. Torque Directionality: Action 1 (left engine) increases angular velocity (`ang_vel`), whereas Action 3 (right engine) decreases it.
+5. Thrust Vectoring: The side engines' impact on `x_vel` and `y_vel` is modulated by the current `angle`, meaning a tilted lander will experience horizontal drift when using side engines.
+6. Ground Boundary: The ground is located at `y_pos = 0`.
+7. Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors transition from 0.0 to 1.0 when the lander reaches the ground.
+8. Crash Mechanics: Ground penetration (indicated by a negative `y_pos`) combined with high impact velocities or large angles triggers severe negative rewards.
+9. Rotational Stability: Managing `ang_vel` through side engine torque is required to stabilize the `angle` and ensure the lander remains upright during descent.
+10. Landing Stability: Successful landing requires maintaining contact on both legs simultaneously; losing contact on one leg (e.g., transitioning from `[1.0, 1.0]` to `[1.0, 0.0]`) often precedes a crash or instability.
+
+---
+
+## 2026-07-09 07:15:50
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): The primary source of vertical upward thrust, used to counteract gravity and manage descent velocity (`y_vel`).
+3. Side Engines (Actions 1 & 3): Used to manipulate the lander's orientation by providing torque and to adjust both `x_vel` and `y_vel`.
+4. Torque Directionality: Action 1 (left engine) increases angular velocity (`ang_vel`), whereas Action 3 (right engine) decreases it.
+5. Thrust Vectoring: The side engines' impact on linear velocities is modulated by the current `angle`; a tilted lander will experience changes in both `x_vel` and `y_vel` when using side engines.
+6. Ground Boundary: The ground is located at `y_pos = 0`.
+7. Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors transition from 0.0 to 1.0 when the lander reaches the ground.
+8. Crash and Instability Mechanics: Severe negative rewards are triggered by ground penetration (`y_pos < 0`), high impact velocities, or significant angular instability (high `ang_vel` or `angle`) during the landing phase.
+9. Rotational Stability: Managing `ang_vel` through side engine torque is required to stabilize the `angle` and minimize rotational kinetic energy before touchdown.
+10. Landing Precision: Successful landing requires the simultaneous minimization of `y_vel`, `ang_vel`, and `angle` at the moment of contact to prevent ground penetration and instability penalties.
+
+---
+
+## 2026-07-09 07:18:45
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): The primary source of vertical upward thrust, used to counteract gravity and manage descent velocity (`y_vel`).
+3. Side Engines (Actions 1 & 3): Used to manipulate the lander's orientation by providing torque and to adjust both `x_vel` and `y_vel`.
+4. Torque Directionality: Action 1 (left engine) increases angular velocity (`ang_vel`), whereas Action 3 (right engine) decreases it.
+5. Thrust Vectoring: The side engines' impact on linear velocities is modulated by the current `angle`; a tilted lander will experience changes in both `x_vel` and `y_vel` when using side engines.
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently when their respective legs make contact with the ground.
+7. Post-Contact Dynamics: Ground contact does not immediately terminate the episode; the lander remains subject to gravity, thrust, and torque, allowing for potential instability or further movement after initial contact.
+8. Rotational and Impact Instability: Severe negative rewards are triggered by high angular velocity (`ang_vel`), significant tilt (`angle`), or high impact velocities during the landing phase.
+9. Landing Precision: Successful landing requires the simultaneous minimization of `y_vel`, `ang_vel`, and `angle` at the moment of contact to ensure stability.
+10. Terminal Reward Structure: The simulation concludes with a large terminal reward (e.g., +100) for a stable landing or a large terminal penalty (e.g., -100) for a crash or unstable touchdown.
+
+---
+
+## 2026-07-09 07:22:26
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): Provides the primary source of vertical upward thrust to counteract gravity and also contributes significant torque, affecting the lander's angular velocity (`ang_vel`).
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (Action 1 generally increases `ang_vel`, while Action 3 generally decreases it) and to adjust linear velocities (`x_vel` and `y_vel`) through thrust vectoring.
+4. Gravity-Induced Torque: If the lander is tilted (`angle` ≠ 0), gravity can induce changes in angular velocity (`ang_vel`) even when no engines are active (Action 0).
+5. Thrust Vectoring: The impact of side engines on linear velocities (`x_vel` and `y_vel`) is modulated by the current `angle`; a tilted lander will experience lateral movement when side engines are fired.
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently, allowing for states where only one leg is in contact with the ground.
+7. Post-Contact Dynamics: Ground contact does not immediately terminate the episode; the lander remains subject to gravity, thrust, and torque, which can cause it to tip, slide, or continue rotating.
+8. Angular Momentum: Angular velocity (`ang_vel`) persists due to rotational inertia, even when no engines are being used (Action 0).
+9. Landing Stability: Successful landing requires the simultaneous minimization of `y_vel`, `ang_vel`, and `angle` at the moment of contact to prevent post-contact instability.
+10. Terminal Reward Structure: The simulation concludes with a large terminal reward for a stable landing or a large terminal penalty (e.g., -100) for a crash or unstable touchdown.
+
+---
+
+## 2026-07-09 07:23:52
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): Provides the primary source of vertical upward thrust to counteract gravity and also contributes significant torque, affecting `ang_vel`.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque and to adjust linear velocities (`x_vel` and `y_vel`) through thrust vectoring.
+4. Thrust Vectoring: The impact of side engines on linear velocities is modulated by the current `angle`; a tilted lander will experience lateral movement when side engines are fired.
+5. Angular Momentum: Angular velocity (`ang_vel`) persists due to rotational inertia, even when no engines are being used (Action 0).
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently, allowing for states where only one leg is in contact with the ground.
+7. Contact Stability: Once ground contact is established, the lander must maintain low `angle`, `ang_vel`, and `y_vel`; failure to maintain stability while in contact can trigger large negative rewards (e.g., -10 to -20).
+8. Post-Contact Dynamics: Ground contact does not immediately terminate the episode; the lander remains subject to gravity, thrust, and torque, which can cause it to tip, slide, or continue rotating.
+9. Successful Landing: Achieving a high terminal reward (e.g., 100) requires the lander to reach a state of minimal `y_vel`, `ang_vel`, and `angle` upon and during contact.
+10. Terminal and Mid-Episode Penalties: The simulation concludes with a large terminal reward for success, but significant penalties for crashes or instability can be applied mid-episode if stability thresholds are violated while in contact.
+
+---
+
+## 2026-07-09 07:27:23
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): Provides the primary source of vertical upward thrust and is a critical tool for vertical stabilization during ground contact.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque and to adjust linear velocities; their contribution to vertical movement is a function of the lander's `angle`.
+4. Thrust Vectoring: The impact of side engines on linear velocities is modulated by the current `angle`; a tilted lander will experience both lateral and vertical movement when side engines are fired.
+5. Angular Momentum: Angular velocity (`ang_vel`) persists due to rotational inertia, even when no engines are being used (Action 0).
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently, allowing for states of partial contact where only one leg is touching the ground.
+7. Post-Contact Dynamics: Ground contact is not a terminal state; the lander remains subject to gravity, thrust, and torque, which can cause it to tip, slide, or rotate.
+8. Contact-Phase Reward Duality: While in contact, the environment provides both significant negative penalties for instability and high positive rewards for successful stabilization.
+9. Stability Requirements: To avoid large mid-episode penalties during contact, the lander must maintain minimal `angle`, `ang_vel`, and `y_vel`.
+10. High Action-State Dependency: The outcome and reward of an action are extremely sensitive to the current state; an action that stabilizes the lander in one orientation can become a catastrophic source of instability in another.
+
+---
+
+## 2026-07-09 07:29:06
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): Provides the primary source of vertical upward thrust and is essential for managing vertical descent and maintaining altitude during the contact phase.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque and to adjust linear velocities; their contribution to vertical and lateral movement is determined by the lander's `angle`.
+4. Lateral Velocity Management: Side engines are critical for neutralizing horizontal drift (`x_vel`), which must be minimized to achieve a stable landing.
+5. Angular Momentum: Angular velocity (`ang_vel`) persists due to rotational inertia, requiring active engine torque to counteract.
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently, allowing for states of partial contact.
+7. Post-Contact Dynamics: Ground contact is not a terminal state; the lander remains subject to gravity, thrust, and torque, which can lead to sliding, tipping, or continued rotation.
+8. Contact-Phase Stability Penalties: During ground contact, the environment issues significant negative rewards (e.g., -10 to -20) if the lander maintains non-negligible residual linear (`x_vel`, `y_vel`) or angular (`ang_vel`) velocities.
+9. Catastrophic Failure: A terminal catastrophic penalty (e.g., -100) is triggered if the lander reaches an irrecoverable state, such as an excessive tilt or velocity, during the landing sequence.
+10. Thrust Vectoring: The effect of side engines on linear velocities is modulated by the current `angle`; a tilted lander will experience both lateral and vertical acceleration when side engines are fired.
+
+---
+
+## 2026-07-09 07:34:25
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): Provides the primary source of vertical upward thrust and is essential for managing descent and maintaining altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque and to adjust linear velocities; the effect on linear movement is modulated by the lander's current `angle`.
+4. Lateral Velocity Management: Side engines are critical for neutralizing horizontal drift (`x_vel`), which must be minimized to achieve a stable landing.
+5. Angular Momentum: `ang_vel` persists due to rotational inertia, requiring active engine torque to counteract and stabilize orientation.
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently, allowing for states of partial or single-leg contact.
+7. Post-Contact Dynamics: Ground contact is not a terminal state; the lander remains subject to gravity, thrust, and torque, which can lead to sliding or tipping (loss of contact).
+8. Contact-Phase Stability Penalties: During ground contact, the environment issues significant negative rewards (e.g., -10 to -21) if the lander maintains non-negligible residual vertical velocity (`y_vel`).
+9. Contact Reward: The transition from no contact to leg contact (the transition of a contact sensor from 0.0 to 1.0) can trigger significant positive rewards.
+10. Catastrophic Failure: A terminal catastrophic penalty is triggered if the lander reaches an irrecoverable state, such as an excessive tilt or velocity, during the landing sequence.
+
+---
+
+## 2026-07-09 07:36:11
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): Provides the primary source of vertical upward thrust and is essential for managing descent and maintaining altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque and to adjust linear velocities; the effect on linear movement is modulated by the lander's current `angle`.
+4. Lateral Velocity Management: Side engines are critical for neutralizing horizontal drift (`x_vel`), which must be minimized to achieve a stable landing.
+5. Angular Momentum: `ang_vel` persists due to rotational inertia, requiring active engine torque to counteract and stabilize orientation.
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently, allowing for states of partial or single-leg contact.
+7. Contact Transition Reward: The transition from no contact to leg contact (the transition of a contact sensor from 0.0 to 1.0) triggers significant positive rewards.
+8. Contact-Phase Stability Penalties: During ground contact, significant negative rewards (often exceeding -10) are issued if the lander maintains non-negligible vertical velocity (`y_vel`) or if engine thrust is applied, which can destabilize the landing.
+9. Post-Contact Dynamics: Ground contact is not a terminal state; the lander remains subject to gravity and engine thrust, which can lead to sliding, tipping, or loss of contact.
+10. Catastrophic Failure: A terminal catastrophic penalty (e.g., -100.0) is triggered if the lander reaches an irrecoverable state, such as excessive tilt or velocity.
+
+---
+
+## 2026-07-09 07:38:31
+
+1. Gravity: A constant downward force that reduces `y_vel` over time when no upward thrust is applied.
+2. Main Engine (Action 2): Provides the primary source of vertical upward thrust and is essential for managing descent and maintaining altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque and to adjust linear velocities; the effect on linear movement is modulated by the lander's current `angle`.
+4. Lateral Velocity Management: Side engines are critical for neutralizing horizontal drift (`x_vel`), which must be minimized to achieve a stable landing.
+5. Angular Momentum: `ang_vel` persists due to rotational inertia, requiring active engine torque to counteract and stabilize orientation.
+6. Independent Contact Detection: The `left_leg_contact` and `right_leg_contact` sensors trigger independently, allowing for states of partial or single-leg contact.
+7. Contact Transition Reward: The transition from no contact to leg contact (the transition of a contact sensor from 0.0 to 1.0) triggers significant positive rewards.
+8. Contact-Phase Instability: While contact provides high rewards, applying engine thrust (Actions 1, 2, or 3) during the contact phase is a high-risk behavior that can lead to rapid instability.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity and engine thrust, which can lead to sliding, tipping, or a transition to a terminal state.
+10. Catastrophic Failure: A terminal catastrophic penalty (-100.0) is triggered by irrecoverable states, such as excessive tilt, high impact velocity, or applying engine thrust while both legs are in contact.
+
+---
+
+## 2026-07-09 07:40:17
+
+1. Gravity: A constant downward force that reduces `y_vel` over time in the absence of upward thrust.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`), with the effect on linear movement being dependent on the current `angle`.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: A significant positive reward is triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Single-Leg Contact Instability: Applying engine thrust (Actions 1, 2, or 3) while only one leg is in contact results in substantial negative rewards (e.g., -18.2), indicating high instability.
+8. Dual-Leg Contact Catastrophe: Applying any engine thrust (Actions 1, 2, or 3) while both legs are in contact (`left_leg_contact=1.0` and `right_leg_contact=1.0`) triggers an immediate terminal catastrophic penalty of -100.0.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque.
+10. Terminal Failure Conditions: Catastrophic failure (-100.0) is triggered by specific irrecoverable actions, most notably applying thrust while the lander has achieved dual-leg contact.
+
+---
+
+## 2026-07-09 07:45:38
+
+1. Gravity: A constant downward force that reduces `y_vel` over time in the absence of upward thrust.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`), with the effect on linear movement being dependent on the current `angle`.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: A significant positive reward is triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Single-Leg Contact Instability: Single-leg contact (one sensor at 1.0) is a valid but potentially unstable state; certain combinations of orientation, velocity, and engine actions during this state can trigger substantial negative rewards (e.g., ~ -10.0).
+8. Dual-Leg Contact Viability: Applying thrust (Actions 1, 2, or 3) while both legs are in contact (`left_leg_contact=1.0` and `right_leg_contact=1.0`) is a permitted, non-terminal state and does not trigger a catastrophic penalty.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque.
+10. Terminal Failure Re-evaluation: Catastrophic failure (-100.0) is not triggered by dual-leg contact thrusting, implying it is instead linked to other factors such as high-velocity impacts or unrecoverable orientation.
+
+---
+
+## 2026-07-09 07:46:27
+
+1. Gravity: A constant downward force that reduces `y_vel` over time in the absence of upward thrust.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`), with the effect on linear movement being dependent on the current `angle`.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: A significant positive reward is triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Single-Leg Contact Instability: Single-leg contact (one sensor at 1.0) is a valid but potentially unstable state; certain combinations of orientation, velocity, and engine actions during this state can trigger substantial negative rewards.
+8. Dual-Leg Contact Viability: Applying thrust (Actions 1, 2, or 3) while both legs are in contact (`left_leg_contact=1.0` and `right_leg_contact=1.0`) is a permitted, non-terminal state.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque even after both sensors register contact.
+10. Velocity-Dependent Terminal Outcomes: The episode concludes in either a catastrophic failure (-100.0) or a successful landing (+100.0). The distinction is determined by the vertical velocity (`y_vel`) at the moment of dual-leg contact; high-velocity impacts trigger the failure penalty, while low-velocity, controlled contacts trigger the success reward.
+
+---
+
+## 2026-07-09 07:49:15
+
+1. Gravity: A constant downward force that reduces `y_vel` over time in the absence of upward thrust.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`), with the effect on linear movement being dependent on the current `angle`.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: A significant positive reward is triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Single-Leg Pivot Effect: Contact with only one leg can act as a pivot point, where applying thrust can generate extreme torque, leading to rapid and uncontrolled increases in `ang_vel`.
+8. Dual-Leg Contact Viability: Applying thrust (Actions 1, 2, or 3) while both legs are in contact (`left_leg_contact=1.0` and `right_leg_contact=1.0`) is a permitted, non-terminal state.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque even after sensors register contact.
+10. Multi-Factor Terminal Failure: Failure (-100.0) is triggered by high vertical velocity (`y_vel`) during impact or by excessive angular instability (high `angle` or `ang_vel`) during the landing or contact phase.
+
+---
+
+## 2026-07-09 07:52:08
+
+1. Gravity: A constant downward force that reduces `y_vel` over time in the absence of upward thrust.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`), with the effect on linear movement being dependent on the current `angle`.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: A significant positive reward is triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Single-Leg Pivot Instability: Applying side engines (Actions 1 or 3) while only one leg is in contact can act as a pivot point, generating extreme torque that leads to rapid and potentially uncontrolled increases in `ang_vel`.
+8. Dual-Leg Contact Viability: Applying thrust (Actions 1, 2, or 3) while both legs are in contact (`left_leg_contact=1.0` and `right_leg_contact=1.0`) is a permitted, non-terminal state.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque even after sensors register contact.
+10. Multi-Factor Terminal Failure: Failure (-100.0) is triggered by high vertical velocity (`y_vel`) during impact or by excessive angular instability (high `angle` or `ang_vel`) during the landing or contact phase.
+
+---
+
+## 2026-07-09 07:56:22
+
+1. Gravity: A constant downward force that reduces `y_vel` over time in the absence of upward thrust.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`), with the effect on linear movement being dependent on the current `angle`.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: A significant positive reward is triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Single-Leg Pivot Instability: Applying side engines (Actions 1 or 3) while only one leg is in contact can act as a pivot point, generating extreme torque that leads to rapid increases in `ang_vel`.
+8. Contact-Induced Penalties: Significant negative rewards are triggered by positive vertical velocity (`y_vel > 0`) or by applying engine thrust (Actions 1, 2, or 3) while in a contact state, unless the engines are actively managing a negative `y_vel`.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque even after sensors register contact.
+10. Multi-Factor Terminal Failure: Failure (-100.0) is triggered by high vertical velocity (`y_vel`) during impact or by excessive angular instability (high `angle` or `ang_vel`) during the landing or contact phase.
+
+---
+
+## 2026-07-09 07:58:07
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`).
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: Positive rewards are triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Vertical Impact Penalty: Significant negative rewards are triggered if contact occurs while the lander has a positive vertical velocity (`y_vel > 0`).
+8. Contact-Thrust Penalty: Applying engine thrust (Actions 1, 2, or 3) while in a contact state is heavily penalized unless the thrust is actively managing a negative vertical velocity (`y_vel < 0`).
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque even after sensors register contact.
+10. Terminal Outcome Requirements: Success is achieved through stable contact at low velocities; failure is triggered by high impact velocity or excessive angular instability (`angle` or `ang_vel`).
+
+---
+
+## 2026-07-09 08:12:03
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation via torque (`ang_vel` and `angle`) and to adjust lateral velocity (`x_vel`).
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Independent Contact Detection: `left_leg_contact` and `right_leg_contact` sensors operate independently, allowing for states of single-leg contact.
+6. Contact Transition Reward: Significant positive rewards (approx. +10 to +20) are triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Contact Disruption/Loss Penalty: Significant negative rewards (approx. -10) are triggered by transitions from 1.0 to 0.0 or by applying actions (1, 2, 3, or 0) that disrupt an established contact state.
+8. Velocity-Dependent Contact Reward: The magnitude of contact transition rewards is positively correlated with lower vertical velocities (`y_vel`) at the moment of contact.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque even after sensors register contact.
+10. Terminal Outcome Requirements: Success is achieved through stable contact at low velocities; failure is triggered by high impact velocity or excessive angular instability.
+
+---
+
+## 2026-07-09 08:14:45
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for generating vertical upward thrust to manage descent and altitude.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation and lateral velocity, but applying them while in a contact state frequently triggers severe negative rewards.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to counteract and stabilize the lander's orientation.
+5. Ground Plane: The landing surface is located at $y \approx 0$; state values can become negative, indicating the lander has penetrated the ground plane.
+6. Contact Transition Reward: Significant positive rewards are triggered when a contact sensor transitions from 0.0 to 1.0.
+7. Contact Loss and Engine Interference Penalties: Significant negative rewards are triggered by transitions from 1.0 to 0.0 (loss of contact) or by the application of engine actions (1, 2, or 3) while a contact state is established.
+8. Velocity-Dependent Contact Reward: The magnitude of contact transition rewards is positively correlated with lower vertical velocities (`y_vel`) at the moment of contact.
+9. Post-Contact Dynamics: Ground contact is not an inherently terminal state; the lander remains subject to gravity, lateral drift, and engine-induced torque even after sensors register contact.
+10. Terminal Outcome Requirements: Success is achieved through stable contact at low velocities; catastrophic failure is indicated by massive negative rewards (e.g., -100), triggered by high impact velocity or extreme angular instability.
+
+---
+
+## 2026-07-09 08:16:31
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust, but applying it while any leg is in a contact state (1.0) triggers massive negative rewards (frequently ranging from -10 to -20).
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation and lateral velocity, but they generally incur negative rewards, even during flight prior to making contact.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to stabilize orientation.
+5. Ground Plane: The landing surface is at $y \approx 0$; negative state values indicate the lander has penetrated the ground.
+6. Independent Leg Contact: Contact sensors for the left and right legs operate independently, allowing for partial contact states (e.g., [1.0, 0.0] or [0.0, 1.0]).
+7. Contact Transition Rewards: Significant positive rewards are triggered when a contact sensor transitions from 0.0 to 1.0, with magnitude positively correlated to lower vertical velocity.
+8. Contact Loss Penalties: Transitions from 1.0 to 0.0 (loss of contact) trigger significant negative rewards.
+9. Engine-Contact Interference: Applying any engine action (1, 2, or 3) while a contact state is established is heavily penalized.
+10. Terminal Success: Successful stabilization at low velocities is indicated by a large terminal reward (e.g., 100.0).
+
+---
+
+## 2026-07-09 08:19:11
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust; it provides positive rewards during flight and can yield either positive or small negative rewards while in a contact state.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation and lateral velocity; they can provide small positive rewards during certain flight phases but generally incur negative rewards.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to stabilize orientation.
+5. Ground Plane: The landing surface is at $y \approx 0$; negative state values indicate the lander has penetrated the ground.
+6. Independent Leg Contact: Contact sensors for the left and right legs operate independently, allowing for partial contact states (e.g., [1.0, 0.0]).
+7. Contact Transition Rewards: Significant positive rewards are triggered when a contact sensor transitions from 0.0 to 1.0.
+8. Contact Loss Penalties: Transitions from 1.0 to 0.0 (loss of contact) trigger massive negative rewards, typically ranging from -8 to -20.
+9. Engine/Contact Interaction: While applying engines during contact can result in minor negative rewards, the most severe penalties are specifically tied to the transition from a contact state to a non-contact state.
+10. Terminal Failure: A large negative terminal reward (e.g., -100.0) is triggered upon a crash or a failed landing attempt.
+
+---
+
+## 2026-07-09 08:23:08
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust; it can yield large positive rewards during contact transitions or sustained flight, but also significant negative rewards.
+3. Side Engines (Actions 1 & 3): Used to manipulate orientation and lateral velocity; they can provide both positive and negative rewards, particularly during contact states.
+4. Angular Momentum: Rotational velocity (`ang_vel`) persists due to inertia, requiring active engine torque to stabilize orientation.
+5. Ground Plane: The landing surface is at $y \approx 0$; the lander can penetrate the ground ($y < 0$) while still maintaining leg contact.
+6. Independent Leg Contact: Contact sensors for the left and right legs operate independently, allowing for partial contact states (e.g., `[1.0, 0.0]`).
+7. High-Magnitude Contact Transitions: Transitions in contact state (0.0 $\leftrightarrow$ 1.0) for either leg or swaps between legs (e.g., `[0.0, 1.0]` to `[1.0, 0.0]`) trigger significant reward spikes.
+8. Directional Contact Rewards: The sign of contact-related rewards is direction-dependent: transitions that establish contact (gains) or swap legs generally yield large positive rewards, while transitions that lose contact (losses) trigger large negative rewards.
+9. Engine/Contact Interaction: Engines can be applied while the lander is in a contact state, which can result in either positive or negative reward outcomes depending on the stability of the craft.
+10. Terminal Failure: A large negative terminal reward (e.g., -100.0) is triggered upon a crash or a failed landing attempt.
+
+---
+
+## 2026-07-09 08:24:04
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust; essential for managing descent velocity, but can exacerbate instability if the lander's orientation is not controlled.
+3. Side Engines (Actions 1 & 3): Used to manipulate both lateral velocity (`x_vel`) and angular velocity (`ang_vel`), serving as the primary mechanism for rotational torque.
+4. Angular Momentum Escalation: `ang_vel` can escalate to high magnitudes (e.g., > 1.0 rad/s), creating a state where the craft's rotation becomes difficult to counteract with available engine torque.
+5. Independent Leg Contact: Sensors for the left and right legs operate independently, allowing for partial contact states (e.g., `[1.0, 0.0]`) or full contact (`[1.0, 1.0]`).
+6. Contact Transition Rewards: Transitions that establish contact (gains) or swap legs (e.g., `[0.0, 1.0]` to `[1.0, 0.0]`) trigger significant positive reward spikes.
+7. Descent Phase Rewards: High-magnitude positive rewards can be triggered by specific engine applications during the final approach to the ground, even prior to the establishment of leg contact.
+8. Contact-Stability Relationship: Achieving contact (e.g., `[1.0, 0.0]`) does not guarantee a successful landing; high angular velocity during or immediately after contact is a primary driver of instability and terminal failure.
+9. Engine/Contact Interaction: Applying engines while in a contact state results in highly variable rewards, where the sign and magnitude depend heavily on the stability and orientation of the craft.
+10. Terminal Failure: A large negative terminal reward (-100.0) is triggered upon a crash, which is frequently preceded by uncontrolled angular rotation or high-velocity impacts.
+
+---
+
+## 2026-07-09 08:26:07
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust; effective application during descent generates significant positive rewards by managing vertical velocity.
+3. Side Engines (Actions 1 & 3): Used to manipulate both lateral velocity (`x_vel`) and angular velocity (`ang_vel`), serving as the primary mechanism for rotational torque.
+4. Angular Momentum Escalation: High `ang_vel` magnitudes can create states where rotation becomes extremely difficult to counteract with available side-engine torque.
+5. Contact Transition Rewards: Transitions that establish contact (e.g., from `[0.0, 0.0]` to `[1.0, 0.0]`) or achieve full contact (`[1.0, 1.0]`) trigger high-magnitude positive reward spikes.
+6. Ground Instability Penalties: While in a contact state, the lander frequently incurs large negative rewards (typically between -10.0 and -20.0) caused by tip-over events, high-velocity ground impacts, or rapid loss of contact.
+7. Descent Phase Rewards: Positive rewards are frequently triggered by the application of the main engine during the approach phase, even prior to the establishment of leg contact.
+8. Post-Landing Stability Requirements: Achieving contact does not end the stability challenge; the lander must maintain a steady orientation to avoid the repeated heavy penalties associated with ground-based oscillations and impacts.
+9. Engine/Contact Interaction: Applying engines while in a contact state results in highly variable rewards, where the outcome is heavily dependent on whether the thrust assists in stabilizing the craft or exacerbates a tip-over.
+10. Distinction of Failures: The simulation distinguishes between terminal crashes (large negative terminal reward, e.g., -100.0) and severe ground-based instability/impacts (non-terminal large negative rewards, e.g., -10.0 to -20.0).
+
+---
+
+## 2026-07-09 08:31:27
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust; effective application during descent generates significant positive rewards by managing vertical velocity.
+3. Side Engines (Actions 1 & 3): Used to manipulate both lateral velocity (`x_vel`) and angular velocity (`ang_vel`), serving as the primary mechanism for rotational torque.
+4. Angular Momentum Escalation: High `ang_vel` magnitudes can create states where rotation becomes extremely difficult to counteract with available side-engine torque.
+5. Contact Establishment Rewards: Transitions that establish contact (e.g., from `[0.0, 0.0]` to `[1.0, 0.0]`) trigger high-magnitude positive reward spikes, with re-establishing contact or achieving full contact often yielding significantly higher rewards (up to ~+22.0).
+6. Contact Loss Penalties: Abrupt loss of ground contact (e.g., transitioning from `[1.0, 1.0]` to `[0.0, 0.0]`) or high-velocity ground impacts trigger massive negative rewards, typically between -10.0 and -20.0.
+7. Descent Phase Rewards: Positive rewards are frequently triggered by the application of the main engine during the approach phase, even prior to the establishment of leg contact.
+8. Post-Landing Stability Requirements: Achieving contact does not end the stability challenge; the lander must maintain consistent contact and orientation to avoid the repeated heavy penalties associated with contact loss or tip-overs.
+9. Engine-Induced Instability: Applying engines while in a contact state can exacerbate instability; specifically, the main engine can trigger an immediate loss of contact and the associated large negative penalties.
+10. Distinction of Failures: The simulation distinguishes between terminal crashes (large negative terminal reward) and severe ground-based instability, impacts, or contact loss (non-terminal large negative rewards).
+
+---
+
+## 2026-07-09 08:32:50
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust; effective application during descent manages vertical velocity and can trigger positive rewards.
+3. Side Engines (Actions 1 & 3): Used to manipulate both lateral velocity (`x_vel`) and angular velocity (`ang_vel`), serving as the primary mechanism for rotational torque.
+4. Angular Momentum Escalation: High `ang_vel` magnitudes (particularly exceeding |1.0|) are strongly correlated with massive negative rewards, suggesting a threshold where rotation becomes difficult to counteract.
+5. Multi-Leg Contact States: Ground contact is tracked independently for each leg, allowing for partial contact states (`[1.0, 0.0]` or `[0.0, 1.0]`) as well as full contact (`[1.0, 1.0]`).
+6. Contact Establishment Rewards: Transitions that establish any form of ground contact (partial or full) trigger significant positive reward spikes (e.g., ~+8.0 to +13.0).
+7. Contact Loss and Impact Penalties: Abrupt loss of leg contact or high-velocity ground impacts trigger massive negative rewards, typically ranging from -10.0 to -21.0.
+8. Engine-Induced Instability: Applying engines while in a contact state can exacerbate instability; specifically, the main engine can trigger an immediate loss of contact and the associated large negative penalties.
+9. Post-Landing Stability Requirements: Achieving contact does not end the stability challenge; the lander must maintain consistent contact and orientation to avoid repeated heavy penalties associated with tipping or leg separation.
+10. Terminal Success Reward: A successful, stabilized landing at the end of an episode can yield an extremely high-magnitude terminal reward (e.g., +100.0), distinguishing it from incremental descent rewards.
+
+---
+
+## 2026-07-09 08:34:42
+
+1. Gravity: A constant downward force that reduces `y_vel` over time.
+2. Main Engine (Action 2): The primary mechanism for vertical thrust; application during descent manages vertical velocity and triggers positive rewards.
+3. Side Engines (Actions 1 & 3): Used to manipulate both lateral velocity (`x_vel`) and angular velocity (`ang_vel`), serving as the primary mechanism for rotational torque.
+4. Angular Momentum Thresholds: High `ang_vel` magnitudes (approaching or exceeding |1.0|) are strongly correlated with massive negative rewards, indicating a threshold where rotation becomes difficult to counteract.
+5. Independent Leg Contact: Ground contact is tracked independently for each leg, allowing for partial contact states (`[1.0, 0.0]` or `[0.0, 1.0]`) as well as full contact (`[1.0, 1.0]`).
+6. Contact Establishment Rewards: Transitions that establish ground contact (partial or full) trigger significant positive reward spikes, ranging from approximately +7.0 to +18.0.
+7. Contact Loss and Impact Penalties: Abrupt loss of leg contact or high-velocity ground impacts trigger massive negative rewards, typically ranging from -7.0 to -21.0.
+8. Engine-Induced Contact Loss: Applying side engines (Actions 1 or 3) while in a contact state frequently causes immediate leg separation (contact loss), leading to rapid cycles of contact loss penalties and contact establishment rewards.
+9. Post-Landing Stability Requirements: Achieving contact does not end the stability challenge; the lander must manage angular velocity carefully to avoid "jittering" (repeatedly gaining and losing contact), which incurs frequent negative penalties.
+10. Terminal Success Reward: A successful, stabilized landing at the end of an episode can yield an extremely high-magnitude terminal reward (e.g., +100.0), distinguishing it from incremental descent rewards.
+
+---
+
+## 2026-07-09 08:38:35
+
+1. **Gravity:** A constant downward force that reduces `y_vel` over time.
+2. **Main Engine (Action 2):** The primary mechanism for vertical thrust; application during descent manages vertical velocity and is essential for controlling descent rates.
+3. **Side Engines (Actions 1 & 3):** Used to manipulate both lateral velocity (`x_vel`) and angular velocity (`ang_vel`), serving as the primary mechanism for rotational torque and lateral correction.
+4. **Angular Velocity Penalties:** High `ang_vel` magnitudes (approaching or exceeding |1.0|) are strongly correlated with significant negative rewards, both as intermediate penalties during descent and as a primary driver for terminal failure.
+5. **Independent Leg Contact:** Ground contact is tracked independently for each leg, allowing for partial contact states (`[1.0, 0.0]` or `[0.0, 1.0]`) as well as full contact (`[1.0, 1.0]`).
+6. **Contact Establishment Rewards:** Transitions that establish ground contact (partial or full) trigger significant positive reward spikes, typically ranging from approximately +8.0 to +18.0.
+7. **Contact Loss and Impact Penalties:** Abrupt loss of leg contact or high-velocity ground impacts trigger massive negative rewards, ranging from approximately -7.0 to -21.0.
+8. **Engine-Induced Contact Loss:** Applying side engines (Actions 1 or 3) while in a contact state frequently causes immediate leg separation (contact loss), leading to rapid cycles of contact loss penalties and contact establishment rewards.
+9. **Stability vs. Terminal Failure:** Achieving full leg contact (`[1.0, 1.0]`) does not guarantee success; if the lander possesses high angular velocity upon contact or at the end of the episode, it can trigger a massive terminal failure penalty (e.g., -100.0).
+10. **Terminal Success Reward:** A successful, stabilized landing—characterized by full leg contact and minimal angular velocity—yields an extremely high-magnitude terminal reward (e.g., +100.0).
+
+---
+
+## 2026-07-09 08:41:05
+
+1. **Gravity:** A constant downward force that reduces `y_vel` over time.
+2. **Main Engine (Action 2):** The primary mechanism for vertical thrust; application during descent manages vertical velocity and is essential for controlling descent rates.
+3. **Side Engines (Actions 1 & 3):** Used to manipulate both lateral velocity (`x_vel`) and angular velocity (`ang_vel`), serving as the primary mechanism for rotational torque and lateral correction.
+4. **Angular Velocity Risks:** While high `ang_vel` magnitudes (approaching or exceeding |1.0|) do not always trigger immediate negative rewards (as they can be offset by contact establishment bonuses), they are strongly correlated with subsequent catastrophic contact loss and terminal failure.
+5. **Independent Leg Contact:** Ground contact is tracked independently for each leg, allowing for partial contact states (`[1.0, 0.0]` or `[0.0, 1.0]`) as well as full contact (`[1.0, 1.0]`).
+6. **Contact Establishment Rewards:** Transitions that establish ground contact (partial or full) trigger significant positive reward spikes, typically observed in the range of +8.0 to +10.5.
+7. **Contact Loss Penalties:** Abrupt loss of leg contact triggers significant negative rewards, ranging from approximately -9.0 to -20.0, which can occur due to either high angular velocity or sudden vertical shifts.
+8. **Engine-Induced Destabilization:** Applying side engines (Actions 1 or 3) while in a contact state can cause immediate leg separation (contact loss), leading to rapid cycles of contact loss penalties and contact establishment rewards.
+9. **Stability Requirement for Success:** Achieving full leg contact (`[1.0, 1.0]`) is a prerequisite for success, but the lander must also maintain low angular velocity to avoid the instability that leads to contact loss or terminal failure.
+10. **Terminal Success Reward:** A successful, stabilized landing—characterized by full leg contact and minimal angular velocity—yields an extremely high-magnitude terminal reward (e.g., +100.0).
+
+---
+
+## 2026-07-09 08:44:08
+
+1. **Gravity:** A constant downward force that reduces `y_vel` over time.
+2. **Main Engine (Action 2):** The primary mechanism for vertical thrust; application during descent is essential for managing vertical velocity and descent rates.
+3. **Side Engines (Actions 1 & 3):** Used to manipulate lateral velocity (`x_vel`) and angular velocity (`ang_vel`); however, applying these actions frequently incurs immediate negative rewards (typically between -1.0 and -3.0) due to the rotational torque and destabilization they introduce.
+4. **Angular Velocity Survivability:** While high `ang_vel` magnitudes (even exceeding $|1.0|$) do not trigger immediate failure, they significantly increase the difficulty of maintaining contact and necessitate rapid stabilization to avoid terminal failure.
+5. **Independent Leg Contact:** Ground contact is tracked independently for each leg, allowing for partial contact states (`[1.0, 0.0]` or `[0.0, 1.0]`) which serve as intermediate steps before full stabilization.
+6. **Contact Establishment Rewards:** Transitions that establish ground contact (partial or full) trigger significant positive reward spikes, observed in the range of approximately +7.0 to +15.0.
+7. **Contact Loss Penalties:** Abrupt loss of leg contact triggers significant negative rewards, which can be caused by high angular velocity or the destabilizing effects of side-engine thrust.
+8. **Engine-Induced Destabilization:** Applying side engines (Actions 1 or 3) while in a contact state can cause immediate leg separation, resulting in rapid cycles of contact loss penalties and contact establishment rewards.
+9. **Stability Requirement for Success:** Achieving full leg contact (`[1.0, 1.0]`) is a prerequisite for success, but the lander must also damp all velocities to avoid the instability that leads to terminal failure.
+10. **Terminal Rewards:** A successful, stabilized landing yields a terminal reward of +100.0, whereas a catastrophic failure or loss of control results in a terminal penalty of -100.0.
+
+---
+
+## 2026-07-09 08:47:55
+
+1. **Gravity:** A constant downward force that reduces `y_vel` over time.
+2. **Main Engine (Action 2):** The primary mechanism for vertical thrust; application during descent is essential for managing vertical velocity and descent rates.
+3. **Side Engines (Actions 1 & 3):** Used to manipulate lateral velocity (`x_vel`) and angular velocity (`ang_vel`). While they incur immediate negative rewards (typically -1.0 to -3.0), they can be used to re-establish contact after a loss.
+4. **Angular Velocity Survivability:** While high `ang_vel` magnitudes (even exceeding $|1.0|$) do not trigger immediate failure, they significantly increase the difficulty of maintaining contact and necessitate rapid stabilization to avoid terminal failure.
+5. **Independent Leg Contact:** Ground contact is tracked independently for each leg, allowing for partial contact states (`[1.0, 0.0]` or `[0.0, 1.0]`) which serve as intermediate steps before full stabilization.
+6. **Contact Establishment Rewards:** Transitions that establish ground contact (partial or full) trigger significant positive reward spikes, observed in the range of approximately +7.0 to +12.5.
+7. **Contact Loss Penalties:** Abrupt loss of leg contact triggers massive negative rewards, which can be caused by high angular velocity or aggressive engine thrusting; these penalties are often severe, ranging from -8.0 to -20.5.
+8. **Engine-Induced Destabilization:** Applying side engines (Actions 1 or 3) or the main engine (Action 2) while in a contact state can cause immediate leg separation, leading to high-magnitude cycles of contact loss penalties and contact establishment rewards.
+9. **Stability Requirement for Success:** Achieving full leg contact (`[1.0, 1.0]`) is a prerequisite for success, but the lander must also damp all velocities to avoid the instability that leads to terminal failure.
+10. **Terminal Rewards:** A successful, stabilized landing yields a terminal reward of +100.0, whereas a catastrophic failure or loss of control results in a terminal penalty of -100.0.
+
+---
+
+## 2026-07-09 21:59:47
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, excessive or uncompensated use of the main engine drives high horizontal velocity and uncontrollable rotation.
+5. **Side Engine (Actions 1 & 3) Dynamics**: These actions are critical for managing `angle` and `ang_vel`, but they are often applied too late to counteract high momentum.
+6. **Action 0 (Nothing) Dynamics**: Leads to passive descent where gravity and existing momentum dominate, causing the lander to drift and tilt unchecked.
+7. **Failure Pattern: Engine Spamming**: Continuous, repetitive use of the main engine without stabilizing side-engine corrections leads to terminal tilt and lateral drift.
+8. **Failure Pattern: Uncompensated Tilt**: Using the main engine while the lander is at a significant angle converts vertical thrust into horizontal momentum, accelerating the crash.
+9. **Critical Moment (Episode 1)**: Steps 5–29 demonstrate how early, sustained main engine use causes a permanent tilt and rapid $x\_vel$ increase.
+10. **Critical Moment (Episode 2)**: Steps 67–79 show the lander entering a "death spiral" where main engine use at a high angle creates fatal horizontal velocity.
+
+---
+
+## 2026-07-09 22:06:33
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, the main engine becomes a primary driver of $x\_vel$ and `ang_vel` when used at significant `angle` deviations.
+5. **Side Engine (Action 3) Dynamics**: These actions are critical for managing `angle`, but their effectiveness at arresting rotation diminishes as `ang_vel` and `angle` magnitude increase.
+6. **Action 0 (Nothing) Dynamics**: This action leads to passive descent where existing $x\_vel$, $y\_vel$, and `ang_vel` persist unchecked, allowing momentum to carry the lander into terminal states.
+7. **Failure Pattern: Momentum Conversion**: Using the main engine at extreme angles (e.g., $|angle| > 0.5$) effectively converts intended vertical lift into massive horizontal momentum ($x\_vel$).
+8. **Failure Pattern: Angular Saturation**: At high angular velocities, the lander can enter a state where side engine thrust is insufficient to counteract the accumulated rotation, leading to a "death spiral."
+9. **Critical Moment (Episode 1)**: Steps 0–25 show how early, frequent main engine use creates an initial tilt that compounds into an unrecoverable angular state.
+10. **Critical Moment (Episode 2)**: Steps 70–79 demonstrate how a period of inaction (Action 0) allows high existing horizontal and angular momentum to proceed toward failure unchecked.
+
+---
+
+## 2026-07-09 22:11:03
+
+1. **Gravity & Descent**: Gravity drives a continuous increase in downward vertical velocity ($y\_vel$); failure to provide upward thrust leads to rapid altitude loss.
+2. **Angular Instability**: Once the `angle` deviates from zero, `ang_vel` (angular velocity) tends to accumulate, making the lander increasingly difficult to stabilize.
+3. **Horizontal Drift**: High $x\_vel$ is a primary indicator of imminent failure, often caused by asymmetrical thrust or using the main engine while tilted.
+4. **Main Engine (Action 2) Dynamics**: While necessary for lift, the main engine becomes a primary driver of $x\_vel$ and `ang_vel` when used at significant `angle` deviations.
+5. **Side Engine (Action 3) Dynamics**: These actions can exacerbate rotation if the thrust direction aligns with the current `ang_vel`; if used incorrectly, they accelerate the increase in `angle` rather than arresting it.
+6. **Action 0 (Nothing) Dynamics**: This action leads to passive descent where existing $x\_vel$, $y\_vel$, and `ang_vel` persist unchecked, allowing momentum to carry the lander into terminal states.
+7. **Failure Pattern: Momentum Conversion**: Using the main engine at extreme angles (e.g., $|angle| > 0.5$) effectively converts intended vertical lift into massive horizontal momentum ($x\_vel$).
+8. **Failure Pattern: Angular Saturation**: At high angular velocities, the lander can enter a state where side engine thrust is insufficient to counteract the accumulated rotation, leading to a "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` increases, the lander's control authority diminishes; engines that previously provided stabilization begin to act as drivers of further angular and horizontal instability.
+10. **Terminal Momentum Persistence**: High $x\_vel$ and `ang_vel` are highly persistent and can continue to grow even when the lander is attempting to manage vertical descent ($y\_vel$) via the main engine.
+
+---
+
+## 2026-07-09 23:22:32
+
+1. **Gravity-Driven Descent**: Gravity causes a continuous increase in downward vertical velocity ($y\_vel$). The main engine is required to counteract this, but vertical descent often accelerates despite engine use if the lander is not perfectly upright.
+2. **Angular-Angular Velocity Coupling**: Any deviation in `angle` from zero tends to generate or exacerbate `ang_vel` (angular velocity), creating a feedback loop where rotational momentum becomes increasingly difficult to arrest as it accumulates.
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a primary indicator of imminent failure. Even if vertical descent is managed, high horizontal velocity often leads to a crash upon contact.
+4. **Main Engine (Action 2) Dual-Role**: While the main engine provides necessary upward thrust to mitigate $y\_vel$, its application at non-zero `angle` values effectively converts vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`).
+5. **Side Engine (Action 1 & 3) Functional Constraints**: Side engines are the primary tools for manipulating `angle` and `ang_vel`, but they provide no vertical thrust and no direct horizontal translation correction, meaning they cannot arrest $y\_vel$ or $x\_vel$.
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows all existing velocities ($x\_vel, y\_vel, ang\_vel$) and the current `angle` to persist unchecked, allowing gravity and existing momentum to drive the lander toward a terminal state.
+7. **The Stability Trade-off**: Attempts to correct `angle` using side engines often result in an uncorrected drift in $y\_vel$ or $x\_vel$, as the engines' primary purpose is angular stabilization rather than translational control.
+8. **Angular Momentum Saturation**: If `ang_vel` reaches high magnitudes, the corrective torque from side engines may become insufficient to counteract the rotation, leading to an irrecoverable "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` increases, the lander's ability to use the main engine for vertical lift diminishes, as a larger portion of the thrust is diverted into horizontal and angular instability.
+10. **Terminal State Sensitivity**: High $x\_vel$, $y\_vel$, or `ang_vel` at the moment of contact (even if the lander is relatively upright) results in a failure state, meaning stabilization must be achieved well before ground contact.
+
+---
+
+## 2026-07-09 23:26:11
+
+1. **Gravity-Driven Descent and Velocity Thresholds**: Gravity causes continuous downward acceleration. Once $|y\_vel|$ exceeds a certain threshold, the main engine (Action 2) may struggle to provide sufficient net upward thrust to reverse the descent, often only slowing the rate of acceleration.
+2. **Angular-Angular Velocity Coupling**: Any deviation in `angle` from zero generates `ang_vel`. This creates a feedback loop where rotational momentum can accumulate rapidly, making the lander increasingly difficult to stabilize.
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a primary indicator of failure. The lander's horizontal momentum is difficult to arrest, and high $|x\_vel|$ at the moment of contact leads to failure regardless of vertical stability.
+4. **Main Engine (Action 2) Vectoring**: When the lander is not perfectly upright, the main engine's thrust is diverted; a portion of the vertical lift is converted into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), reducing its efficiency in controlling $y\_vel$.
+5. **Side Engine (Action 1 & 3) Momentum Risk**: While side engines are the primary tool for manipulating `angle`, improper application can rapidly drive `ang_vel` to high magnitudes, inadvertently accelerating the lander's rotation instead of correcting it.
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows all existing velocities and the current `angle` to persist unchecked, allowing gravity and existing momentum to drive the lander toward a terminal state.
+7. **The Stability-Translation Trade-off**: Attempts to correct `angle` using side engines often result in uncorrected drift in $y\_vel$ or $x\_vel$, as these engines provide no vertical thrust or direct horizontal translation correction.
+8. **Angular Momentum Saturation**: If `ang_vel` reaches high magnitudes, the corrective torque from side engines becomes insufficient to counteract the rotation, leading to an irrecoverable "death spiral."
+9. **Control Authority Degradation**: As the magnitude of `angle` or `ang_vel` increases, the lander's ability to use the main engine for effective vertical lift diminishes, as more thrust is diverted into horizontal and angular instability.
+10. **Terminal State Sensitivity**: Failure occurs if $x\_vel$, $y\_vel$, or `ang_vel` are high at the moment of contact. Achieving a near-zero $y$ position is insufficient for success if the lander has not also stabilized its other velocities.
+
+---
+
+## 2026-07-09 23:29:33
+
+1. **Gravity-Driven Descent and Vertical Velocity**: Gravity causes continuous downward acceleration. If $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, especially if the lander's orientation is not vertical.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Velocity as a Persistent Threat**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide no direct horizontal translation correction, making horizontal momentum difficult to arrest once established.
+
+4. **Main Engine (Action 2) Thrust Vectoring**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of the vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), reducing its effectiveness for altitude control.
+
+5. **Side Engine (Action 1 & 3) Torque Risks**: While side engines are intended to control `angle`, applying them while `ang_vel` is already high or in the wrong direction can accelerate the rotation (increasing $|ang\_vel|$) rather than dampening it.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but can exacerbate horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the corrective torque available from side engines becomes insufficient to counteract the rotational momentum, leading to an irrecoverable "death spiral."
+
+9. **Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-09 23:34:25
+
+1. **Gravity-Driven Descent and Vertical Velocity**: Gravity causes continuous downward acceleration. If $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, particularly as the lander's tilt increases.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt, which is often insufficient to arrest high established momentum.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), creating a coupling between altitude control and stability.
+
+5. **Side Engine Torque vs. Angular Inertia**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is high, the corrective torque from side engines may be insufficient to dampen the rotation, or may even exacerbate it if the timing/direction is misaligned with the momentum.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the rotational momentum can exceed the total corrective torque available from the side engines, leading to an irrecoverable "death spiral" where the lander cannot return to a vertical orientation.
+
+9. **Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-09 23:38:38
+
+1. **Gravity-Driven Descent**: Gravity causes continuous downward acceleration. If vertical velocity $|y\_vel|$ is not managed early, the descent rate can exceed the capacity of the main engine to provide sufficient net upward thrust, especially as the lander's tilt increases.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any deviation in `angle` from zero generates `ang_vel`. This creates a self-reinforcing cycle where the resulting angular velocity further increases the tilt, making the rotation increasingly difficult to arrest.
+
+3. **Horizontal Momentum Persistence**: High $|x\_vel|$ is a critical failure condition. Side engines (Actions 1 and 3) provide zero horizontal translation correction, and the main engine (Action 2) can only provide horizontal correction as a secondary consequence of its tilt, which is often insufficient to arrest high established momentum.
+
+4. **Main Engine (Action 2) Thrust Vectoring/Coupling**: When the lander is tilted (angle $\neq$ 0), the main engine's thrust is misaligned with the vertical axis. This diverts a portion of its vertical lift into horizontal momentum ($x\_vel$) and angular momentum (`ang_vel`), creating a coupling between altitude control and stability.
+
+5. **Side Engine Torque vs. Angular Momentum**: Side engines are the primary tool for managing `angle`, but they must overcome existing `ang_vel`. If `ang_vel` is high, the corrective torque from side engines may be insufficient to reverse the direction of rotation, allowing the `angle` to continue increasing despite continuous corrective thrust.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows gravity and all existing translational and angular velocities to persist unchecked, leading to a deterministic progression toward a terminal state.
+
+7. **Decoupled Control Axes**: The control mechanisms are specialized; side engines manipulate rotation but offer no vertical or horizontal translation correction, while the main engine primarily manages vertical descent but introduces horizontal and angular instability when tilted.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the rotational momentum can exceed the total corrective torque available from the side engines, leading to an irrecoverable "death spiral" where the lander cannot return to a vertical orientation.
+
+9. **Vertical Control Authority Degradation**: The effectiveness of the main engine for vertical stabilization diminishes as the `angle` increases, because a growing percentage of its thrust is converted into horizontal and angular acceleration rather than upward lift.
+
+10. **Terminal State Sensitivity**: Success is determined by the state at the moment of leg contact (left or right). If $x\_vel$, $y\_vel$, or `ang_vel` exceed safe thresholds at the moment of contact, the landing is a failure, regardless of the $y$ position.
+
+---
+
+## 2026-07-09 23:42:59
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of $y\_vel$. If $|y\_vel|$ is not arrested by the main engine, the descent rate will eventually exceed the lander's ability to stabilize.
+
+2. **Angular-Angular Velocity Feedback Loop**: Any non-zero `angle` generates `ang_vel`, which in turn exacerbates the tilt. This creates a self-reinforcing instability that requires active torque to interrupt.
+
+3. **Horizontal Momentum Persistence and Side Engine Limitation**: Side engines (Actions 1 and 3) provide torque for rotational control but offer no capability for horizontal ($x\_vel$) translation correction. Horizontal momentum remains persistent unless modified by the main engine's thrust vector.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is tilted ($\text{angle} \neq 0$), the main engine's (Action 2) thrust is vectorially split. A portion of the thrust provides vertical lift, while the remainder contributes to horizontal acceleration ($x\_vel$) and angular acceleration (`ang_vel`).
+
+5. **Torque-Momentum Competition**: The ability of side engines to correct `angle` is dependent on the current `ang_vel`. If angular momentum is sufficiently high, the corrective torque provided by side engines may be insufficient to reverse the direction of rotation, allowing the tilt to increase despite corrective actions.
+
+6. **Action 0 (Nothing) Inertia**: Choosing no action allows the current state of translational and angular velocities to evolve purely under the influence of gravity and existing momentum, leading to a deterministic progression of the current trajectory.
+
+7. **Decoupled Control Specialization**: The control system is specialized: side engines primarily manipulate the rotational state (`angle` and `ang_vel`), whereas the main engine primarily manages the vertical state (`y_pos` and `y_vel`) and secondarily influences horizontal and angular stability through thrust vector misalignment.
+
+8. **Angular Momentum Saturation**: As `ang_vel` and `angle` reach high magnitudes, the lander may enter a "death spiral" where the total corrective torque available from the side engines is lower than the existing angular momentum, making orientation recovery impossible.
+
+9. **Vertical Control Authority Degradation**: The effective vertical lift provided by the main engine decreases as the `angle` increases. As the thrust vector tilts further from the vertical axis, a larger percentage of the engine's power is diverted into horizontal and angular acceleration rather than altitude maintenance.
+
+10. **Terminal State Sensitivity**: The outcome of the simulation is determined by the state variables at the exact moment of leg contact. High magnitudes of $|x\_vel|$, $|y\_vel|$, `ang_vel`, or `angle` at the moment of contact trigger failure, regardless of the lander's altitude.
+
+---
+
+## 2026-07-09 23:46:42
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$. Successful altitude management requires the main engine to provide sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Rotational Specialization**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel` but have no direct influence on translational velocities ($x\_vel$ or $y\_vel$).
+
+6. **Horizontal Momentum Persistence**: Horizontal velocity ($x\_vel$) is persistent and cannot be corrected by side engines; it can only be modified by the main engine (Action 2) through thrust vectoring when the lander is tilted.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration and reducing the ability to arrest $y\_vel$.
+
+9. **Decoupled Control Requirement**: Stabilization requires a coordinated approach: side engines must manage orientation (`angle`/`ang_vel`) while the main engine manages descent rate ($y\_vel$) and horizontal drift ($x\_vel$).
+
+10. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|angle|$, or $|x\_vel|$ at this instant trigger failure.
+
+---
+
+## 2026-07-09 23:50:58
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Rotational Specialization**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel` but have no direct influence on translational velocities ($x\_vel$ or $y\_vel$).
+
+6. **Thrust-Induced Horizontal Acceleration**: If the `angle` is oriented such that the thrust vector aligns with the direction of current $x\_vel$, the main engine (Action 2) will exacerbate horizontal drift rather than counteracting it.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration and reducing the ability to arrest $y\_vel$.
+
+9. **Decoupled Control Requirement**: Stabilization requires a coordinated approach: side engines must manage orientation (`angle`/`ang_vel`) while the main engine must be precisely angled to manage both descent rate ($y\_vel$) and horizontal drift ($x\_vel$).
+
+10. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure.
+
+---
+
+## 2026-07-09 23:54:59
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Rotational Specialization**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel` but have no direct influence on translational velocities ($x\_vel$ or $y\_vel$).
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure.
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time, the velocity at the moment of contact may exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-10 01:07:10
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact ($left\_leg\_contact=1.0$ or $right\_leg\_contact=1.0$); high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure.
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time, the velocity at the moment of contact may exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-10 01:12:22
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, meaning rotational corrections inherently alter the lander's trajectory.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact; high magnitudes of $|y\_vel|$, $|x\_vel|$, or $|ang\_vel|$ at this instant trigger failure, typically resulting in a large negative reward penalty (e.g., -100).
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time and at a near-vertical orientation, terminal velocities will exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-10 01:17:39
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, meaning rotational corrections inherently alter the lander's trajectory.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the state variables at the moment of leg contact; high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ at this instant trigger failure, typically resulting in a large negative reward penalty (e.g., -100).
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time and at a near-vertical orientation, terminal velocities or angular states will exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-10 01:21:18
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, meaning rotational corrections inherently alter the lander's trajectory.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity and Contact Phase**: The simulation outcome is determined by the lander's state variables during the contact phase; high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ during the steps following initial leg contact trigger a failure penalty (e.g., -100).
+
+10. **Descent Momentum Inertia**: Due to the continuous accumulation of $y\_vel$ from gravity, the lander builds significant downward momentum; if the main engine is not applied with sufficient lead time and at a near-vertical orientation, terminal velocities or angular states will exceed safety thresholds despite active thrusting.
+
+---
+
+## 2026-07-10 01:24:42
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Main Engine-Induced Lateral Drift**: Using Action 2 while at a non-zero `angle` creates horizontal acceleration ($x\_vel$). Consequently, attempts to correct vertical descent can inadvertently increase horizontal drift if the lander is not oriented vertically.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity and Contact Phase**: The simulation outcome is determined by the stability of the state variables during the contact phase (when `left_leg_contact` or `right_leg_contact` is 1.0); high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ during these steps trigger a failure penalty.
+
+10. **Rotational Stability at Landing**: Managing $y\_vel$ is insufficient for a successful landing; the lander must also minimize `ang_vel` and `angle` prior to contact, as high rotational momentum at the moment of impact triggers a failure even if vertical velocity is low.
+
+---
+
+## 2026-07-10 01:28:09
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for arresting $y\_vel$; successful altitude management requires sufficient upward thrust to counteract gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Terminal State Sensitivity**: The simulation outcome is determined by the stability of the state variables during the contact phase (when `left_leg_contact` or `right_leg_contact` is 1.0); high magnitudes of $|y\_vel|$, $|x\_vel|$, $|angle|$, or $|ang\_vel|$ during these steps trigger a failure penalty.
+
+10. **Multi-Axis Landing Stability**: Successful landing requires the simultaneous minimization of descent rate ($y\_vel$), horizontal drift ($x\_vel$), and rotational state (`angle` and `ang_vel`); failure can be triggered by high rotational momentum or horizontal velocity even if the vertical descent is controlled.
+
+---
+
+## 2026-07-10 01:31:57
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Triggered Outcome**: The simulation outcome is determined by the state of the lander at the specific moment contact is first detected (`left_leg_contact` or `right_leg_contact` transitions to 1.0).
+
+10. **Multi-Axis Landing Stability**: Successful landing requires the simultaneous minimization of $y\_vel$, $x\_vel$, `angle`, and `ang_vel`; high $|ang\_vel|$ is a particularly critical failure driver, capable of triggering a failure even if the vertical descent rate ($y\_vel$) is relatively low.
+
+---
+
+## 2026-07-10 01:35:18
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being dependent on the lander's current orientation.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Triggered Outcome**: The simulation outcome is determined by the state of the lander at the specific moment contact is first detected (`left_leg_contact` or `right_leg_contact` transitions to 1.0).
+
+10. **Angular Velocity-Induced Failure**: High $|ang\_vel|$ at the moment of contact is a primary driver of failure, capable of triggering a crash even if the lander's vertical descent rate ($y\_vel$) and horizontal velocity ($x\_vel$) are relatively low and stable.
+
+---
+
+## 2026-07-10 01:39:28
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being dependent on the lander's current orientation.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-State Continuity**: The detection of leg contact (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) does not immediately terminate the episode, allowing for continued state evolution and movement while in a contact state.
+
+10. **Angular Velocity-Induced Crash**: Extreme angular velocity ($|ang\_vel|$) is the primary trigger for the terminal failure reward (-100), which can manifest either during descent or as a result of rapid instability following the establishment of leg contact.
+
+---
+
+## 2026-07-10 01:43:21
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Side Engine Dual-Effect**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being dependent on the lander's current orientation.
+
+6. **Lateral Drift Accumulation**: High horizontal translation ($x\_vel$) can accumulate through both main engine vector coupling and side engine usage; once significant horizontal momentum is established, it is difficult to nullify without inducing further angular instability.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Rotational Spikes**: The transition to a contact state (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) can trigger sudden, extreme spikes in `ang_vel`, even when the lander's orientation (`angle`) and vertical velocity ($y\_vel$) appear relatively stable.
+
+10. **Terminal Angular Velocity Failure**: The terminal failure reward (-100) is triggered by extreme angular velocity ($|ang\_vel|$), which frequently manifests as a rapid, uncontrolled escalation immediately following the establishment of leg contact.
+
+---
+
+## 2026-07-10 01:45:31
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` coupled with `ang_vel` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces that contribute to changes in both $x\_vel$ and $y\_vel$, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, creating a coupling effect where horizontal and angular corrections compete for control authority.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Rotational Spikes**: The transition to a contact state (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) can trigger sudden, extreme, and near-instantaneous spikes in $|ang\_vel|$, even when the lander's orientation and vertical velocity appear relatively stable.
+
+10. **Terminal Angular Velocity Failure**: The terminal failure reward (-100) is triggered by reaching a critical threshold of $|ang\_vel|$, a state that frequently manifests as a rapid, uncontrolled escalation immediately following the establishment of leg contact.
+
+---
+
+## 2026-07-10 01:49:27
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Rotational Instability**: The transition to a contact state (`left_leg_contact` or `right_leg_contact` transitioning to 1.0) can trigger sudden, extreme, and near-instantaneous spikes in $|ang\_vel|$, which frequently leads to terminal failure if the velocity exceeds critical thresholds.
+
+10. **Surface Skidding and Contact Volatility**: At near-zero $y\_pos$, the lander can enter a "skidding" state where leg contact states oscillate rapidly between 0.0 and 1.0. In this state, the lander can maintain low $y\_vel$ despite non-zero lateral or angular momentum, though engine actions during contact result in extreme reward volatility.
+
+---
+
+## 2026-07-10 01:50:29
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Induced Pivot Torque**: The establishment of leg contact transforms the lander into a constrained system where the main engine (Action 2) can act as a pivot, converting vertical thrust into rapid, non-linear increases in `ang_vel`.
+
+10. **Grounded Stability Sensitivity**: Once in a contact state, the lander's stability becomes extremely sensitive to engine inputs; thrusting actions that are effective for descent in free-fall can trigger catastrophic, terminal spikes in `ang_vel` when the lander is grounded.
+
+---
+
+## 2026-07-10 01:54:03
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Fulcrum-Effect Pivot Dynamics**: Establishing leg contact transforms the lander into a constrained system where the contact point serves as a pivot; in this state, any thrust from the main engine (Action 2) is converted into significant, rapid angular acceleration (`ang_vel`).
+
+10. **Grounded-State Thrust Instability**: While the main engine is the primary vertical controller in free-fall, its application during a contact state triggers a high-magnitude coupling between vertical thrust and angular velocity, frequently resulting in terminal rotational instability.
+
+---
+
+## 2026-07-10 01:56:26
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Fulcrum-Effect Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point serves as a pivot; in this state, any thrust from the main engine (Action 2) is converted into high-magnitude, rapid angular acceleration (`ang_vel`).
+
+10. **Grounded-State Rotational Instability**: While the main engine is the primary vertical controller in free-fall, its application during a contact state triggers a high-magnitude coupling between vertical thrust and angular velocity, frequently resulting in extreme, divergent rotational states.
+
+---
+
+## 2026-07-10 01:59:51
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Fulcrum-Effect Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point serves as a pivot; in this state, any thrust from the main engine (Action 2) is converted into high-magnitude, rapid angular acceleration (`ang_vel`).
+
+10. **Grounded-State Rotational Divergence**: While the main engine is the primary vertical controller in free-fall, its application during a contact state triggers a high-magnitude coupling between vertical thrust and angular velocity, frequently resulting in extreme, divergent rotational states and immediate failure.
+
+---
+
+## 2026-07-10 02:01:24
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, the main engine (Action 2) acts as a high-leverage torque source, where the resulting `ang_vel` is highly sensitive to the alignment of the thrust vector relative to the pivot.
+
+10. **Grounded-State Contact Volatility**: The application of Action 2 while in a contact state is highly sensitive to the existing `angle` and `ang_vel`. Depending on the orientation, thrust can either maintain a stable grounded state or cause an immediate loss of contact (transitioning `leg_contact` from 1.0 to 0.0) accompanied by rapid, divergent rotational acceleration.
+
+---
+
+## 2026-07-10 02:03:37
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, the main engine (Action 2) acts as a high-leverage torque source, where the resulting `ang_vel` is highly sensitive to the alignment of the thrust vector relative to the pivot.
+
+10. **Grounded-State Contact Volatility and Chattering**: Contact does not equate to stability. The lander can enter a prolonged state of "chattering" or high-frequency bouncing, where leg contacts oscillate rapidly between 0.0 and 1.0. This state is characterized by extreme reward volatility, where the difference between a stable landing and a catastrophic failure is represented by massive swings in reward within a single timestep.
+
+---
+
+## 2026-07-10 02:06:59
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, the main engine (Action 2) acts as a high-leverage torque source, where the resulting `ang_vel` is highly sensitive to the alignment of the thrust vector relative to the pivot.
+
+10. **Bimodal Contact Termination and Stability Requirements**: The simulation distinguishes between partial contact (one leg) and full contact (both legs = 1.0). The transition to full contact serves as the terminal state trigger; if this occurs while $x\_vel$, $y\_vel$, or $ang\_vel$ are non-negligible, the lander incurs a catastrophic -100 reward, indicating that landing stability requires the simultaneous minimization of all velocity components at the moment of full contact.
+
+---
+
+## 2026-07-10 02:09:22
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, any engine thrust (Action 1, 2, or 3) acts as a high-leverage torque source, making the resulting `ang_vel` extremely sensitive to the alignment of the thrust vector relative to the contact point.
+
+10. **Non-Terminal Contact and Stability Requirements**: The simulation distinguishes between partial contact (one leg) and full contact (both legs = 1.0). Establishing contact does not necessarily terminate the episode, allowing for post-contact maneuvering; however, the stability of the lander (minimization of $x\_vel$, $y\_vel$, and $ang\_vel$ at the moment of contact) is a primary determinant of the total reward and the transition from a "PARTIAL" to a stable landing.
+
+---
+
+## 2026-07-10 02:13:38
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum and Control Coupling**: Significant horizontal translation ($x\_vel$) is difficult to nullify; attempts to correct lateral drift using side engines often induce angular instability, as the translational force of the side engines creates a torque moment that contributes to `ang_vel`.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact (`left_leg_contact` or `right_leg_contact` = 1.0) transforms the lander into a constrained system where the contact point acts as a pivot. In this state, any engine thrust (Action 1, 2, or 3) acts as a high-leverage torque source, making the resulting `ang_vel` extremely sensitive to the alignment of the thrust vector relative to the contact point.
+
+10. **Contact Fragility and Momentum-Induced Ejection**: Establishing contact does not guarantee a stable landing. If the lander possesses significant angular momentum or if engine thrust is applied while the lander is pivoted on a contact point, the resulting torque can cause the lander to tip or "bounce," leading to an abrupt loss of leg contact and a transition back to an airborne state.
+
+---
+
+## 2026-07-10 02:14:55
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Leverage Pivot Dynamics**: Establishing leg contact transforms the lander into a pivot-constrained system. In this state, any engine thrust (Action 1, 2, or 3) acts as a high-leverage torque source, causing the resulting `ang_vel` to be extremely sensitive to the alignment of the thrust vector relative to the contact point.
+
+10. **Contact-Thrust Instability**: Applying significant engine thrust while in a contact state—particularly the main engine—frequently induces violent angular oscillations or "bounces." This results in an abrupt loss of leg contact and a transition back to an airborne state.
+
+---
+
+## 2026-07-10 02:17:50
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Single-Leg Pivot Dynamics**: A state of partial contact (where only one leg contact is 1.0) transforms the lander into a single-point pivot system, making the resulting `ang_vel` extremely sensitive to the alignment of any applied engine thrust relative to the contact point.
+
+10. **Contact-Thrust Instability**: Applying thrust (Actions 1, 2, or 3) while in contact frequently induces violent oscillations or "bounces," resulting in an abrupt loss of contact. In high-momentum or highly tilted contact states, even applying no thrust (Action 0) can fail to prevent these instabilities, leading to significant negative rewards.
+
+---
+
+## 2026-07-10 02:20:51
+
+---
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Single-Leg Pivot Dynamics**: A state of partial contact (where only one leg contact is 1.0) transforms the lander into a single-point pivot system, making the resulting `ang_vel` extremely sensitive to the alignment of any applied engine thrust relative to the contact point.
+
+10. **Contact-State Reward Volatility**: The transition to a contact state (leg contact = 1.0) introduces extreme reward volatility. While specific corrective thrusting (particularly Action 1) can yield massive positive rewards, most thrusting maneuvers (Actions 1, 2, or 3) during high angular or lateral momentum in contact trigger catastrophic negative penalties (often < -15.0). In highly unstable contact states, even inaction (Action 0) can result in significant negative rewards.
+
+---
+
+## 2026-07-10 02:22:27
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-State Reward Volatility**: The transition to a contact state (leg contact = 1.0) introduces extreme reward volatility. While specific corrective thrusting (particularly Actions 1 or 3) can yield large positive rewards, most thrusting maneuvers during high angular or lateral momentum in contact trigger catastrophic negative penalties.
+
+10. **Contact-Phase Kinetic Sensitivity**: During the contact phase, the lander's stability is contingent on the simultaneous minimization of `ang_vel`, `x_vel`, and `y_vel`. Excessive kinetic energy in any of these three axes during contact frequently triggers massive, rapid-fire negative reward spikes, even if the lander remains in contact.
+
+---
+
+## 2026-07-10 02:28:26
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Phase Reward Extremity**: The contact phase (leg contact = 1.0) is characterized by extreme reward polarity. Corrective maneuvers that successfully mitigate residual kinetic energy result in massive positive rewards, while maneuvers that fail to stabilize or that exacerbate angular or lateral motion trigger massive negative penalties.
+
+10. **Multi-Axis Kinetic Stabilization**: To achieve high-magnitude positive rewards during the contact phase, the lander must use active thrust (Actions 1, 2, or 3) to simultaneously minimize the magnitudes of `ang_vel`, `x_vel`, and `y_vel`.
+
+---
+
+## 2026-07-10 02:31:12
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while remaining in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Phase Reward Sensitivity**: The contact phase (leg contact = 1.0) is characterized by extreme reward polarity; the reward signal is highly sensitive to the instantaneous magnitudes of $x\_vel$, $y\_vel$, and $ang\_vel$, where even small residual velocities trigger massive negative penalties.
+
+10. **Multi-Axis Stabilization Conflict**: During the contact phase, thrust actions intended to stabilize a single axis (e.g., reducing `ang_vel`) often inadvertently increase velocities in other axes (e.g., $x\_vel$ or $y\_vel$) due to thrust vector coupling, which frequently results in catastrophic negative rewards.
+
+---
+
+## 2026-07-10 02:38:12
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-State High-Frequency Jitter**: The transition between contact (1.0) and non-contact (0.0) states is highly volatile and sensitive to minute changes in $y\_pos$ and $y\_vel$, often causing rapid, single-step oscillations in the status of individual legs.
+
+10. **Asymmetric Contact-Phase Sensitivity**: The environment supports independent contact states for each leg; asymmetric contact (where only one leg is in contact) introduces complex torque and, when combined with residual $x\_vel$, $y\_vel$, or $ang\_vel$, triggers extreme negative reward penalties.
+
+---
+
+## 2026-07-10 02:41:04
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Velocity Penalty Coupling**: High magnitudes of $x\_vel$ or $y\_vel$ during contact transitions ($0.0 \leftrightarrow 1.0$) or while in a sustained contact state trigger severe negative rewards, penalizing "hard" or "sliding" landings.
+
+10. **Main Engine-Contact Conflict**: Applying the main engine (Action 2) while the lander is in an established contact state ($leg\_contact=1.0$) frequently results in extreme negative rewards, suggesting that engine thrust significantly destabilizes the lander upon ground contact.
+
+---
+
+## 2026-07-10 02:45:20
+
+1. **Gravity-Driven Descent**: Gravity provides continuous downward acceleration, increasing the magnitude of negative $y\_vel$ throughout the descent.
+
+2. **Main Engine Vertical Control**: Action 2 is the primary mechanism for managing $y\_vel$; the lander is capable of achieving positive $y\_vel$ if the main engine thrust exceeds gravitational acceleration.
+
+3. **Angular-Angular Velocity Feedback Loop**: A non-zero `angle` creates a rotational state that requires active torque to stabilize; without intervention, the tilt can become self-reinforcing.
+
+4. **Main Engine Thrust Vector Coupling**: When the lander is at a non-zero `angle`, the thrust from Action 2 is vectorially distributed, contributing simultaneously to vertical lift ($y\_vel$), horizontal translation ($x\_vel$), and angular acceleration (`ang_vel`).
+
+5. **Orientation-Dependent Side Engine Translation**: Actions 1 and 3 provide torque to manipulate `angle` and `ang_vel`, but they also exert direct translational forces in both $x$ and $y$ directions, with the direction of translation being strictly dependent on the lander's current `angle`.
+
+6. **Lateral Momentum Persistence**: Establishing leg contact does not immediately nullify horizontal velocity; the lander can maintain significant lateral translation ($x\_vel$) and undergo sustained "skidding" while in a contact state.
+
+7. **Torque-Momentum Competition**: The effectiveness of corrective side-engine actions is limited by the current magnitude of `ang_vel`; if angular momentum is too high, the available torque from Actions 1 or 3 may be insufficient to reverse or halt the rotation.
+
+8. **Vertical Control Authority Degradation**: As the absolute value of `angle` increases, the effective vertical component of the main engine's thrust decreases, diverting more power into horizontal and angular acceleration.
+
+9. **Contact-Velocity Penalty Coupling**: High magnitudes of $x\_vel$ or $y\_vel$ during contact transitions ($0.0 \leftrightarrow 1.0$) or while in a sustained contact state trigger severe negative rewards, penalizing "hard" or "sliding" landings.
+
+10. **Post-Contact Engine Instability**: Achieving leg contact can yield positive rewards, but the lander enters a volatile state where $y\_pos$ can become negative (ground penetration). In this state, applying any engine thrust (Actions 1, 2, or 3) while `angle` or `ang_vel` are non-zero is highly likely to trigger a terminal failure (-100 reward) via rapid rotational tip-over.

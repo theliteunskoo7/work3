@@ -402,7 +402,8 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
           analyzer_every=10, analyzer_topk=2, analyzer_n_traj=2,
           analyzer_threshold=200,
           unlikelihood_lr=1e-4,
-          summary_n_traj=2):
+          summary_n_traj=2,
+          llm_cutoff_mean=0.0):
     """
     Same PPO loop as ppo.py, interleaved with two LLM-driven side updates,
     both triggered on completed-episode counts (not on the PPO n_steps
@@ -423,6 +424,17 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     fires every `analyzer_every` completed episodes and sends only the most
     recent `analyzer_n_traj` of that window to the LLM; the summary refreshes
     once per update in a background thread (not on a fixed episode cadence).
+
+    Both are permanently disabled, one-way, the first time mean_100 reaches
+    `llm_cutoff_mean` (default 0.0). Rationale: the LLM-driven signal helps
+    during early training (mean_100 deeply negative, the actor is crashing
+    a lot and benefits from a corrective nudge), but once the actor stops
+    crashing and settles into a "lands but doesn't stabilize" local optimum,
+    the same mechanism has been observed to reinforce that stuck behavior
+    rather than help escape it. This is a one-way latch, not a live toggle:
+    once tripped it stays off even if mean_100 later dips back below the
+    cutoff, since flipping the LLM back on mid-recovery risks reintroducing
+    exactly the reinforcement that caused the stall in the first place.
     """
     if api_key is None:
         api_key = os.getenv("OPENAI_API_KEY", "sk-no-key-required")
@@ -479,12 +491,18 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
     summary_thread: threading.Thread | None = None
     analyzer_buffer = []
 
+    # One-way latch: once mean_100 first reaches llm_cutoff_mean, both the
+    # analyzer/unlikelihood update and the summary refresh stop running for
+    # the rest of training (see train()'s docstring for why this is one-way).
+    llm_frozen = False
+
     print(f"Training PPO+LLM on LunarLander-v3 (up to {max_episodes} episodes)")
     print(f"  n_steps={n_steps}  n_epochs={n_epochs}  batch_size={batch_size}")
     print(f"  clip_eps={clip_eps}  lr={lr}  gamma={gamma}  gae_lambda={gae_lambda}")
     print(f"  entropy_coef={entropy_coef}  value_coef={value_coef}")
     print(f"  analyzer_every={analyzer_every}  analyzer_n_traj={analyzer_n_traj}  analyzer_topk={analyzer_topk}  analyzer_threshold={analyzer_threshold}  unlikelihood_lr={unlikelihood_lr}")
-    print(f"  summary_n_traj={summary_n_traj} (AI agent updates summary every PPO update using the last N episodes)  llm_model={llm_model}\n")
+    print(f"  summary_n_traj={summary_n_traj} (AI agent updates summary every PPO update using the last N episodes)  llm_model={llm_model}")
+    print(f"  llm_cutoff_mean={llm_cutoff_mean} (analyzer + summary permanently stop once mean(100) first reaches this)\n")
 
     ep_count   = 0
     update_num = 0
@@ -505,9 +523,17 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
             all_ep_rewards.append(r)
             recent.append(r)
             ep_count += 1
-            analyzer_buffer.append((traj, r))
+            if not llm_frozen:
+                analyzer_buffer.append((traj, r))
 
         mean_100 = np.mean(recent) if recent else float("nan")
+
+        if not llm_frozen and not np.isnan(mean_100) and mean_100 >= llm_cutoff_mean:
+            llm_frozen = True
+            analyzer_buffer = []  # nothing left to analyze; free it rather than let it sit unused
+            print(f"  [LLM] mean(100)={mean_100:.1f} reached cutoff {llm_cutoff_mean} -- "
+                  f"permanently disabling the analyzer and summary refresh for the rest of this run.")
+
         if mean_100 > best_mean:
             best_mean = mean_100
             # actor is on cpu_device here (rollout just finished, not yet
@@ -550,6 +576,9 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         for pg in unlikelihood_optimizer.param_groups:
             pg['lr'] = ul_lr_now
 
+        # Once llm_frozen flips True, analyzer_buffer was cleared and nothing gets appended
+        # to it anymore (see the completed_episodes loop above), so this loop's condition
+        # can never be true again for the rest of the run -- no separate gate needed here.
         while len(analyzer_buffer) >= analyzer_every:
             batch = analyzer_buffer[:analyzer_every]
             analyzer_buffer = analyzer_buffer[analyzer_every:]
@@ -645,7 +674,7 @@ def train(n_steps=2048, n_epochs=4, batch_size=64,
         # 5th rollout, when mean_100 approaches the solve threshold) — summaries
         # converge early so high-frequency updates add no value at late training.
         _summary_gap = max(1, int(5 * _mean_for_scale / analyzer_threshold))
-        if completed_episodes and update_num % _summary_gap == 0:
+        if not llm_frozen and completed_episodes and update_num % _summary_gap == 0:
             recent_eps = completed_episodes[-summary_n_traj:]
             ep_trajs   = [traj for traj, _ in recent_eps]
             ep_rews    = [r for _, r in recent_eps]
@@ -725,6 +754,10 @@ if __name__ == "__main__":
                         help="LR for the separate actor-only unlikelihood optimizer.")
     parser.add_argument("--summary-n-traj",   type=int,   default=2,
                         help="Number of most recent episodes sent to the AI agent summary update each PPO update.")
+    parser.add_argument("--llm-cutoff-mean",  type=float, default=0.0,
+                        help="Once mean(100) first reaches this value, permanently stop the LLM "
+                             "analyzer/unlikelihood update and the AI agent summary refresh for "
+                             "the rest of the run (one-way latch, does not re-enable on a later dip).")
     args = parser.parse_args()
 
     save_dir = os.path.dirname(os.path.abspath(__file__))
@@ -765,6 +798,7 @@ if __name__ == "__main__":
             analyzer_threshold=args.analyzer_threshold,
             unlikelihood_lr=args.unlikelihood_lr,
             summary_n_traj=args.summary_n_traj,
+            llm_cutoff_mean=args.llm_cutoff_mean,
         )
     finally:
         sys.stdout = sys.__stdout__

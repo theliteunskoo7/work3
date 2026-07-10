@@ -3,7 +3,7 @@ import random
 import numpy as np
 import torch
 
-DEFAULT_SEED = 1
+DEFAULT_SEED = 4
 
 
 def set_global_seed(seed):
